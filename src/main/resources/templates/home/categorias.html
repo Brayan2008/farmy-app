@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categorias</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/categorias.css}">
+    <script th:src="@{/script.js}"></script>
+
+</head>
+
+<body>
+    <main id='main-content' class="flex h-dvh">
+
+        <!-- #region sidebar-->
+        <div th:replace="fragments/sidebar.html :: sidebar-fragment"></div>
+        <!-- #endregion -->
+
+        <div class="container">
+            <h1>Gestión de Categorías</h1>
+
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="BUSCAR CATEGORÍA">
+                <span class="search-icon">🔍</span>
+            </div>
+
+            <div class="filters-container">
+                <span class="filter-label">Filtrar por:</span>
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label>Estado:</label>
+                        <select>
+                            <option>Activo</option>
+                            <option>Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre de Categoría</th>
+                            <th>Descripción</th>
+                            <th>Estado</th>
+                            <th>Fecha de Creación</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td data-label="Código">CAT001</td>
+                            <td data-label="Nombre de Categoría">Analgésicos</td>
+                            <td data-label="Descripción">Medicamentos para aliviar el dolor</td>
+                            <td data-label="Estado"><span class="estado-activo">✓ Activo</span></td>
+                            <td data-label="Fecha de Creación">10/01/2025</td>
+                            <td data-label="Acciones">
+                                <div class="acciones-group">
+                                    <button class="btn-editar">✏ Editar</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td data-label="Código">CAT003</td>
+                            <td data-label="Nombre de Categoría">Vitaminas y Minerales</td>
+                            <td data-label="Descripción">Suplementos nutricionales y vitamínicos</td>
+                            <td data-label="Estado"><span class="estado-activo">✓ Activo</span></td>
+                            <td data-label="Fecha de Creación">15/01/2025</td>
+                            <td data-label="Acciones">
+                                <div class="acciones-group">
+                                    <button class="btn-editar">✏ Editar</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td data-label="Código">CAT004</td>
+                            <td data-label="Nombre de Categoría">Antihistamínicos</td>
+                            <td data-label="Descripción">Medicamentos para tratar alergias</td>
+                            <td data-label="Estado"><span class="estado-inactivo">⊗ Inactivo</span></td>
+                            <td data-label="Fecha de Creación">18/01/2025</td>
+                            <td data-label="Acciones">
+                                <div class="acciones-group">
+                                    <button class="btn-editar">✏ Editar</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td data-label="Código">CAT005</td>
+                            <td data-label="Nombre de Categoría">Anti-inflamatorios</td>
+                            <td data-label="Descripción">Medicamentos para reducir inflamación</td>
+                            <td data-label="Estado"><span class="estado-activo">✓ Activo</span></td>
+                            <td data-label="Fecha de Creación">20/01/2025</td>
+                            <td data-label="Acciones">
+                                <div class="acciones-group">
+                                    <button class="btn-editar">✏ Editar</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td data-label="Código">CAT006</td>
+                            <td data-label="Nombre de Categoría">Digestivos</td>
+                            <td data-label="Descripción">Medicamentos para problemas gastrointestinales</td>
+                            <td data-label="Estado"><span class="estado-activo">✓ Activo</span></td>
+                            <td data-label="Fecha de Creación">22/01/2025</td>
+                            <td data-label="Acciones">
+                                <div class="acciones-group">
+                                    <button class="btn-editar">✏ Editar</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td data-label="Código">CAT007</td>
+                            <td data-label="Nombre de Categoría">Probióticos</td>
+                            <td data-label="Descripción">Microorganismos beneficiosos para la salud</td>
+                            <td data-label="Estado"><span class="estado-activo">✓ Activo</span></td>
+                            <td data-label="Fecha de Creación">25/01/2025</td>
+                            <td data-label="Acciones">
+                                <div class="acciones-group">
+                                    <button class="btn-editar">✏ Editar</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="botones-contenedor">
+                <button class="btn-nuevo" onclick="registrar('modalCategoria')">Nueva Categoría</button>
+            </div>
+        </div>
+
+        <dialog id="modalCategoria">
+            <div class="modal-header">
+                <h2>Registrar Categoría</h2>
+            </div>
+
+            <form class="modal-body" method="dialog">
+                <div class="form-grid">
+                    <!-- Nombre de la categoría -->
+                    <div class="form-group">
+                        <label for="nombreCategoria">Nombre de la categoría</label>
+                        <input type="text" id="nombreCategoria" class="form-input" placeholder="Categoría" required>
+                    </div>
+
+                    <!-- Estado -->
+                    <div class="form-group">
+                        <label for="estado">Estado</label>
+                        <select id="estado" class="form-select" required>
+                            <option value="activo">Activo</option>
+                            <option value="inactivo">Inactivo</option>
+                        </select>
+                    </div>
+
+                    <!-- Descripción -->
+                    <div class="form-group">
+                        <label for="descripcion">Descripción</label>
+                        <textarea id="descripcion" class="form-textarea" placeholder="breve_descripción"
+                            required></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancelar"
+                        onclick="(document.getElementById('modalCategoria').close())">Cancelar</button>
+                    <button type="submit" class="btn-registrar">Registrar</button>
+                </div>
+            </form>
+        </dialog>
+    </main>
+
+</body>
+
+</html>

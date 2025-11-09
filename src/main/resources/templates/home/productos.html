@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/products.css}">
+    <script th:src="@{/script.js}"></script>
+
+</head>
+
+<body>
+    <main id='main-content' class="flex h-dvh">
+
+        <!-- #region sidebar-->
+        <div th:replace="fragments/sidebar.html :: sidebar-fragment"></div>
+        <!-- #endregion -->
+
+        <div class="container">
+            <h1>Gestión de Productos</h1>
+            <div class="caja-buscar search-container">
+                <input type="text" placeholder="BUSCAR">
+                <span class="search-icon">🔍</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Categoria</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Estado</th>
+                        <th>Modificar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2047218</td>
+                        <td>Risperidona</td>
+                        <td>Salud</td>
+                        <td>$/ 24.00</td>
+                        <td>100</td>
+                        <td><span class="activo">Activo</span></td>
+                        <td><button class="btn-editar">Editar</button></td>
+                    </tr>
+                    <tr>
+                        <td>2047214</td>
+                        <td>Shampoo Medicasp</td>
+                        <td>Cuidado Personal</td>
+                        <td>$/ 22.00</td>
+                        <td>100</td>
+                        <td><span class="inactivo">Inactivo</span></td>
+                        <td><button class="btn-editar">Editar</button></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button class="btn-nuevo" onclick="registrar('modalProductos')">Nuevo Producto</button>
+        </div>
+
+        <dialog id="modalProductos">
+            <div class="modal-header">
+                <h2>Registrar Producto</h2>
+            </div>
+            <form class="modal-body">
+                <div class="form-grid">
+                    <!-- Nombre del Producto -->
+                    <div class="form-group">
+                        <label for="nombreProducto">Nombre del Producto</label>
+                        <input type="text" id="nombreProducto" class="form-input" placeholder="Laboratorio" required>
+                    </div>
+
+                    <!-- Código interno -->
+                    <div class="form-group">
+                        <label for="codigoInterno">Código interno</label>
+                        <input type="text" id="codigoInterno" class="form-input" placeholder="0000001" required>
+                    </div>
+
+                    <!-- Seleccionar Categoría -->
+                    <div class="form-group">
+                        <label for="categoria">Seleccionar Categoría</label>
+                        <select id="categoria" class="form-select" required>
+                            <option value="">categoría</option>
+                            <option value="salud">Salud</option>
+                            <option value="cuidado-personal">Cuidado Personal</option>
+                            <option value="belleza">Belleza</option>
+                            <option value="medicamentos">Medicamentos</option>
+                            <option value="vitaminas">Vitaminas</option>
+                        </select>
+                    </div>
+
+                    <!-- Seleccionar Presentación -->
+                    <div class="form-group">
+                        <label for="presentacion">Seleccionar Presentación</label>
+                        <select id="presentacion" class="form-select" required>
+                            <option value="">Presentación</option>
+                            <option value="tabletas">Tabletas</option>
+                            <option value="capsulas">Cápsulas</option>
+                            <option value="jarabe">Jarabe</option>
+                            <option value="crema">Crema</option>
+                            <option value="ampolla">Ampolla</option>
+                            <option value="suspension">Suspensión</option>
+                        </select>
+                    </div>
+
+                    <!-- Seleccionar Laboratorio -->
+                    <div class="form-group">
+                        <label for="laboratorio">Seleccionar Laboratorio</label>
+                        <select id="laboratorio" class="form-select" required>
+                            <option value="">laboratorio</option>
+                            <option value="bayer">Bayer</option>
+                            <option value="pfizer">Pfizer</option>
+                            <option value="roche">Roche</option>
+                            <option value="novartis">Novartis</option>
+                        </select>
+                    </div>
+
+                    <!-- Fecha de Vencimiento -->
+                    <div class="form-group">
+                        <label for="fechaVencimiento">Fecha de Vencimiento</label>
+                        <input type="text" id="fechaVencimiento" class="form-input" placeholder="DD/MM/YY"
+                            pattern="\d{2}/\d{2}/\d{2}">
+                    </div>
+
+                    <!-- Seleccionar Marca -->
+                    <div class="form-group">
+                        <label for="marca">Seleccionar Marca</label>
+                        <select id="marca" class="form-select" required>
+                            <option value="">marca</option>
+                            <option value="marca1">Marca 1</option>
+                            <option value="marca2">Marca 2</option>
+                            <option value="marca3">Marca 3</option>
+                        </select>
+                    </div>
+
+                    <!-- Estado -->
+                    <div class="form-group">
+                        <label for="estado">Estado</label>
+                        <select id="estado" class="form-select" required>
+                            <option value="activo">Activo</option>
+                            <option value="inactivo">Inactivo</option>
+                        </select>
+                    </div>
+
+                    <!-- Divisor visual -->
+                    <div class="form-divider"></div>
+
+                    <!-- Stock Mínimo -->
+                    <div class="form-group">
+                        <label for="stockMinimo">Stock Mínimo</label>
+                        <input type="number" id="stockMinimo" class="form-input" placeholder="100" min="0" required>
+                    </div>
+
+                    <!-- Principio Activo -->
+                    <div class="form-group">
+                        <label for="principioActivo">Principio Activo</label>
+                        <input type="text" id="principioActivo" class="form-input" placeholder="...........">
+                    </div>
+
+                    <!-- Precio de venta -->
+                    <div class="form-group">
+                        <label for="precioVenta">Precio de venta</label>
+                        <input type="text" id="precioVenta" class="form-input" placeholder="S/." required>
+                    </div>
+
+                    <!-- Condición de venta -->
+                    <div class="form-group">
+                        <label for="condicionVenta">Condición de venta</label>
+                        <select id="condicionVenta" class="form-select" required>
+                            <option value="con-receta">Con Receta</option>
+                            <option value="sin-receta">Sin Receta</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancelar"
+                        onclick="(document.getElementById('modalProductos').close())">Cancelar</button>
+                    <button type="submit" class="btn-registrar">Registrar</button>
+                </div>
+            </form>
+        </dialog>
+       
+    </main>
+
+</body>
+
+</html>

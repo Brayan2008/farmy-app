@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compras</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/compras.css}">
+    <script th:src="@{/script.js}"></script>
+
+</head>
+
+<body>
+    <main id='main-content' class="flex h-dvh">
+
+        <!-- #region sidebar-->
+        <div th:replace="fragments/sidebar.html :: sidebar-fragment"></div>
+        <!-- #endregion -->
+
+        <div class="container">
+
+                <h1>Gestión de Compras</h1>
+
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="BUSCAR">
+                    <span class="search-icon">🔍</span>
+                </div>
+
+                <div class="filters-container">
+                    <span class="filter-label">Filtrar por:</span>
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label>Estado:</label>
+                            <select>
+                                <option>Activo</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Tipo de Pago:</label>
+                            <select>
+                                <option>Activo</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre o razón social</th>
+                                <th>Deuda (S/.)</th>
+                                <th>Tipo de Pago</th>
+                                <th>Total (S/.)</th>
+                                <th>Estado</th>
+                                <th>Fecha</th>
+                                <th>Detalles</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td data-label="Código">233</td>
+                                <td data-label="Nombre o razón social">Celso</td>
+                                <td data-label="Deuda (S/.)">0</td>
+                                <td data-label="Tipo de Pago">Contado</td>
+                                <td data-label="Total (S/.)">1200</td>
+                                <td data-label="Estado"><span class="estado-pagado">✓ Pagado</span></td>
+                                <td data-label="Fecha">9/10/2025</td>
+                                <td data-label="Detalles">
+                                    <div class="acciones-group">
+                                        <button class="btn-ver">👁 Ver</button>
+                                        <button class="btn-pagar-gris">💳 Pagar</button>
+                                        <button class="btn-anular">✕ Anular</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="Código">234</td>
+                                <td data-label="Nombre o razón social">Bardales</td>
+                                <td data-label="Deuda (S/.)">120</td>
+                                <td data-label="Tipo de Pago">Credito</td>
+                                <td data-label="Total (S/.)">5100</td>
+                                <td data-label="Estado"><span class="estado-pendiente">✏ Pendiente</span></td>
+                                <td data-label="Fecha">1/12/2025</td>
+                                <td data-label="Detalles">
+                                    <div class="acciones-group">
+                                        <button class="btn-ver">👁 Ver</button>
+                                        <button class="btn-pagar">💳 Pagar</button>
+                                        <button class="btn-anular">✕ Anular</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="Código">235</td>
+                                <td data-label="Nombre o razón social">Missael</td>
+                                <td data-label="Deuda (S/.)">0</td>
+                                <td data-label="Tipo de Pago">Contado</td>
+                                <td data-label="Total (S/.)">600</td>
+                                <td data-label="Estado"><span class="estado-anulado">⊗ Anulado</span></td>
+                                <td data-label="Fecha">15/10/2025</td>
+                                <td data-label="Detalles">
+                                    <div class="acciones-group">
+                                        <button class="btn-ver">👁 Ver</button>
+                                        <button class="btn-pagar-gris">💳 Pagar</button>
+                                        <button class="btn-anular">✕ Anular</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="Código">236</td>
+                                <td data-label="Nombre o razón social">Fasanando</td>
+                                <td data-label="Deuda (S/.)">0</td>
+                                <td data-label="Tipo de Pago">Contado</td>
+                                <td data-label="Total (S/.)">5470</td>
+                                <td data-label="Estado"><span class="estado-pagado">✓ Pagado</span></td>
+                                <td data-label="Fecha">31/10/2025</td>
+                                <td data-label="Detalles">
+                                    <div class="acciones-group">
+                                        <button class="btn-ver">👁 Ver</button>
+                                        <button class="btn-pagar-gris">💳 Pagar</button>
+                                        <button class="btn-anular">✕ Anular</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="botones-contenedor">
+                    <button class="btn-nuevo" onclick="registrar('modalCompra')">Nueva Compra</button>
+                </div>
+        </div>
+        <dialog id="modalCompra">
+            <div class="modal-header">
+                <h2>Registrar Compra</h2>
+            </div>
+
+            <form class="modal-body" method="dialog">
+                <!-- Información de compra -->
+                <div class="section">
+                    <span class="section-header">Información de compra</span>
+                    <div class="form-grid form-grid-3">
+                        <div class="form-group">
+                            <label for="tipoComprobante">Tipo de comprobante</label>
+                            <select id="tipoComprobante" class="form-select" required>
+                                <option value="factura">Factura</option>
+                                <option value="boleta">Boleta</option>
+                                <option value="ticket">Ticket</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="numero">Número:</label>
+                            <input type="text" id="numero" class="form-input" placeholder="0001" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="fecha">Fecha:</label>
+                            <input type="date" id="fecha" class="form-input" value="1999-01-01" required>
+                        </div>
+                    </div>
+                    <div class="form-grid form-grid-2" style="margin-top: 20px;">
+                        <div></div>
+                        <div class="form-group">
+                            <label for="hora">Hora:</label>
+                            <input type="time" id="hora" class="form-input" value="16:30" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Buscar proveedor -->
+                <div class="section">
+                    <span class="section-header">Buscar proveedor</span>
+                    <div class="form-grid form-grid-2">
+                        <div class="input-with-button">
+                            <div class="form-group">
+                                <label for="ruc">RUC:</label>
+                                <input type="text" id="ruc" class="form-input" placeholder="10000000000" required>
+                            </div>
+                            <button type="button" class="btn-buscar">Buscar</button>
+                        </div>
+                        <div class="form-group">
+                            <label for="telefono">Teléfono:</label>
+                            <input type="tel" id="telefono" class="form-input" placeholder="999999999">
+                        </div>
+                    </div>
+                    <div class="form-grid form-grid-2" style="margin-top: 20px;">
+                        <div class="form-group">
+                            <label for="nombreRazon">Nombre o razón social:</label>
+                            <input type="text" id="nombreRazon" class="form-input" placeholder="Joseph Cabrera Espinoza"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label for="direccion">Dirección:</label>
+                            <input type="text" id="direccion" class="form-input"
+                                placeholder="Jr. Cañete 955 - Pasco - San Román">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detalle de compra -->
+                <div class="section">
+                    <span class="section-header">Detalle de compra</span>
+                    <div class="table-wrapper">
+                        <table class="products-table">
+                            <thead>
+                                <tr>
+                                    <th>Ítem</th>
+                                    <th>Código</th>
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Presentación</th>
+                                    <th>Precio Unitario de venta</th>
+                                    <th>Precio de venta</th>
+                                    <th>N° Lote</th>
+                                    <th>IGV</th>
+                                    <th>Subtotal</th>
+                                    <th>Precio Total</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>SKU001</td>
+                                    <td>Paracetamol 200mg - Portugal</td>
+                                    <td>100</td>
+                                    <td>Tabletas</td>
+                                    <td>0.60</td>
+                                    <td>1.00</td>
+                                    <td>14880</td>
+                                    <td>9.00</td>
+                                    <td>50.00</td>
+                                    <td>59.00</td>
+                                    <td><button type="button" class="btn-action btn-quitar">✕ Quitar</button></td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>SKU002</td>
+                                    <td>Amoxicilina 200ml - Portugal</td>
+                                    <td>120</td>
+                                    <td>Jarabe</td>
+                                    <td>0.60</td>
+                                    <td>1.50</td>
+                                    <td>12398</td>
+                                    <td>10.80</td>
+                                    <td>60.00</td>
+                                    <td>70.80</td>
+                                    <td><button type="button" class="btn-action btn-quitar">✕ Quitar</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="text-align: center; margin-top: 15px;">
+                        <button type="button" class="btn-action btn-agregar">✓ Agregar</button>
+                    </div>
+                </div>
+
+                <!-- Resumen y Adicionales -->
+                <div class="bottom-section">
+                    <!-- Resumen -->
+                    <div class="summary-box">
+                        <h3 style="margin-bottom: 15px; font-size: 16px; color: #333;">Resumen</h3>
+                        <table class="summary-table">
+                            <tr>
+                                <td class="summary-label">Detalle</td>
+                                <td class="summary-value">Precio Total</td>
+                            </tr>
+                            <tr>
+                                <td class="summary-label">Subtotal</td>
+                                <td class="summary-value">120.00</td>
+                            </tr>
+                            <tr>
+                                <td class="summary-label">IGV (18%)</td>
+                                <td class="summary-value">19.80</td>
+                            </tr>
+                            <tr>
+                                <td class="summary-label">Total</td>
+                                <td class="summary-value">129.80</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- Adicionales -->
+                    <div class="additional-box">
+                        <span class="section-header">Adicionales</span>
+                        <div class="form-grid" style="gap: 15px; margin-top: 15px;">
+                            <div class="form-group">
+                                <label for="tipoPago">Tipo de pago</label>
+                                <select id="tipoPago" class="form-select" required>
+                                    <option value="contado">Contado</option>
+                                    <option value="credito">Crédito</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="valorPagado">Valor pagado (S/.):</label>
+                                <input type="number" id="valorPagado" class="form-input" placeholder="S. 30"
+                                    step="0.01">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancelar"
+                        onclick="(document.getElementById('modalCompra').close())">Cancelar</button>
+                    <button type="submit" class="btn-registrar">Registrar</button>
+                </div>
+            </form>
+        </dialog>
+    </main>
+</body>
+
+</html>

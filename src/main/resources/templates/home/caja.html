@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caja</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/caja.css}">
+    <script th:src="@{/script.js}"></script>
+</head>
+
+<body>
+    <main id='main-content' class="flex h-dvh">
+
+        <!-- #region sidebar-->
+        <div th:replace="fragments/sidebar.html :: sidebar-fragment"></div>
+        <!-- #endregion -->
+
+        <div class="container">
+
+                <h1>Gestión de Caja</h1>
+
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="BUSCAR MOVIMIENTO">
+                    <span class="search-icon">🔍</span>
+                </div>
+
+                <div class="filters-container">
+                    <span class="filter-label">Filtrar por:</span>
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label>Tipo:</label>
+                            <select>
+                                <option>Ingreso</option>
+                                <option>Egreso</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Estado:</label>
+                            <select>
+                                <option>Confirmado</option>
+                                <option>Pendiente</option>
+                                <option>Anulado</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Tipo</th>
+                                <th>Descripción</th>
+                                <th>Monto (S/.)</th>
+                                <th>Fecha</th>
+                                <th>Hora</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td data-label="Código">CAJ001</td>
+                                <td data-label="Tipo"><span class="tipo-ingreso">💰 Ingreso</span></td>
+                                <td data-label="Descripción">Venta de medicamentos - Factura #001</td>
+                                <td data-label="Monto (S/.)">850.00</td>
+                                <td data-label="Fecha">27/10/2025</td>
+                                <td data-label="Hora">09:15</td>
+                                <td data-label="Estado"><span class="estado-confirmado">✓ Confirmado</span></td>
+                                <td data-label="Acciones">
+                                    <div class="acciones-group">
+                                        <button class="btn-editar">✏ Editar</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="Código">CAJ002</td>
+                                <td data-label="Tipo"><span class="tipo-egreso">💸 Egreso</span></td>
+                                <td data-label="Descripción">Pago a proveedor Bayer S.A.</td>
+                                <td data-label="Monto (S/.)">1,200.00</td>
+                                <td data-label="Fecha">27/10/2025</td>
+                                <td data-label="Hora">10:30</td>
+                                <td data-label="Estado"><span class="estado-confirmado">✓ Confirmado</span></td>
+                                <td data-label="Acciones">
+                                    <div class="acciones-group">
+                                        <button class="btn-editar">✏ Editar</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="Código">CAJ005</td>
+                                <td data-label="Tipo"><span class="tipo-ingreso">💰 Ingreso</span></td>
+                                <td data-label="Descripción">Venta de medicamentos - Factura #002</td>
+                                <td data-label="Monto (S/.)">675.25</td>
+                                <td data-label="Fecha">27/10/2025</td>
+                                <td data-label="Hora">15:10</td>
+                                <td data-label="Estado"><span class="estado-anulado">⊗ Anulado</span></td>
+                                <td data-label="Acciones">
+                                    <div class="acciones-group">
+                                        <button class="btn-editar">✏ Editar</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="Código">CAJ006</td>
+                                <td data-label="Tipo"><span class="tipo-ingreso">💰 Ingreso</span></td>
+                                <td data-label="Descripción">Venta de medicamentos - Boleta #046</td>
+                                <td data-label="Monto (S/.)">95.80</td>
+                                <td data-label="Fecha">27/10/2025</td>
+                                <td data-label="Hora">16:35</td>
+                                <td data-label="Estado"><span class="estado-confirmado">✓ Confirmado</span></td>
+                                <td data-label="Acciones">
+                                    <div class="acciones-group">
+                                        <button class="btn-editar">✏ Editar</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="resumen-caja">
+                    <div class="resumen-item ingreso">
+                        <span class="resumen-label">Total Ingresos:</span>
+                        <span class="resumen-valor">S/ 1,946.55</span>
+                    </div>
+                    <div class="resumen-item egreso">
+                        <span class="resumen-label">Total Egresos:</span>
+                        <span class="resumen-valor">S/ 1,380.75</span>
+                    </div>
+                    <div class="resumen-item saldo">
+                        <span class="resumen-label">Saldo del Día:</span>
+                        <span class="resumen-valor">S/ 565.80</span>
+                    </div>
+                </div>
+
+                <div class="botones-contenedor">
+
+                    <button class="btn-nuevo" onclick="registrar('modalMovimiento')">Nuevo Movimiento</button>
+                </div>
+        </div>
+
+        <dialog id="modalMovimiento">
+            <div class="modal-header">
+                <h2>Registrar Movimiento</h2>
+            </div>
+
+            <form class="modal-body" method="dialog">
+                <div class="form-grid">
+                    <!-- Tipo de Movimiento -->
+                    <div class="form-group">
+                        <label for="tipo">Tipo de Movimiento</label>
+                        <select id="tipo" class="form-select" required>
+                            <option value="">Seleccione...</option>
+                            <option value="ingreso">💰 Ingreso</option>
+                            <option value="egreso">💸 Egreso</option>
+                        </select>
+                    </div>
+
+                    <!-- Estado -->
+                    <div class="form-group">
+                        <label for="estado">Estado</label>
+                        <select id="estado" class="form-select" required>
+                            <option value="confirmado">✓ Confirmado</option>
+                            <option value="pendiente">⏳ Pendiente</option>
+                            <option value="anulado">⊗ Anulado</option>
+                        </select>
+                    </div>
+
+                    <!-- Monto -->
+                    <div class="form-group">
+                        <label for="monto">Monto (S/.)</label>
+                        <input type="number" id="monto" class="form-input" placeholder="0.00" step="0.01" min="0"
+                            required>
+                    </div>
+
+                    <!-- Fecha -->
+                    <div class="form-group">
+                        <label for="fecha">Fecha</label>
+                        <input type="date" id="fecha" class="form-input" required>
+                    </div>
+
+                    <!-- Hora -->
+                    <div class="form-group">
+                        <label for="hora">Hora</label>
+                        <input type="time" id="hora" class="form-input" required>
+                    </div>
+
+                    <!-- Categoría -->
+                    <div class="form-group">
+                        <label for="categoria">Categoría</label>
+                        <select id="categoria" class="form-select" required>
+                            <option value="">Seleccione...</option>
+                            <option value="ventas">Ventas</option>
+                            <option value="compras">Compras</option>
+                            <option value="pagos-proveedor">Pagos a Proveedor</option>
+                            <option value="gastos-operativos">Gastos Operativos</option>
+                            <option value="servicios">Servicios Públicos</option>
+                            <option value="salarios">Salarios</option>
+                            <option value="otros">Otros</option>
+                        </select>
+                    </div>
+
+                    <!-- Descripción -->
+                    <div class="form-group form-group-full">
+                        <label for="descripcion">Descripción</label>
+                        <textarea id="descripcion" class="form-textarea" placeholder="Describa el movimiento de caja..."
+                            required></textarea>
+                    </div>
+
+                    <!-- Método de Pago -->
+                    <div class="form-group">
+                        <label for="metodoPago">Método de Pago</label>
+                        <select id="metodoPago" class="form-select" required>
+                            <option value="">Seleccione...</option>
+                            <option value="efectivo">Efectivo</option>
+                            <option value="tarjeta">Tarjeta</option>
+                            <option value="transferencia">Transferencia</option>
+                            <option value="cheque">Cheque</option>
+                        </select>
+                    </div>
+
+                    <!-- Responsable -->
+                    <div class="form-group">
+                        <label for="responsable">Responsable</label>
+                        <input type="text" id="responsable" class="form-input" placeholder="Nombre del responsable"
+                            required>
+                    </div>
+
+                    <!-- Número de Comprobante -->
+                    <div class="form-group">
+                        <label for="comprobante">N° Comprobante</label>
+                        <input type="text" id="comprobante" class="form-input" placeholder="Factura/Boleta #">
+                    </div>
+
+                    <!-- Referencia -->
+                    <div class="form-group">
+                        <label for="referencia">Referencia</label>
+                        <input type="text" id="referencia" class="form-input" placeholder="Código de referencia">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancelar"
+                        onclick="(document.getElementById('modalMovimiento').close())">Cancelar</button>
+                    <button type="submit" class="btn-registrar">Registrar</button>
+                </div>
+            </form>
+        </dialog>
+    </main>
+
+</body>
+
+</html>

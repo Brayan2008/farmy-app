@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - PHARMAHORRO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+</head>
+
+<body>
+    <main id='main-content' class="flex h-dvh">
+        <!-- #region sidebar-->
+        <div th:replace="fragments/sidebar.html :: sidebar-fragment"></div>
+        <!-- #endregion -->
+
+        <!-- #region main-content -->
+        <div class="flex-1 h-screen overflow-y-auto overflow-x-hidden" id="main-content">
+            <header class="dashboard-header">
+                <div class="header-content">
+                    <div class="header-title">
+                        <h1>Dashboard</h1>
+                        <p class="header-subtitle">Resumen general del sistema</p>
+                    </div>
+                    <div class="user-info">
+                        <div class="user-details">
+                            <div class="user-name">Celso Bardales</div>
+                            <div class="user-role">Administrador</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="container">
+                <!-- Tarjetas de resumen -->
+                <section class="summary-cards">
+                    <!-- Tarjeta de Ventas -->
+                    <div class="summary-card">
+                        <div class="card-header">
+                            <div class="card-title">Ventas del Día</div>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-value">S/ 1,125.00</div>
+                            <div class="card-subtitle">4 transacciones</div>
+                            <span class="card-change positive">+15.3% vs ayer</span>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta de Compras -->
+                    <div class="summary-card">
+                        <div class="card-header">
+                            <div class="card-title">Compras Pendientes</div>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-value">S/ 8,370.00</div>
+                            <div class="card-subtitle">3 órdenes activas</div>
+                            <span class="card-change negative"> -5.2% vs mes anterior</span>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta de Caja -->
+                    <div class="summary-card">
+                        <div class="card-header">
+                            <div class="card-title">Saldo en Caja</div>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-value">S/ 565.80</div>
+                            <div class="card-subtitle">Balance actual</div>
+                            <span class="card-change positive">Ingresos: S/ 1,946.55</span>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta de Productos -->
+                    <div class="summary-card">
+                        <div class="card-header">
+                            <div class="card-title">Productos Críticos</div>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-value">12</div>
+                            <div class="card-subtitle">Bajo stock</div>
+                            <span class="card-change negative"> Requieren atención</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Sección de Últimas Ventas -->
+                <section class="details-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Últimas Ventas</h2>
+                        <a href="#" class="view-all-link">Ver todas →</a>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Cliente</th>
+                                    <th>Vendedor</th>
+                                    <th>Método de Pago</th>
+                                    <th>Importe Total</th>
+                                    <th>Estado</th>
+                                    <th>Fecha</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td data-label="Código">PN001</td>
+                                    <td data-label="Cliente">Celso</td>
+                                    <td data-label="Vendedor">Gerardo 001</td>
+                                    <td data-label="Método de Pago">Efectivo</td>
+                                    <td data-label="Importe Total">S/ 80.00</td>
+                                    <td data-label="Estado"><span class="status-badge completado">Registrada</span></td>
+                                    <td data-label="Fecha">27/10/2025</td>
+                                </tr>
+                                <tr>
+                                    <td data-label="Código">PN003</td>
+                                    <td data-label="Cliente">Missael</td>
+                                    <td data-label="Vendedor">Piña Reategui</td>
+                                    <td data-label="Método de Pago">Efectivo</td>
+                                    <td data-label="Importe Total">S/ 5.00</td>
+                                    <td data-label="Estado"><span class="status-badge completado">Registrada</span></td>
+                                    <td data-label="Fecha">27/10/2025</td>
+                                </tr>
+                                <tr>
+                                    <td data-label="Código">PN004</td>
+                                    <td data-label="Cliente">Fasanando</td>
+                                    <td data-label="Vendedor">Ronaldo Espinoza</td>
+                                    <td data-label="Método de Pago">Efectivo</td>
+                                    <td data-label="Importe Total">S/ 15.00</td>
+                                    <td data-label="Estado"><span class="status-badge completado">Registrada</span></td>
+                                    <td data-label="Fecha">27/10/2025</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Sección de Movimientos de Caja Recientes -->
+                <section class="details-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Movimientos de Caja Recientes</h2>
+                        <a href="#" class="view-all-link">Ver todos →</a>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Tipo</th>
+                                    <th>Descripción</th>
+                                    <th>Monto</th>
+                                    <th>Estado</th>
+                                    <th>Fecha</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td data-label="Código">CAJ001</td>
+                                    <td data-label="Tipo"> Ingreso</td>
+                                    <td data-label="Descripción">Venta de medicamentos - Factura #001</td>
+                                    <td data-label="Monto">S/ 850.00</td>
+                                    <td data-label="Estado"><span class="status-badge completado">Confirmado</span></td>
+                                    <td data-label="Fecha">27/10/2025</td>
+                                </tr>
+                                <tr>
+                                    <td data-label="Código">CAJ003</td>
+                                    <td data-label="Tipo"> Ingreso</td>
+                                    <td data-label="Descripción">Venta de medicamentos - Boleta #045</td>
+                                    <td data-label="Monto">S/ 325.50</td>
+                                    <td data-label="Estado"><span class="status-badge pendiente">⏳ Pendiente</span></td>
+                                    <td data-label="Fecha">27/10/2025</td>
+                                </tr>
+                                <tr>
+                                    <td data-label="Código">CAJ004</td>
+                                    <td data-label="Tipo"> Egreso</td>
+                                    <td data-label="Descripción">Gastos operativos - Servicios públicos</td>
+                                    <td data-label="Monto">S/ 180.75</td>
+                                    <td data-label="Estado"><span class="status-badge completado">Confirmado</span></td>
+                                    <td data-label="Fecha">27/10/2025</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </div>
+        <!-- #endregion -->
+    </main>
+</body>
+
+</html>

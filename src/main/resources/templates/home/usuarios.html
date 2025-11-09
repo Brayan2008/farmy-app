@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuarios</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/users.css}">
+    <script th:src="@{/script.js}"></script>
+
+</head>
+
+<body>
+    <main id='main-content' class="flex h-dvh">
+
+        <!-- #region sidebar-->
+        <div th:replace="fragments/sidebar.html :: sidebar-fragment"></div>
+        <!-- #endregion -->
+
+        <div class="container">
+            <h1>Gestión de Usuarios</h1>
+            <table id="tabla-usuarios">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Correo electrónico</th>
+                        <th>Estado</th>
+                        <th>Rol</th>
+                        <th>Editar información</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Celso</td>
+                        <td>celso123@example.com</td>
+                        <td><span class="activo">Activo</span></td>
+                        <td><span class="rol">Administrador</span></td>
+                        <td><button class="btn-editar">Editar</button></td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Bardales</td>
+                        <td>andymaster123@example.com</td>
+                        <td><span class="inactivo">Inactivo</span></td>
+                        <td><span class="rol">Usuario</span></td>
+                        <td><button class="btn-editar">Editar</button></td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Missael</td>
+                        <td>bmast20082005@example.com</td>
+                        <td><span class="activo">Activo</span></td>
+                        <td><span class="rol">Trabajador</span></td>
+                        <td><button class="btn-editar">Editar</button></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="flex justify-around">
+                <button class="btn-regresar">Regresar</button>
+                <button class="btn-nuevo" onclick="registrar('registrar-User')">Nuevo Usuario</button>
+            </div>
+        </div>
+
+        <dialog id="registrar-User">
+            <div class="modal-header">
+                <h2>Registrar usuario</h2>
+            </div>
+
+            <form class="modal-body" method="dialog">
+                <div class="form-grid">
+                    <!-- Nombre de usuario -->
+                    <div class="form-group">
+                        <label for="nombreUsuario">Nombre de usuario</label>
+                        <input type="text" id="nombreUsuario" class="form-input" placeholder="Usuario" required>
+                    </div>
+
+                    <!-- Correo Electrónico -->
+                    <div class="form-group">
+                        <label for="correo">Correo Electrónico</label>
+                        <input type="email" id="correo" class="form-input" placeholder="user@example.com" required>
+                    </div>
+
+                    <!-- Contraseña -->
+                    <div class="form-group">
+                        <label for="contrasena">Contraseña</label>
+                        <input type="password" id="contrasena" class="form-input" placeholder="***********" required>
+                    </div>
+
+                    <!-- Seleccionar Rol -->
+                    <div class="form-group">
+                        <label for="rol">Seleccionar Rol</label>
+                        <select id="rol" class="form-select" required>
+                            <option value="administrador">Administrador</option>
+                            <option value="usuario">Usuario</option>
+                            <option value="trabajador">Trabajador</option>
+                        </select>
+                    </div>
+
+                    <!-- Repetir contraseña -->
+                    <div class="form-group">
+                        <label for="repetirContrasena">Repetir contraseña</label>
+                        <input type="password" id="repetirContrasena" class="form-input" placeholder="***********"
+                            required>
+                    </div>
+
+                    <!-- Estado del usuario -->
+                    <div class="form-group">
+                        <label for="estado">Estado del usuario</label>
+                        <select id="estado" class="form-select" required>
+                            <option value="activo">Activo</option>
+                            <option value="inactivo">Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn-cancelar"
+                        onclick="(document.getElementById('registrar-User').close())">Cancelar</button>
+                    <button type="submit" class="btn-registrar" onclick="funcionregistrar()">Registrar</button>
+                </div>
+            </form>
+        </dialog>
+    </main>
+
+</body>
+
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proveedores</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/proveedores.css}">
+    <script th:src="@{/script.js}"></script>
+</head>
+
+<body>
+    <main id='main-content' class="flex h-dvh">
+
+        <!-- #region sidebar-->
+        <div th:replace="fragments/sidebar.html :: sidebar-fragment"></div>
+        <!-- #endregion -->
+
+        <div class="container">
+            <h1>Gestión de Proveedores</h1>
+
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="BUSCAR PROVEEDOR">
+                <span class="search-icon">🔍</span>
+            </div>
+
+            <div class="filters-container">
+                <span class="filter-label">Filtrar por:</span>
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label>Estado:</label>
+                        <select>
+                            <option>Activo</option>
+                            <option>Inactivo</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Tipo:</label>
+                        <select>
+                            <option>Laboratorio</option>
+                            <option>Distribuidor</option>
+                            <option>Importador</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Razón Social</th>
+                            <th>RUC</th>
+                            <th>Teléfono</th>
+                            <th>Email</th>
+                            <th>Tipo</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td data-label="Código">PROV001</td>
+                            <td data-label="Razón Social">Laboratorios Bayer S.A.</td>
+                            <td data-label="RUC">20123456789</td>
+                            <td data-label="Teléfono">(01) 234-5678</td>
+                            <td data-label="Email">ventas@bayer.com.pe</td>
+                            <td data-label="Tipo">Laboratorio</td>
+                            <td data-label="Estado"><span class="estado-activo">✓ Activo</span></td>
+                            <td data-label="Acciones">
+                                <div class="acciones-group">
+                                    <button class="btn-editar">✏ Editar</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td data-label="Código">PROV002</td>
+                            <td data-label="Razón Social">Pfizer Perú S.R.L.</td>
+                            <td data-label="RUC">20234567890</td>
+                            <td data-label="Teléfono">(01) 345-6789</td>
+                            <td data-label="Email">contacto@pfizer.com.pe</td>
+                            <td data-label="Tipo">Laboratorio</td>
+                            <td data-label="Estado"><span class="estado-activo">✓ Activo</span></td>
+                            <td data-label="Acciones">
+                                <div class="acciones-group">
+                                    <button class="btn-editar">✏ Editar</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td data-label="Código">PROV003</td>
+                            <td data-label="Razón Social">Distribuidora Médica Lima S.A.C.</td>
+                            <td data-label="RUC">20345678901</td>
+                            <td data-label="Teléfono">(01) 456-7890</td>
+                            <td data-label="Email">ventas@medicalima.com</td>
+                            <td data-label="Tipo">Distribuidor</td>
+                            <td data-label="Estado"><span class="estado-inactivo">⊗ Inactivo</span></td>
+                            <td data-label="Acciones">
+                                <div class="acciones-group">
+                                    <button class="btn-editar">✏ Editar</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td data-label="Código">PROV004</td>
+                            <td data-label="Razón Social">Roche Farma Perú S.A.</td>
+                            <td data-label="RUC">20456789012</td>
+                            <td data-label="Teléfono">(01) 567-8901</td>
+                            <td data-label="Email">info@roche.com.pe</td>
+                            <td data-label="Tipo">Laboratorio</td>
+                            <td data-label="Estado"><span class="estado-activo">✓ Activo</span></td>
+                            <td data-label="Acciones">
+                                <div class="acciones-group">
+                                    <button class="btn-editar">✏ Editar</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td data-label="Código">PROV005</td>
+                            <td data-label="Razón Social">Importadora Farmacéutica del Sur E.I.R.L.</td>
+                            <td data-label="RUC">20567890123</td>
+                            <td data-label="Teléfono">(01) 678-9012</td>
+                            <td data-label="Email">importaciones@farmasur.pe</td>
+                            <td data-label="Tipo">Importador</td>
+                            <td data-label="Estado"><span class="estado-activo">✓ Activo</span></td>
+                            <td data-label="Acciones">
+                                <div class="acciones-group">
+                                    <button class="btn-editar">✏ Editar</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td data-label="Código">PROV006</td>
+                            <td data-label="Razón Social">Novartis Biociencias Perú S.A.</td>
+                            <td data-label="RUC">20678901234</td>
+                            <td data-label="Teléfono">(01) 789-0123</td>
+                            <td data-label="Email">peru@novartis.com</td>
+                            <td data-label="Tipo">Laboratorio</td>
+                            <td data-label="Estado"><span class="estado-activo">✓ Activo</span></td>
+                            <td data-label="Acciones">
+                                <div class="acciones-group">
+                                    <button class="btn-editar">✏ Editar</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="botones-contenedor">
+
+                <button class="btn-nuevo" onclick="registrar('modalProveedor')">Nuevo Proveedor</button>
+            </div>
+        </div>
+
+        <dialog id="modalProveedor">
+            <div class="modal-header">
+                <h2>Registrar Proveedor</h2>
+            </div>
+
+            <form class="modal-body" method="dialog">
+                <div class="form-grid">
+                    <!-- Razón Social -->
+                    <div class="form-group form-group-full">
+                        <label for="razonSocial">Razón Social</label>
+                        <input type="text" id="razonSocial" class="form-input" placeholder="Laboratorios Bayer S.A."
+                            required>
+                    </div>
+
+                    <!-- RUC -->
+                    <div class="form-group">
+                        <label for="ruc">RUC</label>
+                        <input type="text" id="ruc" class="form-input" placeholder="20123456789" pattern="[0-9]{11}"
+                            maxlength="11" required>
+                    </div>
+
+                    <!-- Teléfono -->
+                    <div class="form-group">
+                        <label for="telefono">Teléfono</label>
+                        <input type="tel" id="telefono" class="form-input" placeholder="(01) 234-5678" required>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" class="form-input" placeholder="ventas@proveedor.com" required>
+                    </div>
+
+                    <!-- Tipo de Proveedor -->
+                    <div class="form-group">
+                        <label for="tipo">Tipo de Proveedor</label>
+                        <select id="tipo" class="form-select" required>
+                            <option value="">Seleccione...</option>
+                            <option value="laboratorio">Laboratorio</option>
+                            <option value="distribuidor">Distribuidor</option>
+                            <option value="importador">Importador</option>
+                        </select>
+                    </div>
+
+                    <!-- Dirección -->
+                    <div class="form-group form-group-full">
+                        <label for="direccion">Dirección</label>
+                        <input type="text" id="direccion" class="form-input"
+                            placeholder="Av. Principal 123, Distrito, Ciudad" required>
+                    </div>
+
+                    <!-- Estado -->
+                    <div class="form-group">
+                        <label for="estado">Estado</label>
+                        <select id="estado" class="form-select" required>
+                            <option value="activo">Activo</option>
+                            <option value="inactivo">Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancelar"
+                        onclick="(document.getElementById('modalProveedor').close())">Cancelar</button>
+                    <button type="submit" class="btn-registrar">Registrar</button>
+                </div>
+            </form>
+        </dialog>
+    </main>
+
+</body>
+
+</html>

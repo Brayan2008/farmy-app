@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistema de Gestión PHARMAHORRO</title>
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+</head>
+<body>
+    <main>
+        <div class="container">
+            <!-- Sección de la imagen -->
+            <div class="image-section">
+                <img th:src="@{/img/login/login.jpg}" alt="Farmacia PharmaHorro">
+            </div>
+
+            <!-- Sección del formulario de login -->
+            <div class="login-section">
+                <div class="login-header">
+                    <h1>SISTEMA DE GESTIÓN</h1>
+                    <h2>PHARMAHORRO</h2>
+                </div>
+
+                <form class="login-form" id="loginForm">
+                    <div class="form-group">
+                        <label>Usuario</label>
+                        <div class="input-wrapper">
+                            <input type="email" id="email" placeholder="correo@example.com" required>
+                            <img th:src="@{/img/login/user.png}" class="icon" alt="usuario">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Contraseña</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="password" placeholder="*************" required>
+                            <img th:src="@{/img/login/lock.png}" class="icon" alt="contraseña">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="login-button">
+                        <a th:href="@{/home}">Iniciar Sesión</a>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
