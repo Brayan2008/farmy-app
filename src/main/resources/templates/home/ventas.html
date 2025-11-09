@@ -15,15 +15,15 @@
     <main id='main-content' class="flex h-dvh">
 
         <!-- #region sidebar-->
-        <div th:replace="fragments/sidebar.html :: sidebar-fragment"></div>
+        <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
         <!-- #endregion -->
 
         <div class="container">
             <h1>Gestión de Ventas</h1>
 
-            <div class="search-container">
-                <input type="text" class="search-input" placeholder="BUSCAR">
-                <span class="search-icon">🔍</span>
+            <div class="caja-buscar">
+                <input type="text" placeholder="BUSCAR">
+                <span>🔍</span>
             </div>
 
             <div class="filters-container">

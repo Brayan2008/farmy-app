@@ -15,7 +15,7 @@
     <main id='main-content' class="flex h-dvh">
 
         <!-- #region sidebar-->
-        <div th:replace="fragments/sidebar.html :: sidebar-fragment"></div>
+        <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
         <!-- #endregion -->
 
         <div class="container">
@@ -40,26 +40,9 @@
                         <td><span class="rol">Administrador</span></td>
                         <td><button class="btn-editar">Editar</button></td>
                     </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Bardales</td>
-                        <td>andymaster123@example.com</td>
-                        <td><span class="inactivo">Inactivo</span></td>
-                        <td><span class="rol">Usuario</span></td>
-                        <td><button class="btn-editar">Editar</button></td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>Missael</td>
-                        <td>bmast20082005@example.com</td>
-                        <td><span class="activo">Activo</span></td>
-                        <td><span class="rol">Trabajador</span></td>
-                        <td><button class="btn-editar">Editar</button></td>
-                    </tr>
                 </tbody>
             </table>
             <div class="flex justify-around">
-                <button class="btn-regresar">Regresar</button>
                 <button class="btn-nuevo" onclick="registrar('registrar-User')">Nuevo Usuario</button>
             </div>
         </div>

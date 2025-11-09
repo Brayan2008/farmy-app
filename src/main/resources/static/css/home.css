@@ -212,38 +212,6 @@
     margin-bottom: 30px;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-thead {
-    background: #6f42c1;
-    color: white;
-}
-
-thead th {
-    padding: 15px;
-    text-align: left;
-    font-size: 14px;
-    font-weight: 600;
-}
-
-tbody td {
-    padding: 15px;
-    border-bottom: 1px solid #eee;
-    font-size: 14px;
-    color: #333;
-}
-
-tbody tr:last-child td {
-    border-bottom: none;
-}
-
-tbody tr:hover {
-    background-color: #f8f9fa;
-}
-
 /* Estados en tabla */
 .status-badge {
     display: inline-block;
@@ -284,53 +252,12 @@ tbody tr:hover {
         grid-template-columns: 1fr;
     }
 
-    main {
-        padding: 20px 15px;
-    }
-
     .section-header {
         flex-direction: column;
         gap: 10px;
         text-align: center;
     }
 
-    /* Tabla responsive */
-    .table-container {
-        overflow-x: auto;
-    }
-
-    table thead {
-        display: none;
-    }
-
-    table tr {
-        display: block;
-        margin-bottom: 15px;
-        border: 1px solid #ddd;
-        border-radius: 12px;
-        background: white;
-    }
-
-    table tbody td {
-        display: block;
-        text-align: right;
-        padding: 12px 15px;
-        border-bottom: 1px solid #eee;
-        position: relative;
-    }
-
-    table tbody td:last-child {
-        border-bottom: 0;
-    }
-
-    table tbody td::before {
-        content: attr(data-label);
-        float: left;
-        font-weight: bold;
-        color: #6f42c1;
-        text-transform: uppercase;
-        font-size: 12px;
-    }
 }
 
 @media screen and (max-width: 768px) {

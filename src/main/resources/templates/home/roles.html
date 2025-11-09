@@ -6,14 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Roles</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" th:href="@{/css/roles.css}">
+    <link rel="stylesheet" th:href="@{/styles.css}">
     <script th:src="@{/script.js}"></script>
 </head>
 
 <body>
     <main id='main-content' class="flex h-dvh">
         <!-- #region sidebar-->
-        <div th:replace="fragments/sidebar.html :: sidebar-fragment"></div>
+        <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
         <!-- #endregion -->
 
         <div class="container">
@@ -30,16 +30,6 @@
                     <tr>
                         <td>1</td>
                         <td>Administrador</td>
-                        <td><button class="btn-editar">Editar</button></td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Usuario</td>
-                        <td><button class="btn-editar">Editar</button></td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>Trabajador</td>
                         <td><button class="btn-editar">Editar</button></td>
                     </tr>
                 </tbody>

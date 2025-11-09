@@ -15,16 +15,16 @@
     <main id='main-content' class="flex h-dvh">
 
         <!-- #region sidebar-->
-        <div th:replace="fragments/sidebar.html :: sidebar-fragment"></div>
+        <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
         <!-- #endregion -->
 
         <div class="container">
 
                 <h1>Gestión de Compras</h1>
 
-                <div class="search-container">
-                    <input type="text" class="search-input" placeholder="BUSCAR">
-                    <span class="search-icon">🔍</span>
+                <div class="caja-buscar">
+                    <input type="text" placeholder="BUSCAR">
+                    <span>🔍</span>
                 </div>
 
                 <div class="filters-container">
@@ -100,22 +100,6 @@
                                 <td data-label="Total (S/.)">600</td>
                                 <td data-label="Estado"><span class="estado-anulado">⊗ Anulado</span></td>
                                 <td data-label="Fecha">15/10/2025</td>
-                                <td data-label="Detalles">
-                                    <div class="acciones-group">
-                                        <button class="btn-ver">👁 Ver</button>
-                                        <button class="btn-pagar-gris">💳 Pagar</button>
-                                        <button class="btn-anular">✕ Anular</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td data-label="Código">236</td>
-                                <td data-label="Nombre o razón social">Fasanando</td>
-                                <td data-label="Deuda (S/.)">0</td>
-                                <td data-label="Tipo de Pago">Contado</td>
-                                <td data-label="Total (S/.)">5470</td>
-                                <td data-label="Estado"><span class="estado-pagado">✓ Pagado</span></td>
-                                <td data-label="Fecha">31/10/2025</td>
                                 <td data-label="Detalles">
                                     <div class="acciones-group">
                                         <button class="btn-ver">👁 Ver</button>

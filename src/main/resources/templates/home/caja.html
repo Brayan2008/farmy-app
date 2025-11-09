@@ -14,16 +14,16 @@
     <main id='main-content' class="flex h-dvh">
 
         <!-- #region sidebar-->
-        <div th:replace="fragments/sidebar.html :: sidebar-fragment"></div>
+        <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
         <!-- #endregion -->
 
         <div class="container">
 
                 <h1>Gestión de Caja</h1>
 
-                <div class="search-container">
-                    <input type="text" class="search-input" placeholder="BUSCAR MOVIMIENTO">
-                    <span class="search-icon">🔍</span>
+                <div class="caja-buscar">
+                    <input type="text" placeholder="BUSCAR MOVIMIENTO">
+                    <span>🔍</span>
                 </div>
 
                 <div class="filters-container">
@@ -77,20 +77,6 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td data-label="Código">CAJ002</td>
-                                <td data-label="Tipo"><span class="tipo-egreso">💸 Egreso</span></td>
-                                <td data-label="Descripción">Pago a proveedor Bayer S.A.</td>
-                                <td data-label="Monto (S/.)">1,200.00</td>
-                                <td data-label="Fecha">27/10/2025</td>
-                                <td data-label="Hora">10:30</td>
-                                <td data-label="Estado"><span class="estado-confirmado">✓ Confirmado</span></td>
-                                <td data-label="Acciones">
-                                    <div class="acciones-group">
-                                        <button class="btn-editar">✏ Editar</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
                                 <td data-label="Código">CAJ005</td>
                                 <td data-label="Tipo"><span class="tipo-ingreso">💰 Ingreso</span></td>
                                 <td data-label="Descripción">Venta de medicamentos - Factura #002</td>
@@ -98,20 +84,6 @@
                                 <td data-label="Fecha">27/10/2025</td>
                                 <td data-label="Hora">15:10</td>
                                 <td data-label="Estado"><span class="estado-anulado">⊗ Anulado</span></td>
-                                <td data-label="Acciones">
-                                    <div class="acciones-group">
-                                        <button class="btn-editar">✏ Editar</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td data-label="Código">CAJ006</td>
-                                <td data-label="Tipo"><span class="tipo-ingreso">💰 Ingreso</span></td>
-                                <td data-label="Descripción">Venta de medicamentos - Boleta #046</td>
-                                <td data-label="Monto (S/.)">95.80</td>
-                                <td data-label="Fecha">27/10/2025</td>
-                                <td data-label="Hora">16:35</td>
-                                <td data-label="Estado"><span class="estado-confirmado">✓ Confirmado</span></td>
                                 <td data-label="Acciones">
                                     <div class="acciones-group">
                                         <button class="btn-editar">✏ Editar</button>
@@ -138,7 +110,6 @@
                 </div>
 
                 <div class="botones-contenedor">
-
                     <button class="btn-nuevo" onclick="registrar('modalMovimiento')">Nuevo Movimiento</button>
                 </div>
         </div>

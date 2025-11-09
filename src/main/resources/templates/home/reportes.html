@@ -14,16 +14,16 @@
     <main id='main-content' class="flex h-dvh">
 
         <!-- #region sidebar-->
-        <div th:replace="fragments/sidebar.html :: sidebar-fragment"></div>
+        <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
         <!-- #endregion -->
 
         <div class="container">
             <main>
                 <h1>Reportes del Sistema</h1>
 
-                <div class="search-container">
-                    <input type="text" class="search-input" placeholder="BUSCAR REPORTE">
-                    <span class="search-icon">🔍</span>
+                <div class="caja-buscar">
+                    <input type="text" placeholder="BUSCAR REPORTE">
+                    <span>🔍</span>
                 </div>
 
                 <div class="filters-container">
@@ -300,11 +300,10 @@
                 </div>
 
                 <div class="modal-footer">
-                    <span class="footer-info"> El reporte se generará según los parámetros seleccionados</span>
                     <div class="footer-buttons">
                         <button type="button" class="btn-cancelar"
                             onclick="(document.getElementById('modalReporte').close())">Cancelar</button>
-                        <button type="submit" class="btn-generar">Generar</button>
+                        <button type="submit" class="btn-registrar">Generar</button>
                     </div>
                 </div>
             </form>

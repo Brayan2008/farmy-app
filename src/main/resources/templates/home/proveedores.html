@@ -14,15 +14,15 @@
     <main id='main-content' class="flex h-dvh">
 
         <!-- #region sidebar-->
-        <div th:replace="fragments/sidebar.html :: sidebar-fragment"></div>
+        <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
         <!-- #endregion -->
 
         <div class="container">
             <h1>Gestión de Proveedores</h1>
 
-            <div class="search-container">
-                <input type="text" class="search-input" placeholder="BUSCAR PROVEEDOR">
-                <span class="search-icon">🔍</span>
+            <div class="caja-buscar">
+                <input type="text" placeholder="BUSCAR PROVEEDOR">
+                <span>🔍</span>
             </div>
 
             <div class="filters-container">
@@ -68,21 +68,7 @@
                             <td data-label="Teléfono">(01) 234-5678</td>
                             <td data-label="Email">ventas@bayer.com.pe</td>
                             <td data-label="Tipo">Laboratorio</td>
-                            <td data-label="Estado"><span class="estado-activo">✓ Activo</span></td>
-                            <td data-label="Acciones">
-                                <div class="acciones-group">
-                                    <button class="btn-editar">✏ Editar</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td data-label="Código">PROV002</td>
-                            <td data-label="Razón Social">Pfizer Perú S.R.L.</td>
-                            <td data-label="RUC">20234567890</td>
-                            <td data-label="Teléfono">(01) 345-6789</td>
-                            <td data-label="Email">contacto@pfizer.com.pe</td>
-                            <td data-label="Tipo">Laboratorio</td>
-                            <td data-label="Estado"><span class="estado-activo">✓ Activo</span></td>
+                            <td data-label="Estado"><span class="activo">✓ Activo</span></td>
                             <td data-label="Acciones">
                                 <div class="acciones-group">
                                     <button class="btn-editar">✏ Editar</button>
@@ -96,49 +82,7 @@
                             <td data-label="Teléfono">(01) 456-7890</td>
                             <td data-label="Email">ventas@medicalima.com</td>
                             <td data-label="Tipo">Distribuidor</td>
-                            <td data-label="Estado"><span class="estado-inactivo">⊗ Inactivo</span></td>
-                            <td data-label="Acciones">
-                                <div class="acciones-group">
-                                    <button class="btn-editar">✏ Editar</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td data-label="Código">PROV004</td>
-                            <td data-label="Razón Social">Roche Farma Perú S.A.</td>
-                            <td data-label="RUC">20456789012</td>
-                            <td data-label="Teléfono">(01) 567-8901</td>
-                            <td data-label="Email">info@roche.com.pe</td>
-                            <td data-label="Tipo">Laboratorio</td>
-                            <td data-label="Estado"><span class="estado-activo">✓ Activo</span></td>
-                            <td data-label="Acciones">
-                                <div class="acciones-group">
-                                    <button class="btn-editar">✏ Editar</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td data-label="Código">PROV005</td>
-                            <td data-label="Razón Social">Importadora Farmacéutica del Sur E.I.R.L.</td>
-                            <td data-label="RUC">20567890123</td>
-                            <td data-label="Teléfono">(01) 678-9012</td>
-                            <td data-label="Email">importaciones@farmasur.pe</td>
-                            <td data-label="Tipo">Importador</td>
-                            <td data-label="Estado"><span class="estado-activo">✓ Activo</span></td>
-                            <td data-label="Acciones">
-                                <div class="acciones-group">
-                                    <button class="btn-editar">✏ Editar</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td data-label="Código">PROV006</td>
-                            <td data-label="Razón Social">Novartis Biociencias Perú S.A.</td>
-                            <td data-label="RUC">20678901234</td>
-                            <td data-label="Teléfono">(01) 789-0123</td>
-                            <td data-label="Email">peru@novartis.com</td>
-                            <td data-label="Tipo">Laboratorio</td>
-                            <td data-label="Estado"><span class="estado-activo">✓ Activo</span></td>
+                            <td data-label="Estado"><span class="inactivo">⊗ Inactivo</span></td>
                             <td data-label="Acciones">
                                 <div class="acciones-group">
                                     <button class="btn-editar">✏ Editar</button>

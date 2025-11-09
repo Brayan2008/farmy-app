@@ -15,13 +15,13 @@
     <main id='main-content' class="flex h-dvh">
 
         <!-- #region sidebar-->
-        <div th:replace="fragments/sidebar.html :: sidebar-fragment"></div>
+        <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
         <!-- #endregion -->
 
         <div class="container">
                 <h1>Gestión de Marcas</h1>
 
-                <div class="search-container">
+                <div class="caja-buscar">
                     <input type="text" class="search-input" placeholder="BUSCAR MARCA">
                     <span class="search-icon">🔍</span>
                 </div>
@@ -56,7 +56,7 @@
                                 <td data-label="Código">001</td>
                                 <td data-label="Nombre de Marca">Bayer</td>
                                 <td data-label="Descripción">Productos farmacéuticos de alta calidad</td>
-                                <td data-label="Estado"><span class="estado-activo">✓ Activo</span></td>
+                                <td data-label="Estado"><span class="activo">✓ Activo</span></td>
                                 <td data-label="Fecha de Creación">15/01/2025</td>
                                 <td data-label="Acciones">
                                     <div class="acciones-group">
@@ -68,7 +68,7 @@
                                 <td data-label="Código">002</td>
                                 <td data-label="Nombre de Marca">Pfizer</td>
                                 <td data-label="Descripción">Medicamentos innovadores y vacunas</td>
-                                <td data-label="Estado"><span class="estado-activo">✓ Activo</span></td>
+                                <td data-label="Estado"><span class="activo">✓ Activo</span></td>
                                 <td data-label="Fecha de Creación">22/01/2025</td>
                                 <td data-label="Acciones">
                                     <div class="acciones-group">
@@ -80,7 +80,7 @@
                                 <td data-label="Código">003</td>
                                 <td data-label="Nombre de Marca">Novartis</td>
                                 <td data-label="Descripción">Soluciones médicas avanzadas</td>
-                                <td data-label="Estado"><span class="estado-inactivo">⊗ Inactivo</span></td>
+                                <td data-label="Estado"><span class="inactivo">⊗ Inactivo</span></td>
                                 <td data-label="Fecha de Creación">05/02/2025</td>
                                 <td data-label="Acciones">
                                     <div class="acciones-group">
@@ -92,7 +92,7 @@
                                 <td data-label="Código">004</td>
                                 <td data-label="Nombre de Marca">Johnson & Johnson</td>
                                 <td data-label="Descripción">Cuidado de la salud familiar</td>
-                                <td data-label="Estado"><span class="estado-activo">✓ Activo</span></td>
+                                <td data-label="Estado"><span class="activo">✓ Activo</span></td>
                                 <td data-label="Fecha de Creación">12/02/2025</td>
                                 <td data-label="Acciones">
                                     <div class="acciones-group">
@@ -104,7 +104,7 @@
                                 <td data-label="Código">005</td>
                                 <td data-label="Nombre de Marca">Roche</td>
                                 <td data-label="Descripción">Medicamentos de precisión y diagnósticos</td>
-                                <td data-label="Estado"><span class="estado-activo">✓ Activo</span></td>
+                                <td data-label="Estado"><span class="activo">✓ Activo</span></td>
                                 <td data-label="Fecha de Creación">18/02/2025</td>
                                 <td data-label="Acciones">
                                     <div class="acciones-group">

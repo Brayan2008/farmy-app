@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Categorias</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" th:href="@{/css/categorias.css}">
+    <link rel="stylesheet" th:href="@{/styles.css}">
     <script th:src="@{/script.js}"></script>
 
 </head>
@@ -15,15 +15,15 @@
     <main id='main-content' class="flex h-dvh">
 
         <!-- #region sidebar-->
-        <div th:replace="fragments/sidebar.html :: sidebar-fragment"></div>
+        <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
         <!-- #endregion -->
 
         <div class="container">
             <h1>Gestión de Categorías</h1>
 
-            <div class="search-container">
-                <input type="text" class="search-input" placeholder="BUSCAR CATEGORÍA">
-                <span class="search-icon">🔍</span>
+            <div class="caja-buscar">
+                <input type="text" placeholder="BUSCAR CATEGORÍA">
+                <span>🔍</span>
             </div>
 
             <div class="filters-container">
@@ -56,20 +56,8 @@
                             <td data-label="Código">CAT001</td>
                             <td data-label="Nombre de Categoría">Analgésicos</td>
                             <td data-label="Descripción">Medicamentos para aliviar el dolor</td>
-                            <td data-label="Estado"><span class="estado-activo">✓ Activo</span></td>
+                            <td data-label="Estado"><span class="activo">✓ Activo</span></td>
                             <td data-label="Fecha de Creación">10/01/2025</td>
-                            <td data-label="Acciones">
-                                <div class="acciones-group">
-                                    <button class="btn-editar">✏ Editar</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td data-label="Código">CAT003</td>
-                            <td data-label="Nombre de Categoría">Vitaminas y Minerales</td>
-                            <td data-label="Descripción">Suplementos nutricionales y vitamínicos</td>
-                            <td data-label="Estado"><span class="estado-activo">✓ Activo</span></td>
-                            <td data-label="Fecha de Creación">15/01/2025</td>
                             <td data-label="Acciones">
                                 <div class="acciones-group">
                                     <button class="btn-editar">✏ Editar</button>
@@ -80,44 +68,8 @@
                             <td data-label="Código">CAT004</td>
                             <td data-label="Nombre de Categoría">Antihistamínicos</td>
                             <td data-label="Descripción">Medicamentos para tratar alergias</td>
-                            <td data-label="Estado"><span class="estado-inactivo">⊗ Inactivo</span></td>
+                            <td data-label="Estado"><span class="inactivo">⊗ Inactivo</span></td>
                             <td data-label="Fecha de Creación">18/01/2025</td>
-                            <td data-label="Acciones">
-                                <div class="acciones-group">
-                                    <button class="btn-editar">✏ Editar</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td data-label="Código">CAT005</td>
-                            <td data-label="Nombre de Categoría">Anti-inflamatorios</td>
-                            <td data-label="Descripción">Medicamentos para reducir inflamación</td>
-                            <td data-label="Estado"><span class="estado-activo">✓ Activo</span></td>
-                            <td data-label="Fecha de Creación">20/01/2025</td>
-                            <td data-label="Acciones">
-                                <div class="acciones-group">
-                                    <button class="btn-editar">✏ Editar</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td data-label="Código">CAT006</td>
-                            <td data-label="Nombre de Categoría">Digestivos</td>
-                            <td data-label="Descripción">Medicamentos para problemas gastrointestinales</td>
-                            <td data-label="Estado"><span class="estado-activo">✓ Activo</span></td>
-                            <td data-label="Fecha de Creación">22/01/2025</td>
-                            <td data-label="Acciones">
-                                <div class="acciones-group">
-                                    <button class="btn-editar">✏ Editar</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td data-label="Código">CAT007</td>
-                            <td data-label="Nombre de Categoría">Probióticos</td>
-                            <td data-label="Descripción">Microorganismos beneficiosos para la salud</td>
-                            <td data-label="Estado"><span class="estado-activo">✓ Activo</span></td>
-                            <td data-label="Fecha de Creación">25/01/2025</td>
                             <td data-label="Acciones">
                                 <div class="acciones-group">
                                     <button class="btn-editar">✏ Editar</button>
@@ -171,7 +123,6 @@
             </form>
         </dialog>
     </main>
-
 </body>
 
 </html>
