@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
@@ -16,15 +16,13 @@
         <!-- #region sidebar-->
         <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
         <!-- #endregion -->
+        <div class="flex-1 h-screen overflow-y-scroll overflow-x-hidden">
 
-        <div class="container">
+            <div th:replace="~{fragments/header.html :: 
+                              header-info('Mi Caja','Movimientos registrados')}"></div>
+            <div class="container">
 
-                <h1>Gestión de Caja</h1>
-
-                <div class="caja-buscar">
-                    <input type="text" placeholder="BUSCAR MOVIMIENTO">
-                    <span>🔍</span>
-                </div>
+                <div th:replace="~{fragments/search.html :: search-fragment('caja', 'Buscar movimientos...')}"></div>
 
                 <div class="filters-container">
                     <span class="filter-label">Filtrar por:</span>
@@ -47,7 +45,7 @@
                     </div>
                 </div>
 
-                <div class="table-container">
+                <div>
                     <table>
                         <thead>
                             <tr>
@@ -112,6 +110,7 @@
                 <div class="botones-contenedor">
                     <button class="btn-nuevo" onclick="registrar('modalMovimiento')">Nuevo Movimiento</button>
                 </div>
+            </div>
         </div>
 
         <dialog id="modalMovimiento">

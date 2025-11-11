@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
@@ -12,38 +12,43 @@
 </head>
 
 <body>
-    <main id='main-content' class="flex h-dvh">
+    <main id='main-content' class="flex h-screen">
 
         <!-- #region sidebar-->
         <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
         <!-- #endregion -->
+        <div class="flex-1 h-full overflow-y-scroll overflow-x-hidden">
 
-        <div class="container">
-            <h1>Gestión de Usuarios</h1>
-            <table id="tabla-usuarios">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Correo electrónico</th>
-                        <th>Estado</th>
-                        <th>Rol</th>
-                        <th>Editar información</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Celso</td>
-                        <td>celso123@example.com</td>
-                        <td><span class="activo">Activo</span></td>
-                        <td><span class="rol">Administrador</span></td>
-                        <td><button class="btn-editar">Editar</button></td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="flex justify-around">
-                <button class="btn-nuevo" onclick="registrar('registrar-User')">Nuevo Usuario</button>
+            <div th:replace="~{fragments/header.html :: 
+                              header-info('Usuarios','Seguridad > Usuarios del sistema')}"></div>
+
+            <div class="container">
+                <h1 class="text-xl font-black text-wrap my-2 sm:text-2xl">Lista de usuarios registrados</h1>
+                <table id="tabla-usuarios">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Correo electrónico</th>
+                            <th>Estado</th>
+                            <th>Rol</th>
+                            <th>Editar información</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Celso</td>
+                            <td>celso123@example.com</td>
+                            <td><span class="activo">Activo</span></td>
+                            <td><span class="rol">Administrador</span></td>
+                            <td><button class="btn-editar">Editar</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="flex justify-around">
+                    <button class="btn-nuevo" onclick="registrar('registrar-User')">Nuevo Usuario</button>
+                </div>
             </div>
         </div>
 

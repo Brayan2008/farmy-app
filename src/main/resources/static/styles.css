@@ -7,10 +7,10 @@
 body {
     font-family: Arial, sans-serif;
     background: #f8f9fa;
-    min-height: 100vh;
+    height: 100vh;
 }
 
-#main-content{
+#main-content {
     overflow-x: hidden;
 }
 
@@ -18,15 +18,14 @@ body {
     font-family: Arial, sans-serif;
     background: #fff;
     text-align: center;
-    width: 100%;
-    padding: 0rem 1rem;
+    width: 100vw;
     height: 100%;
-    overflow-y: auto;
+    padding: 0rem 1rem;
 }
 
 .filters-container {
-    max-width: 800px;
-    margin: 0 auto 20px;
+    width: 95%;
+    margin: 0 auto 0;
     border: 2px solid #ddd;
     border-radius: 8px;
     padding: 15px;
@@ -71,18 +70,10 @@ body {
     cursor: pointer;
 }
 
-h1 {
-    padding: 20px;
-    font-size: 32px;
-    color: #333;
-    text-shadow: 1px 1px 2px #aaa;
-    margin-bottom: 20px;
-}
-
 table {
     margin: 30px auto;
     border-collapse: collapse;
-    width: 80%;
+    width: 95%;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -145,13 +136,15 @@ tbody tr:hover {
 .btn-nuevo {
     border: none;
     padding: 12px 22px;
+    margin-bottom: 5rem;
     border-radius: 20px;
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
     background: #6f42c1;
     color: white;
-    :hover{
+
+    :hover {
         background: #5a32a3;
     }
 }
@@ -283,34 +276,23 @@ tbody tr:hover {
     background: #5a32a3;
 }
 
-/* #region Buscador*/
-.caja-buscar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-radius: 20px;
-    background-color: #d3d3d3;
-    padding: 8px 15px;
-    width: 80%;
-    font-family: Arial, sans-serif;
-    margin: 0 auto;
-    margin-bottom: 30px;
-}
-
-.caja-buscar input {
-    border: none;
-    outline: none;
-    background: transparent;
-    flex: 1;
-    font-size: 16px;
-    font-weight: bold;
-    color: black;
-}
-
-.caja-buscar:hover {
-    box-shadow: 0 0 5px #a855f7;
-}
 /* #endregion */
+
+dialog {
+    border: none;
+    border-radius: 12px;
+    padding: 0;
+    max-width: 650px;
+    width: 90%;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    align-self: center;
+    justify-self: center;
+}
+
+dialog::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+}
+
 
 /* Responsive */
 @media screen and (max-width: 768px) {
@@ -369,27 +351,8 @@ tbody tr:hover {
     }
 }
 
-dialog {
-    border: none;
-    border-radius: 12px;
-    padding: 0;
-    max-width: 650px;
-    width: 90%;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-    align-self: center;
-    justify-self: center;
-}
-
-dialog::backdrop {
-    background: rgba(0, 0, 0, 0.5);
-}
-
 /* Móviles (640px y menos) */
 @media screen and (max-width: 1000px) {
-    h1 {
-        font-size: 20px;
-        padding: 10px;
-    }
 
     /* Ocultar encabezados de tabla */
     table {
@@ -450,19 +413,12 @@ dialog::backdrop {
         padding: 10px;
         font-size: 14px;
     }
-
-    /* Botones principales en columna */
-    .botones-contenedor {
-        flex-direction: column;
-        gap: 10px;
-        padding: 0 10px;
-    }
-
+    
     .btn-nuevo {
         width: 100%;
         padding: 14px 20px;
         font-size: 15px;
-        margin: 0;
+        margin: 0 0 1rem 0;
     }
 
     .activo,
@@ -470,5 +426,5 @@ dialog::backdrop {
         font-size: 12px;
         padding: 4px 8px;
     }
-   
+
 }

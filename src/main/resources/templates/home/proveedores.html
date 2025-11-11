@@ -1,101 +1,101 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Proveedores</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" th:href="@{/css/proveedores.css}">
+    <link rel="stylesheet" th:href="@{/styles.css}">
     <script th:src="@{/script.js}"></script>
 </head>
 
 <body>
-    <main id='main-content' class="flex h-dvh">
+    <main id='main-content' class="flex h-screen">
 
         <!-- #region sidebar-->
         <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
         <!-- #endregion -->
+        <div class="flex-1 h-full overflow-y-scroll overflow-x-hidden">
 
-        <div class="container">
-            <h1>Gestión de Proveedores</h1>
+            <div th:replace="~{fragments/header.html :: 
+                              header-info('Proveedores','Compras > Proveedores registrados')}"></div>
+            <div class="container">
 
-            <div class="caja-buscar">
-                <input type="text" placeholder="BUSCAR PROVEEDOR">
-                <span>🔍</span>
-            </div>
+                <div th:replace="~{fragments/search.html :: search-fragment('proveedores', 'Distribuidora Margarita EIRL ...')}"></div>
 
-            <div class="filters-container">
-                <span class="filter-label">Filtrar por:</span>
-                <div class="filter-row">
-                    <div class="filter-group">
-                        <label>Estado:</label>
-                        <select>
-                            <option>Activo</option>
-                            <option>Inactivo</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>Tipo:</label>
-                        <select>
-                            <option>Laboratorio</option>
-                            <option>Distribuidor</option>
-                            <option>Importador</option>
-                        </select>
+                <div class="filters-container">
+                    <span class="filter-label">Filtrar por:</span>
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label>Estado:</label>
+                            <select>
+                                <option>Activo</option>
+                                <option>Inactivo</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Tipo:</label>
+                            <select>
+                                <option>Laboratorio</option>
+                                <option>Distribuidor</option>
+                                <option>Importador</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Código</th>
-                            <th>Razón Social</th>
-                            <th>RUC</th>
-                            <th>Teléfono</th>
-                            <th>Email</th>
-                            <th>Tipo</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td data-label="Código">PROV001</td>
-                            <td data-label="Razón Social">Laboratorios Bayer S.A.</td>
-                            <td data-label="RUC">20123456789</td>
-                            <td data-label="Teléfono">(01) 234-5678</td>
-                            <td data-label="Email">ventas@bayer.com.pe</td>
-                            <td data-label="Tipo">Laboratorio</td>
-                            <td data-label="Estado"><span class="activo">✓ Activo</span></td>
-                            <td data-label="Acciones">
-                                <div class="acciones-group">
-                                    <button class="btn-editar">✏ Editar</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td data-label="Código">PROV003</td>
-                            <td data-label="Razón Social">Distribuidora Médica Lima S.A.C.</td>
-                            <td data-label="RUC">20345678901</td>
-                            <td data-label="Teléfono">(01) 456-7890</td>
-                            <td data-label="Email">ventas@medicalima.com</td>
-                            <td data-label="Tipo">Distribuidor</td>
-                            <td data-label="Estado"><span class="inactivo">⊗ Inactivo</span></td>
-                            <td data-label="Acciones">
-                                <div class="acciones-group">
-                                    <button class="btn-editar">✏ Editar</button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                <div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Razón Social</th>
+                                <th>RUC</th>
+                                <th>Teléfono</th>
+                                <th>Email</th>
+                                <th>Tipo</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td data-label="Código">PROV001</td>
+                                <td data-label="Razón Social">Laboratorios Bayer S.A.</td>
+                                <td data-label="RUC">20123456789</td>
+                                <td data-label="Teléfono">(01) 234-5678</td>
+                                <td data-label="Email">ventas@bayer.com.pe</td>
+                                <td data-label="Tipo">Laboratorio</td>
+                                <td data-label="Estado"><span class="activo">✓ Activo</span></td>
+                                <td data-label="Acciones">
+                                    <div class="acciones-group">
+                                        <button class="btn-editar">✏ Editar</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="Código">PROV003</td>
+                                <td data-label="Razón Social">Distribuidora Médica Lima S.A.C.</td>
+                                <td data-label="RUC">20345678901</td>
+                                <td data-label="Teléfono">(01) 456-7890</td>
+                                <td data-label="Email">ventas@medicalima.com</td>
+                                <td data-label="Tipo">Distribuidor</td>
+                                <td data-label="Estado"><span class="inactivo">⊗ Inactivo</span></td>
+                                <td data-label="Acciones">
+                                    <div class="acciones-group">
+                                        <button class="btn-editar">✏ Editar</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
-            <div class="botones-contenedor">
+                <div class="botones-contenedor">
 
-                <button class="btn-nuevo" onclick="registrar('modalProveedor')">Nuevo Proveedor</button>
+                    <button class="btn-nuevo" onclick="registrar('modalProveedor')">Nuevo Proveedor</button>
+                </div>
             </div>
         </div>
 

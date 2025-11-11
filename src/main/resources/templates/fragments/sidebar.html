@@ -8,7 +8,7 @@
         }
 
         .css-bg-sidebar {
-            background-color: #232ab9;
+            background-color: #2A2359;
         }
 
         .css-scrollbar-none::-webkit-scrollbar {
@@ -65,7 +65,7 @@
         <section class="flex-1 flex flex-col gap-1.5 pt-3 text-white font-semibold" id="sidebar-items">
             <!-- Dashboard -->
             <a th:href="@{/home}"
-                class="my-1.5 css-bg-sidebar flex items-center justify-between pr-4 hover:bg-indigo-950 rounded-xl cursor-pointer hover:scale-110 transition-transform">
+                class="my-1.5 css-bg-sidebar flex items-center justify-between pr-4 hover:bg-slate-950 rounded-xl cursor-pointer hover:scale-110 transition-transform">
                 <div class="p-4 pr-4 pt-2 pb-2 flex gap-5 items-center">
                     <img th:src="@{/img/menu-principal/home.png}" alt="Dashboard-icon" class="size-7" />
                     <p>Dashboard</p>
@@ -75,7 +75,7 @@
             <!-- Seguridad -->
             <details class="my-1.5" name="sidebar-menu">
                 <summary class="css-bg-sidebar flex items-center justify-between pr-4 
-                        hover:bg-indigo-950 rounded-xl cursor-pointer 
+                        hover:bg-slate-950 rounded-xl cursor-pointer 
                         hover:scale-110 transition-transform list-none">
                     <div class="p-4 pr-4 pt-2 pb-2 flex gap-5 items-center">
                         <img th:src="@{/img/menu-principal/account-image.png}" alt="Seguridad-icon" class="size-7" />
@@ -84,12 +84,12 @@
                 </summary>
                 <ul class="text-wrap w-48 text-sm">
                     <a th:href="@{/home/usuarios}">
-                        <li class="p-2 pl-12 cursor-pointer hover:bg-indigo-950 rounded-xl
+                        <li class="p-2 pl-12 cursor-pointer hover:bg-slate-950 rounded-xl
                                     hover:scale-105 transition-transform">
                             Usuarios</li>
                     </a>
                     <a th:href="@{/home/roles}">
-                        <li class="p-2 pl-12 cursor-pointer hover:bg-indigo-950 rounded-xl
+                        <li class="p-2 pl-12 cursor-pointer hover:bg-slate-950 rounded-xl
                                     hover:scale-105 transition-transform">
                             Roles</li>
                     </a>
@@ -99,7 +99,7 @@
             <!-- Productos -->
             <details class="my-1.5" name="sidebar-menu">
                 <summary
-                    class="css-bg-sidebar flex items-center justify-between pr-4 hover:bg-indigo-950 rounded-xl cursor-pointer hover:scale-110 transition-transform list-none">
+                    class="css-bg-sidebar flex items-center justify-between pr-4 hover:bg-slate-950 rounded-xl cursor-pointer hover:scale-110 transition-transform list-none">
                     <div class="p-4 pr-4 pt-2 pb-2 flex gap-5 items-center">
                         <img th:src="@{/img/menu-principal/package.png}" alt="Productos-icon" class="size-7" />
                         <p>Productos</p>
@@ -107,22 +107,22 @@
                 </summary>
                 <ul class="text-wrap w-48 text-sm">
                     <a th:href="@{/home/productos}">
-                        <li class="p-2 pl-12 cursor-pointer hover:bg-indigo-950 rounded-xl
+                        <li class="p-2 pl-12 cursor-pointer hover:bg-slate-950 rounded-xl
                                     hover:scale-105 transition-transform">
                             Productos</li>
                     </a>
                     <a th:href="@{/home/marcas}">
-                        <li class="p-2 pl-12 cursor-pointer hover:bg-indigo-950 rounded-xl
+                        <li class="p-2 pl-12 cursor-pointer hover:bg-slate-950 rounded-xl
                                     hover:scale-105 transition-transform">
                             Marcas</li>
                     </a>
                     <a th:href="@{/home/categorias}">
-                        <li class="p-2 pl-12 cursor-pointer hover:bg-indigo-950 rounded-xl
+                        <li class="p-2 pl-12 cursor-pointer hover:bg-slate-950 rounded-xl
                                     hover:scale-105 transition-transform">
                             Categorias</li>
                     </a>
                     <a th:href="@{/home/presentaciones}">
-                        <li class="p-2 pl-12 cursor-pointer hover:bg-indigo-950 rounded-xl
+                        <li class="p-2 pl-12 cursor-pointer hover:bg-slate-950 rounded-xl
                                     hover:scale-105 transition-transform">
                             Presentaciones</li>
                     </a>
@@ -132,7 +132,7 @@
             <!-- Compras -->
             <details class="my-1.5" name="sidebar-menu">
                 <summary
-                    class="css-bg-sidebar flex items-center justify-between pr-4 hover:bg-indigo-950 rounded-xl cursor-pointer hover:scale-110 transition-transform list-none">
+                    class="css-bg-sidebar flex items-center justify-between pr-4 hover:bg-slate-950 rounded-xl cursor-pointer hover:scale-110 transition-transform list-none">
                     <div class="p-4 pr-4 pt-2 pb-2 flex gap-5 items-center">
                         <img th:src="@{/img/menu-principal/car-shopping.png}" alt="Compras-icon" class="size-7" />
                         <p>Compras</p>
@@ -140,12 +140,12 @@
                 </summary>
                 <ul class="text-wrap w-48 text-sm">
                     <a th:href="@{/home/compras}">
-                        <li class="p-2 pl-12 cursor-pointer hover:bg-indigo-950 rounded-xl
+                        <li class="p-2 pl-12 cursor-pointer hover:bg-slate-950 rounded-xl
                          hover:scale-105 transition-transform">
                             Compras</li>
                     </a>
                     <a th:href="@{/home/proveedores}">
-                        <li class="p-2 pl-12 cursor-pointer hover:bg-indigo-950 rounded-xl
+                        <li class="p-2 pl-12 cursor-pointer hover:bg-slate-950 rounded-xl
                                     hover:scale-105 transition-transform">
                             Proveedores</li>
                     </a>
@@ -154,7 +154,7 @@
 
             <!-- Ventas -->
             <a th:href="@{/home/ventas}"
-                class="my-1.5 css-bg-sidebar flex items-center justify-between pr-4 hover:bg-indigo-950 rounded-xl cursor-pointer hover:scale-110 transition-transform">
+                class="my-1.5 css-bg-sidebar flex items-center justify-between pr-4 hover:bg-slate-950 rounded-xl cursor-pointer hover:scale-110 transition-transform">
                 <div class="p-4 pr-4 pt-2 pb-2 flex gap-5 items-center">
                     <img th:src="@{/img/menu-principal/cash.png}" alt="Ventas-icon" class="size-7" />
                     <p>Ventas</p>
@@ -163,16 +163,24 @@
 
             <!-- Caja -->
             <a th:href="@{/home/caja}"
-                class="my-1.5 css-bg-sidebar flex items-center justify-between pr-4 hover:bg-indigo-950 rounded-xl cursor-pointer hover:scale-110 transition-transform">
+                class="my-1.5 css-bg-sidebar flex items-center justify-between pr-4 hover:bg-slate-950 rounded-xl cursor-pointer hover:scale-110 transition-transform">
                 <div class="p-4 pr-4 pt-2 pb-2 flex gap-5 items-center">
                     <img th:src="@{/img/menu-principal/point-sale.png}" alt="Caja-icon" class="size-7" />
                     <p>Caja</p>
                 </div>
             </a>
+            <!-- Inventario -->
+            <a th:href="@{/home/inventario}"
+                class="my-1.5 css-bg-sidebar flex items-center justify-between pr-4 hover:bg-slate-950 rounded-xl cursor-pointer hover:scale-110 transition-transform">
+                <div class="p-4 pr-4 pt-2 pb-2 flex gap-5 items-center">
+                    <img th:src="@{/img/menu-principal/inventory.png}" alt="Inventario-icon" class="size-7" />
+                    <p>Inventario</p>
+                </div>
+            </a>
 
             <!-- Reportes -->
             <a th:href="@{/home/reportes}"
-                class="my-1.5 css-bg-sidebar flex items-center justify-between pr-4 hover:bg-indigo-950 rounded-xl cursor-pointer hover:scale-110 transition-transform">
+                class="my-1.5 css-bg-sidebar flex items-center justify-between pr-4 hover:bg-slate-950 rounded-xl cursor-pointer hover:scale-110 transition-transform">
                 <div class="p-4 pr-4 pt-2 pb-2 flex gap-5 items-center">
                     <img th:src="@{/img/menu-principal/reports.png}" alt="Reportes-icon" class="size-7" />
                     <p>Reportes</p>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
@@ -16,15 +16,13 @@
         <!-- #region sidebar-->
         <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
         <!-- #endregion -->
+        <div class="flex-1 h-screen overflow-y-scroll overflow-x-hidden">
 
-        <div class="container">
-            <main>
-                <h1>Reportes del Sistema</h1>
+            <div th:replace="~{fragments/header.html :: 
+                              header-info('Reportes','Reportes del sistema')}"></div>
+            <div class="container">
 
-                <div class="caja-buscar">
-                    <input type="text" placeholder="BUSCAR REPORTE">
-                    <span>🔍</span>
-                </div>
+                <div th:replace="~{fragments/search.html :: search-fragment('reportes', 'Buscar reporte...')}"></div>
 
                 <div class="filters-container">
                     <span class="filter-label">Filtrar por:</span>
@@ -49,7 +47,7 @@
                     </div>
                 </div>
 
-                <div class="table-container">
+                <div>
                     <table>
                         <thead>
                             <tr>
@@ -115,7 +113,7 @@
                                     </div>
                                 </td>
                             </tr>
-                            
+
                         </tbody>
                     </table>
                 </div>
@@ -138,9 +136,10 @@
                 <div class="botones-contenedor">
                     <button class="btn-nuevo" onclick="registrar('modalReporte')">Nuevo Reporte</button>
                 </div>
-            </main>
 
+            </div>
         </div>
+
         <dialog id="modalReporte">
             <div class="modal-header">
                 <h2>Generar Reporte</h2>

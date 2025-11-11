@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
@@ -16,26 +16,33 @@
         <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
         <!-- #endregion -->
 
-        <div class="container">
-            <h1>Gestión de Roles</h1>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Administrador</td>
-                        <td><button class="btn-editar">Editar</button></td>
-                    </tr>
-                </tbody>
-            </table>
-            <button class="btn-nuevo" onclick="registrar('modalRol')">Nuevo Rol</button>
+        <div class="flex-1 h-screen overflow-y-scroll overflow-x-hidden">
+
+            <div th:replace="~{fragments/header.html :: 
+                              header-info('Roles','Seguridad > Roles del sistema')}"></div>
+
+            <div class="container">
+                <h1 class="text-xl font-black text-wrap my-2 sm:text-2xl">Roles registrados</h1>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Administrador</td>
+                            <td><button class="btn-editar">Editar</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="btn-nuevo" onclick="registrar('modalRol')">Nuevo Rol</button>
+            </div>
         </div>
+
 
         <dialog id="modalRol">
             <div class="modal-header">

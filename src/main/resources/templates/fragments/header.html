@@ -1,0 +1,13 @@
+<header th:fragment="header-info(nombreModulo, descripcion)"
+    class="css-bg-sidebar sticky top-0 z-50 w-full flex justify-between items-center gap-2 px-8 py-2.5 text-white flex-wrap mb-3 shadow-md shadow-black/30">
+    <div>
+        <h1 class="text-lg font-black sm:text-4xl" th:text="${nombreModulo}"></h1>
+        <p class="text-base sm:text-lg" th:text="${descripcion}"></p>
+    </div>
+    <div class="hidden sm:flex items-center gap-1 bg-transparent/40 px-4 py-2 rounded-xl">
+        <div class="text-left">
+            <div class="font-bold text-sm md:font-black" th:text="'Celso Bardales'"></div>
+            <div class="text-xs md:text-sm" th:text="'Administrador'"></div>
+        </div>
+    </div>
+</header>

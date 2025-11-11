@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
@@ -17,118 +17,119 @@
         <!-- #region sidebar-->
         <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
         <!-- #endregion -->
+        <div class="flex-1 h-screen overflow-y-scroll overflow-x-hidden">
 
-        <div class="container">
-            <h1>Gestión de Ventas</h1>
+            <div th:replace="~{fragments/header.html :: 
+                              header-info('Ventas','Ventas registradas')}"></div>
+            <div class="container">
 
-            <div class="caja-buscar">
-                <input type="text" placeholder="BUSCAR">
-                <span>🔍</span>
-            </div>
+                <div th:replace="~{fragments/search.html :: search-fragment('ventas', 'Buscar venta...')}"></div>
 
-            <div class="filters-container">
-                <span class="filter-label">Filtrar por:</span>
-                <div class="filter-row">
-                    <div class="filter-group">
-                        <label>Estado:</label>
-                        <select>
-                            <option>Activo</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>Método de pago:</label>
-                        <select>
-                            <option>Activo</option>
-                        </select>
+                <div class="filters-container">
+                    <span class="filter-label">Filtrar por:</span>
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label>Estado:</label>
+                            <select>
+                                <option>Activo</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Método de pago:</label>
+                            <select>
+                                <option>Activo</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
+
+                <div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Cliente</th>
+                                <th>Vendedor</th>
+                                <th>Método de Pago</th>
+                                <th>Importe Total (S/.)</th>
+                                <th>Estado</th>
+                                <th>Fecha</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td data-label="Código">PN001</td>
+                                <td data-label="Cliente">Celso</td>
+                                <td data-label="Vendedor">Gerardo 001</td>
+                                <td data-label="Método de Pago">Efectivo</td>
+                                <td data-label="Importe Total (S/.)">80</td>
+                                <td data-label="Estado"><span class="estado-registrada">✓ Registrada</span></td>
+                                <td data-label="Fecha">9/10/2025</td>
+                                <td data-label="Acciones">
+                                    <div class="acciones-group">
+                                        <button class="btn-ver">👁 Ver</button>
+                                        <button class="btn-anular">✕ Anular</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="Código">PN002</td>
+                                <td data-label="Cliente">Bardales</td>
+                                <td data-label="Vendedor">Ronaldo Espinoza</td>
+                                <td data-label="Método de Pago">Efectivo</td>
+                                <td data-label="Importe Total (S/.)">25</td>
+                                <td data-label="Estado"><span class="estado-anulada">⊗ Anulada</span></td>
+                                <td data-label="Fecha">1/12/2025</td>
+                                <td data-label="Acciones">
+                                    <div class="acciones-group">
+                                        <button class="btn-ver">👁 Ver</button>
+                                        <button class="btn-anular-gris">✕ Anular</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="Código">PN003</td>
+                                <td data-label="Cliente">Missael</td>
+                                <td data-label="Vendedor">Piña Reategui</td>
+                                <td data-label="Método de Pago">Efectivo</td>
+                                <td data-label="Importe Total (S/.)">5</td>
+                                <td data-label="Estado"><span class="estado-registrada">✓ Registrada</span></td>
+                                <td data-label="Fecha">15/10/2025</td>
+                                <td data-label="Acciones">
+                                    <div class="acciones-group">
+                                        <button class="btn-ver">👁 Ver</button>
+                                        <button class="btn-anular">✕ Anular</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="Código">PN004</td>
+                                <td data-label="Cliente">Fasanando</td>
+                                <td data-label="Vendedor">Ronaldo Espinoza</td>
+                                <td data-label="Método de Pago">Efectivo</td>
+                                <td data-label="Importe Total (S/.)">15</td>
+                                <td data-label="Estado"><span class="estado-registrada">✓ Registrada</span></td>
+                                <td data-label="Fecha">31/10/2025</td>
+                                <td data-label="Acciones">
+                                    <div class="acciones-group">
+                                        <button class="btn-ver">👁 Ver</button>
+                                        <button class="btn-anular">✕ Anular</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="botones-contenedor">
+
+                    <button class="btn-nuevo" onclick="registrar('modalVenta')">Nueva Venta</button>
+                </div>
+
             </div>
-
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Código</th>
-                            <th>Cliente</th>
-                            <th>Vendedor</th>
-                            <th>Método de Pago</th>
-                            <th>Importe Total (S/.)</th>
-                            <th>Estado</th>
-                            <th>Fecha</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td data-label="Código">PN001</td>
-                            <td data-label="Cliente">Celso</td>
-                            <td data-label="Vendedor">Gerardo 001</td>
-                            <td data-label="Método de Pago">Efectivo</td>
-                            <td data-label="Importe Total (S/.)">80</td>
-                            <td data-label="Estado"><span class="estado-registrada">✓ Registrada</span></td>
-                            <td data-label="Fecha">9/10/2025</td>
-                            <td data-label="Acciones">
-                                <div class="acciones-group">
-                                    <button class="btn-ver">👁 Ver</button>
-                                    <button class="btn-anular">✕ Anular</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td data-label="Código">PN002</td>
-                            <td data-label="Cliente">Bardales</td>
-                            <td data-label="Vendedor">Ronaldo Espinoza</td>
-                            <td data-label="Método de Pago">Efectivo</td>
-                            <td data-label="Importe Total (S/.)">25</td>
-                            <td data-label="Estado"><span class="estado-anulada">⊗ Anulada</span></td>
-                            <td data-label="Fecha">1/12/2025</td>
-                            <td data-label="Acciones">
-                                <div class="acciones-group">
-                                    <button class="btn-ver">👁 Ver</button>
-                                    <button class="btn-anular-gris">✕ Anular</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td data-label="Código">PN003</td>
-                            <td data-label="Cliente">Missael</td>
-                            <td data-label="Vendedor">Piña Reategui</td>
-                            <td data-label="Método de Pago">Efectivo</td>
-                            <td data-label="Importe Total (S/.)">5</td>
-                            <td data-label="Estado"><span class="estado-registrada">✓ Registrada</span></td>
-                            <td data-label="Fecha">15/10/2025</td>
-                            <td data-label="Acciones">
-                                <div class="acciones-group">
-                                    <button class="btn-ver">👁 Ver</button>
-                                    <button class="btn-anular">✕ Anular</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td data-label="Código">PN004</td>
-                            <td data-label="Cliente">Fasanando</td>
-                            <td data-label="Vendedor">Ronaldo Espinoza</td>
-                            <td data-label="Método de Pago">Efectivo</td>
-                            <td data-label="Importe Total (S/.)">15</td>
-                            <td data-label="Estado"><span class="estado-registrada">✓ Registrada</span></td>
-                            <td data-label="Fecha">31/10/2025</td>
-                            <td data-label="Acciones">
-                                <div class="acciones-group">
-                                    <button class="btn-ver">👁 Ver</button>
-                                    <button class="btn-anular">✕ Anular</button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="botones-contenedor">
-
-                <button class="btn-nuevo" onclick="registrar('modalVenta')">Nueva Venta</button>
-            </div>
-
         </div>
+
         <dialog id="modalVenta">
             <div class="modal-header">
                 <h2>Registrar Venta</h2>

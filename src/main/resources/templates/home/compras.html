@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
@@ -17,15 +17,14 @@
         <!-- #region sidebar-->
         <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
         <!-- #endregion -->
+        <div class="flex-1 h-screen overflow-y-scroll overflow-x-hidden">
 
-        <div class="container">
+            <div th:replace="~{fragments/header.html :: 
+                              header-info('Gestionar Compras','Compras de productos')}"></div>
 
-                <h1>Gestión de Compras</h1>
+            <div class="container">
 
-                <div class="caja-buscar">
-                    <input type="text" placeholder="BUSCAR">
-                    <span>🔍</span>
-                </div>
+                <div th:replace="~{fragments/search.html :: search-fragment('compras', 'Buscar compra...')}"></div>
 
                 <div class="filters-container">
                     <span class="filter-label">Filtrar por:</span>
@@ -45,7 +44,7 @@
                     </div>
                 </div>
 
-                <div class="table-container">
+                <div>
                     <table>
                         <thead>
                             <tr>
@@ -115,7 +114,9 @@
                 <div class="botones-contenedor">
                     <button class="btn-nuevo" onclick="registrar('modalCompra')">Nueva Compra</button>
                 </div>
+            </div>
         </div>
+
         <dialog id="modalCompra">
             <div class="modal-header">
                 <h2>Registrar Compra</h2>

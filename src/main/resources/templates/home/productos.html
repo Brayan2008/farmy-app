@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
@@ -17,49 +17,51 @@
         <!-- #region sidebar-->
         <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
         <!-- #endregion -->
+        <div class="flex-1 h-screen overflow-y-scroll overflow-x-hidden">
 
-        <div class="container">
-            <h1>Gestión de Productos</h1>
-            <div class="caja-buscar search-container">
-                <input type="text" placeholder="BUSCAR">
-                <span class="search-icon">🔍</span>
+            <div th:replace="~{fragments/header.html :: 
+                              header-info('Productos','Productos registrados')}"></div>
+
+            <div class="container">
+
+                <div th:replace="~{fragments/search.html :: search-fragment('productos', 'Paracetamol 500 mg...')}"></div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Categoria</th>
+                            <th>Precio</th>
+                            <th>Stock</th>
+                            <th>Estado</th>
+                            <th>Modificar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2047218</td>
+                            <td>Risperidona</td>
+                            <td>Salud</td>
+                            <td>$/ 24.00</td>
+                            <td>100</td>
+                            <td><span class="activo">Activo</span></td>
+                            <td><button class="btn-editar">Editar</button></td>
+                        </tr>
+                        <tr>
+                            <td>2047214</td>
+                            <td>Shampoo Medicasp</td>
+                            <td>Cuidado Personal</td>
+                            <td>$/ 22.00</td>
+                            <td>100</td>
+                            <td><span class="inactivo">Inactivo</span></td>
+                            <td><button class="btn-editar">Editar</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="btn-nuevo" onclick="registrar('modalProductos')">Nuevo Producto</button>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Categoria</th>
-                        <th>Precio</th>
-                        <th>Stock</th>
-                        <th>Estado</th>
-                        <th>Modificar</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>2047218</td>
-                        <td>Risperidona</td>
-                        <td>Salud</td>
-                        <td>$/ 24.00</td>
-                        <td>100</td>
-                        <td><span class="activo">Activo</span></td>
-                        <td><button class="btn-editar">Editar</button></td>
-                    </tr>
-                    <tr>
-                        <td>2047214</td>
-                        <td>Shampoo Medicasp</td>
-                        <td>Cuidado Personal</td>
-                        <td>$/ 22.00</td>
-                        <td>100</td>
-                        <td><span class="inactivo">Inactivo</span></td>
-                        <td><button class="btn-editar">Editar</button></td>
-                    </tr>
-                </tbody>
-            </table>
-            <button class="btn-nuevo" onclick="registrar('modalProductos')">Nuevo Producto</button>
         </div>
-
         <dialog id="modalProductos">
             <div class="modal-header">
                 <h2>Registrar Producto</h2>
@@ -182,7 +184,7 @@
                 </div>
             </form>
         </dialog>
-       
+
     </main>
 
 </body>
