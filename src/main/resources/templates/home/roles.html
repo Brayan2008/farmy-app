@@ -66,6 +66,21 @@
                         </select>
                     </div>
 
+
+
+                </div>
+
+                <div class="flex flex-col my-3 ">
+                    <label for="permisos" class="font-bold text-sm">Permisos</label>
+                    <div class="mt-2 border-2 pt-2 overflow-y-scroll h-64 border-purple-900 flex flex-col rounded-md">
+                        <div th:replace="~{fragments/item-checkbox.html :: item-checkbox('usuarios')}"></div>
+                        <div th:replace="~{fragments/item-checkbox.html :: item-checkbox('roles')}"></div>
+                        <div th:replace="~{fragments/item-checkbox.html :: item-checkbox('compras')}"></div>
+                        <div th:replace="~{fragments/item-checkbox.html :: item-checkbox('ventas')}"></div>
+                        <div th:replace="~{fragments/item-checkbox.html :: item-checkbox('productos')}"></div>
+                        <div th:replace="~{fragments/item-checkbox.html :: item-checkbox('reportes')}"></div>
+                        <div th:replace="~{fragments/item-checkbox.html :: item-checkbox('caja')}"></div>
+                    </div>
                 </div>
 
                 <div class="modal-footer">
