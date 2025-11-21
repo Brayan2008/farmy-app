@@ -32,7 +32,7 @@ public class UsuarioController {
         model.addAttribute("listaUsers", lista);
         model.addAttribute("roles", rol.findAll());
         model.addAttribute("usuario", new Usuario());
-        return "/home/usuarios";
+        return "/home/usuarios/usuarios";
     }
 
     @PostMapping("/save")
@@ -50,7 +50,7 @@ public class UsuarioController {
             model.addAttribute("usuarioEditar", uOpt.get());
             model.addAttribute("roles", rol.findAll());
             model.addAttribute("idUsuario", id);
-            return "home/usuarios_editar";
+            return "home/usuarios/usuarios_editar";
         }
 
         throw new ResponseStatusException(HttpStatus.NOT_FOUND);

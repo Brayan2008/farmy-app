@@ -36,7 +36,7 @@ public class RolController {
         model.addAttribute("lista_roles", rol.findAll());
         model.addAttribute("rol", new RolDTO("", null, "activo", null));
 
-        return "/home/roles";
+        return "/home/roles/roles";
     }
 
     @PostMapping
@@ -60,7 +60,7 @@ public class RolController {
                     .toList());
             model.addAttribute("idRol", id);
             model.addAttribute("rolEditar", roldto);
-            return "home/roles_editar";
+            return "home/roles/roles_editar";
         }
 
         throw new ResponseStatusException(HttpStatus.NOT_FOUND);
