@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Usuarios</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <link rel="stylesheet" th:href="@{/css/users.css}">
     <script th:src="@{/script.js}"></script>
 
@@ -28,21 +28,33 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Nombre</th>
+                            <th>Nombre de usuario</th>
                             <th>Correo electrónico</th>
+                            <th>Nombre completo</th>
+                            <th>Teléfono</th>
+                            <th>Creado</th>
+                            <th>Ultimo ingreso</th>
                             <th>Estado</th>
                             <th>Rol</th>
                             <th>Editar información</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Celso</td>
-                            <td>celso123@example.com</td>
-                            <td><span class="activo">Activo</span></td>
-                            <td><span class="rol">Administrador</span></td>
-                            <td><button class="btn-editar">Editar</button></td>
+                        <tr th:each="usuario : ${listaUsers}">
+                            <td th:text="${usuario.idUsuario}"></td>
+                            <td th:text="${usuario.nombreUsuario}"></td>
+                            <td th:text="${usuario.email}"></td>
+                            <td th:text="${usuario.nombreCompleto}"></td>
+                            <td th:text="${usuario.telefono == null ? 'N/A' : usuario.telefono}"></td>
+                            <td th:text="${usuario.fechaCreacion}"></td>
+                            <td th:text="${usuario.fechaUltimoAcceso}"></td>
+                            <td><span class="activo" th:text="${usuario.estado}"></span></td>
+                            <td><span class="rol" th:text="${usuario.rol.nombreRol}"></span></td>
+                            <td>
+                                <form th:action="@{/usuarios/editar/{id}(id=${usuario.idUsuario})}" method="get">
+                                    <button class="btn-editar" type="submit">Editar</button>
+                                </form>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -56,60 +68,59 @@
             <div class="modal-header">
                 <h2>Registrar usuario</h2>
             </div>
+            
+                <form th:action="@{/usuarios/save}" th:object="${usuario}" method="post" class="modal-body">
+                        <!-- Nombre de usuario -->
+                        <div class="form-grid">
+                            <!-- Nombre de usuario -->
+                            <div class="form-group">
+                                <label for="nombreUsuario">Nombre de usuario</label>
+                                <input type="text" th:field="*{nombreUsuario}" class="form-input"
+                                    placeholder="Usuario" required>
+                            </div>
 
-            <form class="modal-body" method="dialog">
-                <div class="form-grid">
-                    <!-- Nombre de usuario -->
-                    <div class="form-group">
-                        <label for="nombreUsuario">Nombre de usuario</label>
-                        <input type="text" id="nombreUsuario" class="form-input" placeholder="Usuario" required>
-                    </div>
+                            <div class="form-group">
+                                <label for="nombreCompleto">Nombre completo</label>
+                                <input type="text" th:field="*{nombreCompleto}" class="form-input"
+                                    placeholder="Nombre completo" required>
+                            </div>
 
-                    <!-- Correo Electrónico -->
-                    <div class="form-group">
-                        <label for="correo">Correo Electrónico</label>
-                        <input type="email" id="correo" class="form-input" placeholder="user@example.com" required>
-                    </div>
+                            <!-- Correo Electrónico -->
+                            <div class="form-group">
+                                <label for="correo">Correo Electrónico</label>
+                                <input type="email" th:field="*{email}" class="form-input"
+                                    placeholder="user@example.com" required>
+                            </div>
 
-                    <!-- Contraseña -->
-                    <div class="form-group">
-                        <label for="contrasena">Contraseña</label>
-                        <input type="password" id="contrasena" class="form-input" placeholder="***********" required>
-                    </div>
+                            <!-- Contraseña -->
+                            <div class="form-group">
+                                <label for="contrasena">Contraseña</label>
+                                <input type="password" th:field="*{contraseña}" class="form-input"
+                                    placeholder="***********" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="telefono">Telefono</label>
+                                <input type="text" th:field="*{telefono}" class="form-input"
+                                    placeholder="Telefono">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="rol">Rol</label>
+                                <select id="rol" th:field="*{rol}" class="form-input" required>
+                                    <option th:each="r : ${roles}" th:value="${r.idRol}" th:text="${r.nombreRol}"></option>
+                                </select>
+                            </div>
 
-                    <!-- Seleccionar Rol -->
-                    <div class="form-group">
-                        <label for="rol">Seleccionar Rol</label>
-                        <select id="rol" class="form-select" required>
-                            <option value="administrador">Administrador</option>
-                            <option value="usuario">Usuario</option>
-                            <option value="trabajador">Trabajador</option>
-                        </select>
-                    </div>
 
-                    <!-- Repetir contraseña -->
-                    <div class="form-group">
-                        <label for="repetirContrasena">Repetir contraseña</label>
-                        <input type="password" id="repetirContrasena" class="form-input" placeholder="***********"
-                            required>
-                    </div>
 
-                    <!-- Estado del usuario -->
-                    <div class="form-group">
-                        <label for="estado">Estado del usuario</label>
-                        <select id="estado" class="form-select" required>
-                            <option value="activo">Activo</option>
-                            <option value="inactivo">Inactivo</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button class="btn-cancelar"
-                        onclick="(document.getElementById('registrar-User').close())">Cancelar</button>
-                    <button type="submit" class="btn-registrar" onclick="funcionregistrar()">Registrar</button>
-                </div>
-            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn-cancelar"
+                                onclick="(document.getElementById('registrar-User').close())">Cancelar</button>
+                            <button type="submit" class="btn-registrar">Registrar</button>
+                        </div>
+                </form>
         </dialog>
     </main>
 

@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roles</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" th:href="@{/styles.css}">
-    <script th:src="@{/script.js}"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roles</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" th:href="@{/styles.css}">
+<script th:src="@{/script.js}"></script>
 </head>
 
 <body>
@@ -28,14 +26,24 @@
                         <tr>
                             <th>ID</th>
                             <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Creado</th>
+                            <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Administrador</td>
-                            <td><button class="btn-editar">Editar</button></td>
+                        <tr th:each="e : ${lista_roles}">
+                            <td th:text="${e.idRol}"></td>
+                            <td th:text="${e.nombreRol}"></td>
+                            <td th:text="${e.descripcion}"></td>
+                            <td th:text="${e.fechaCreación}"></td>
+                            <td th:text="${e.estado}"></td>
+                            <td>
+                                <form th:action="@{/roles/editar/{id}(id=${e.idRol})}" method="get">
+                                    <button class="btn-editar" type="submit">Editar</button>
+                                </form>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -49,47 +57,49 @@
                 <h2>Registrar Rol</h2>
             </div>
 
-            <form class="modal-body" method="dialog">
+            <form class="modal-body" th:object="${rol}" th:action="@{/roles}" method="post">
                 <div class="form-grid">
                     <!-- Nombre del rol -->
                     <div class="form-group">
                         <label for="nombreRol">Nombre del rol</label>
-                        <input type="text" id="nombreRol" class="form-input" placeholder="Rol" required>
+                        <input type="text" th:field="*{nombreRol}" class="form-input" placeholder="Rol" required>
                     </div>
 
                     <!-- Estado -->
                     <div class="form-group">
                         <label for="estado">Estado</label>
-                        <select id="estado" class="form-select" required>
-                            <option value="activo">Activo</option>
-                            <option value="inactivo">Inactivo</option>
+                        <select th:field="*{estado}" class="form-select" required>
+                            <option value="Activo">Activo</option>
+                            <option value="Inactivo">Inactivo</option>
                         </select>
                     </div>
-
-
-
                 </div>
 
+                <!-- Estado -->
+                <div class="form-group">
+                    <label for="descripcion">Descripción (Opcional)</label>
+                    <input type="text" th:field="*{descripcion}" class="form-input">
+                </div>
+
+                <!-- Permisos -->
                 <div class="flex flex-col my-3 ">
                     <label for="permisos" class="font-bold text-sm">Permisos</label>
                     <div class="mt-2 border-2 pt-2 overflow-y-scroll h-64 border-purple-900 flex flex-col rounded-md">
-                        <div th:replace="~{fragments/item-checkbox.html :: item-checkbox('usuarios')}"></div>
-                        <div th:replace="~{fragments/item-checkbox.html :: item-checkbox('roles')}"></div>
-                        <div th:replace="~{fragments/item-checkbox.html :: item-checkbox('compras')}"></div>
-                        <div th:replace="~{fragments/item-checkbox.html :: item-checkbox('ventas')}"></div>
-                        <div th:replace="~{fragments/item-checkbox.html :: item-checkbox('productos')}"></div>
-                        <div th:replace="~{fragments/item-checkbox.html :: item-checkbox('reportes')}"></div>
-                        <div th:replace="~{fragments/item-checkbox.html :: item-checkbox('caja')}"></div>
+                        <div th:each=" permiso: ${permisos}">
+                            <div th:replace="~{fragments/item-checkbox.html :: item-checkbox(${permiso})}"></div>
+                        </div>
                     </div>
                 </div>
 
+                <!-- Botones -->
                 <div class="modal-footer">
                     <button type="button" class="btn-cancelar"
                         onclick="(document.getElementById('modalRol').close())">Cancelar</button>
                     <button type="submit" class="btn-registrar">Registrar</button>
-                </div>
             </form>
+            </div>
         </dialog>
+
     </main>
 
 </body>

@@ -1,4 +1,5 @@
-<div th:fragment="item-checkbox(nombre)" class="flex px-5 py-2 justify-between text-base border-b-purple-800 border-b-2">
+<div th:fragment="item-checkbox(nombre)" 
+      class="flex px-5 py-2 justify-between text-base border-b-purple-800 border-b-2">
     <p th:text="'Gestion de ' + ${nombre}"></p>
-    <input type="checkbox" id="${nombre}" class="size-5 cursor-pointer">
+    <input type="checkbox" th:value="${nombre}" th:field="*{permisos}" class="size-5 cursor-pointer">
 </div>

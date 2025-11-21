@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roles</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/styles.css}">
+    <script th:src="@{/script.js}"></script>
+</head>
+
+<body>
+    <main id='main-content' class="flex h-dvh">
+        <!-- #region sidebar-->
+        <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
+        <!-- #endregion -->
+
+        <div class="flex-1 h-screen overflow-y-scroll overflow-x-hidden">
+
+            <div th:replace="~{fragments/header.html :: 
+                              header-info('Editar Rol','Seguridad > Roles del sistema > Editar Rol')}"></div>
+
+            <div class="container">
+                <h1 class="text-xl font-black text-wrap my-2 sm:text-2xl">Editar Rol</h1>
+
+                <form class="modal-body" th:object="${rolEditar}" th:action="@{/roles/editar/{id}(id=${idRol})}" method="post">
+                    <div class="form-grid">
+                        <!-- Nombre del rol -->
+                        <div class="form-group">
+                            <label for="nombreRol">Nombre del rol</label>
+                            <input type="text" th:field="*{nombreRol}" class="form-input" required>
+                        </div>
+
+                        <!-- Estado -->
+                        <div class="form-group">
+                            <label for="estado">Estado</label>
+                            <select th:field="*{estado}" class="form-select" required>
+                                <option value="Activo">Activo</option>
+                                <option value="Inactivo">Inactivo</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Estado -->
+                    <div class="form-group">
+                        <label for="descripcion">Descripción (Opcional)</label>
+                        <input type="text" th:field="*{descripcion}" class="form-input">
+                    </div>
+
+                    <!-- Permisos -->
+                    <div class="flex flex-col my-3 ">
+                        <label for="permisos" class="font-bold text-sm">Permisos</label>
+                        <div
+                            class="mt-2 border-2 pt-2 overflow-y-scroll h-64 border-purple-900 flex flex-col rounded-md">
+                            <div th:each=" permiso: ${permisos}">
+                                <div th:replace="~{fragments/item-checkbox.html :: item-checkbox(${permiso})}"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="modal-footer">
+                        <a th:href="@{/roles}" class="btn-cancelar" onclick="">Cancelar</a>
+                        <button type="submit" class="btn-registrar">Actualizar</button>
+                </form>
+            </div>
+        </div>
+
+    </main>
+
+</body>
+
+</html>

@@ -1,0 +1,2 @@
+INSERT INTO `permisos` (`id_permiso`, `modulo`) 
+VALUES ('1', 'Caja'), ('2', 'Compras'), ('3', 'Productos'), ('4', 'Reportes'), ('5', 'Roles'), ('6', 'Usuarios'), ('7', 'Ventas');

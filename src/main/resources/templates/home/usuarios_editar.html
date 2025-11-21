@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Usuario</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <link rel="stylesheet" th:href="@{/css/users.css}">
+    <script th:src="@{/script.js}"></script>
+</head>
+
+<body>
+    <main id='main-content' class="flex h-screen">
+
+        <!-- #region sidebar-->
+        <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
+        <!-- #endregion -->
+        <div class="flex-1 h-full overflow-y-scroll overflow-x-hidden">
+
+            <div th:replace="~{fragments/header.html :: 
+                              header-info('Editar Usuario','Seguridad > Usuarios del sistema > Editar Usuario')}"></div>
+
+            <div class="container">
+                <h1 class="text-xl font-black text-wrap my-2 sm:text-2xl">Editar Usuario</h1>
+
+                <form class="modal-body" th:object="${usuarioEditar}" th:action="@{/usuarios/editar/{id}(id=${idUsuario})}" method="post">
+                    <div class="form-grid">
+                        <!-- Nombre de usuario -->
+                        <div class="form-group">
+                            <label for="nombreUsuario">Nombre de usuario</label>
+                            <input type="text" th:field="*{nombreUsuario}" class="form-input" placeholder="Usuario" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="nombreCompleto">Nombre completo</label>
+                            <input type="text" th:field="*{nombreCompleto}" class="form-input" placeholder="Nombre completo" required>
+                        </div>
+
+                        <!-- Correo Electrónico -->
+                        <div class="form-group">
+                            <label for="correo">Correo Electrónico</label>
+                            <input type="email" th:field="*{email}" class="form-input" placeholder="user@example.com" disabled>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="telefono">Telefono</label>
+                            <input type="text" th:field="*{telefono}" class="form-input" placeholder="Telefono">
+                        </div>
+
+                        <!-- Estado -->
+                        <div class="form-group">
+                            <label for="estado">Estado</label>
+                            <select th:field="*{Estado}" class="form-select" required>
+                                <option value="Activo">Activo</option>
+                                <option value="Inactivo">Inactivo</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="rol">Rol</label>
+                            <select id="rol" th:field="*{rol}" class="form-input" required>
+                                <option th:each="r : ${roles}" th:value="${r.idRol}" th:text="${r.nombreRol}"></option>
+                            </select>
+                        </div>
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <a th:href="@{/usuarios}" class="btn-cancelar">Cancelar</a>
+                        <button type="submit" class="btn-registrar">Actualizar</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+    </main>
+
+</body>
+
+</html>
