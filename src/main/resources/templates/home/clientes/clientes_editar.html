@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Cliente</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <link rel="stylesheet" th:href="@{/css/marcas.css}">
+    <script th:src="@{/script.js}"></script>
+</head>
+
+<body>
+    <main id='main-content' class="flex h-screen">
+
+        <!-- #region sidebar-->
+        <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
+        <!-- #endregion -->
+        <div class="flex-1 h-full overflow-y-scroll overflow-x-hidden">
+
+            <div th:replace="~{fragments/header.html :: 
+                              header-info('Editar Cliente','Clientes > Editar Cliente')}"></div>
+
+            <div class="container">
+                <h1 class="text-xl font-black text-wrap my-2 sm:text-2xl">Editar Cliente</h1>
+
+                <form class="modal-body" th:object="${clienteEditar}" th:action="@{/clientes/editar/{id}(id=${idCliente})}" method="post">
+                    <div class="form-grid">
+
+                        <div class="form-group">
+                            <label for="numeroDocumento">Número de documento</label>
+                            <input type="text" th:field="*{numeroDocumento}" class="form-input" placeholder="Documento" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tipoDocumento">Tipo</label>
+                            <select th:field="*{tipoDocumento}" class="form-select" required>
+                                <option value="DNI">DNI</option>
+                                <option value="RUC">RUC</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="nombre">Nombre</label>
+                            <input type="text" th:field="*{nombre}" class="form-input" placeholder="Nombre" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="apellidos">Apellidos</label>
+                            <input type="text" th:field="*{apellidos}" class="form-input" placeholder="Apellidos">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="direccion">Dirección</label>
+                            <input type="text" th:field="*{direccion}" class="form-input" placeholder="Dirección">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" th:field="*{email}" class="form-input" placeholder="email@example.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="estado">Estado</label>
+                            <select th:field="*{estado}" class="form-select" required>
+                                <option value="Activo">Activo</option>
+                                <option value="Inactivo">Inactivo</option>
+                            </select>
+                        </div>
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <a th:href="@{/clientes}" class="btn-cancelar">Cancelar</a>
+                        <button type="submit" class="btn-registrar">Actualizar</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+    </main>
+
+</body>
+
+</html>
