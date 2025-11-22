@@ -51,28 +51,21 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td data-label="Código">CAT001</td>
-                                <td data-label="Nombre de Categoría">Analgésicos</td>
-                                <td data-label="Descripción">Medicamentos para aliviar el dolor</td>
-                                <td data-label="Estado"><span class="activo">✓ Activo</span></td>
-                                <td data-label="Fecha de Creación">10/01/2025</td>
-                                <td data-label="Acciones">
-                                    <div class="acciones-group">
-                                        <button class="btn-editar">✏ Editar</button>
-                                    </div>
+                            <tr th:each="c : ${listaCategorias}">
+                                <td th:text="${c.idCategoria}"></td>
+                                <td th:text="${c.nombreCategoria}"></td>
+                                <td th:text="${c.descripcion}"></td>
+
+                                <td>
+                                    <span th:if="${c.estado == 'Activo'}" class="activo">✓ Activo</span>
+                                    <span th:if="${c.estado == 'Inactivo'}" class="inactivo">⊗ Inactivo</span>
                                 </td>
-                            </tr>
-                            <tr>
-                                <td data-label="Código">CAT004</td>
-                                <td data-label="Nombre de Categoría">Antihistamínicos</td>
-                                <td data-label="Descripción">Medicamentos para tratar alergias</td>
-                                <td data-label="Estado"><span class="inactivo">⊗ Inactivo</span></td>
-                                <td data-label="Fecha de Creación">18/01/2025</td>
-                                <td data-label="Acciones">
-                                    <div class="acciones-group">
-                                        <button class="btn-editar">✏ Editar</button>
-                                    </div>
+
+                                <td th:text="${c.fechaRegistro}"></td>
+
+                                <td>
+                                    <a th:href="@{/categorias/editar/{id}(id=${c.idCategoria})}"
+                                        class="btn-editar">✏ Editar</a>
                                 </td>
                             </tr>
                         </tbody>
@@ -90,34 +83,46 @@
                 <h2>Registrar Categoría</h2>
             </div>
 
-            <form class="modal-body" method="dialog">
+            <form class="modal-body"
+                th:action="@{/categorias/save}"
+                th:object="${categoria}"
+                method="post">
+
                 <div class="form-grid">
+
                     <!-- Nombre de la categoría -->
                     <div class="form-group">
                         <label for="nombreCategoria">Nombre de la categoría</label>
-                        <input type="text" id="nombreCategoria" class="form-input" placeholder="Categoría" required>
+                        <input type="text"
+                        th:field="*{nombreCategoria}"
+                        class="form-input"
+                        placeholder="Categoría"
+                        required>
                     </div>
 
                     <!-- Estado -->
                     <div class="form-group">
                         <label for="estado">Estado</label>
-                        <select id="estado" class="form-select" required>
-                            <option value="activo">Activo</option>
-                            <option value="inactivo">Inactivo</option>
+                        <select th:field="*{estado}" class="form-select" required>
+                            <option value="Activo">Activo</option>
+                            <option value="Inactivo">Inactivo</option>
                         </select>
                     </div>
 
                     <!-- Descripción -->
                     <div class="form-group">
                         <label for="descripcion">Descripción</label>
-                        <textarea id="descripcion" class="form-textarea" placeholder="breve_descripción"
+                        <textarea th:field="*{descripcion}"
+                            class="form-textarea"
+                            placeholder="breve_descripción"
                             required></textarea>
                     </div>
+
                 </div>
 
                 <div class="modal-footer">
                     <button type="button" class="btn-cancelar"
-                        onclick="(document.getElementById('modalCategoria').close())">Cancelar</button>
+                        onclick="document.getElementById('modalCategoria').close()">Cancelar</button>
                     <button type="submit" class="btn-registrar">Registrar</button>
                 </div>
             </form>
