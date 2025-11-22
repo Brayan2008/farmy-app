@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Proveedor</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <link rel="stylesheet" th:href="@{/styles.css}">
+    <script th:src="@{/script.js}"></script>
+</head>
+
+<body>
+    <main id='main-content' class="flex h-screen">
+
+        <!-- #region sidebar-->
+        <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
+        <!-- #endregion -->
+        <div class="flex-1 h-full overflow-y-scroll overflow-x-hidden">
+
+            <div th:replace="~{fragments/header.html :: 
+                            header-info('Editar Proveedor','Compras > Proveedores > Editar Proveedor')}"></div>
+
+            <div class="container">
+                <h1 class="text-xl font-black text-wrap my-2 sm:text-2xl">Editar Proveedor</h1>
+
+                <form class="modal-body" th:object="${proveedorEditar}" th:action="@{/proveedores/editar/{id}(id=${idProveedor})}" method="post">
+                    <div class="form-grid">
+
+                        <!-- Razón Social -->
+                        <div class="form-group form-group-full">
+                            <label for="razonSocial">Razón Social</label>
+                            <input type="text" id="razonSocial" th:field="*{razonSocial}" class="form-input" placeholder="Laboratorios Bayer S.A." required>
+                        </div>
+
+                        <!-- RUC -->
+                        <div class="form-group">
+                            <label for="ruc">RUC</label>
+                            <input type="text" id="ruc" th:field="*{ruc}" class="form-input" placeholder="20123456789" pattern="[0-9]{11}"
+                                maxlength="11" required>
+                        </div>
+
+                        <!-- Teléfono -->
+                        <div class="form-group">
+                            <label for="telefono">Teléfono</label>
+                            <input type="tel" id="telefono" th:field="*{telefono}" class="form-input" placeholder="(01) 234-5678" required>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" th:field="*{email}" class="form-input" placeholder="ventas@proveedor.com" required>
+                        </div>
+
+                        <!-- Tipo de Proveedor -->
+                        <div class="form-group">
+                            <label for="tipo">Tipo de Proveedor</label>
+                            <select id="tipo" th:field="*{tipo}" class="form-select" required>
+                                <option value="">Seleccione...</option>
+                                <option value="Laboratorio">Laboratorio</option>
+                                <option value="Distribuidor">Distribuidor</option>
+                                <option value="Importador">Importador</option>
+                            </select>
+                        </div>
+
+                        <!-- Dirección -->
+                        <div class="form-group form-group-full">
+                            <label for="direccion">Dirección</label>
+                            <input type="text" id="direccion" th:field="*{direccion}" class="form-input"
+                                placeholder="Av. Principal 123, Distrito, Ciudad" required>
+                        </div>
+
+                        <!-- Estado -->
+                        <div class="form-group">
+                            <label for="estado">Estado</label>
+                            <select id="estado" th:field="*{estado}" class="form-select" required>
+                                <option value="Activo">Activo</option>
+                                <option value="Inactivo">Inactivo</option>
+                            </select>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <a th:href="@{/proveedores}" class="btn-cancelar">Cancelar</a>
+                        <button type="submit" class="btn-registrar">Actualizar</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+    </main>
+
+</body>
+
+</html>
+
