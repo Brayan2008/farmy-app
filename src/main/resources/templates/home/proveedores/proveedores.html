@@ -19,7 +19,7 @@
         <div class="flex-1 h-full overflow-y-scroll overflow-x-hidden">
 
             <div th:replace="~{fragments/header.html :: 
-                              header-info('Proveedores','Compras > Proveedores registrados')}"></div>
+                            header-info('Proveedores','Compras > Proveedores registrados')}"></div>
             <div class="container">
 
                 <div th:replace="~{fragments/search.html :: search-fragment('proveedores', 'Distribuidora Margarita EIRL ...')}"></div>
@@ -60,31 +60,21 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td data-label="Código">PROV001</td>
-                                <td data-label="Razón Social">Laboratorios Bayer S.A.</td>
-                                <td data-label="RUC">20123456789</td>
-                                <td data-label="Teléfono">(01) 234-5678</td>
-                                <td data-label="Email">ventas@bayer.com.pe</td>
-                                <td data-label="Tipo">Laboratorio</td>
-                                <td data-label="Estado"><span class="activo">✓ Activo</span></td>
-                                <td data-label="Acciones">
-                                    <div class="acciones-group">
-                                        <button class="btn-editar">✏ Editar</button>
-                                    </div>
+                            <tr th:each="p : ${listaProveedores}">
+                                <td data-label="Código" th:text="${p.codigo}"></td>
+                                <td data-label="Razón Social" th:text="${p.razonSocial}"></td>
+                                <td data-label="RUC" th:text="${p.ruc}"></td>
+                                <td data-label="Teléfono" th:text="${p.telefono}"></td>
+                                <td data-label="Email" th:text="${p.email}"></td>
+                                <td data-label="Tipo" th:text="${p.tipo}"></td>
+                                <td data-label="Estado">
+                                    <span th:classappend="${p.estado == 'Activo' ? 'activo' : 'inactivo'}" th:text="${p.estado}"></span>
                                 </td>
-                            </tr>
-                            <tr>
-                                <td data-label="Código">PROV003</td>
-                                <td data-label="Razón Social">Distribuidora Médica Lima S.A.C.</td>
-                                <td data-label="RUC">20345678901</td>
-                                <td data-label="Teléfono">(01) 456-7890</td>
-                                <td data-label="Email">ventas@medicalima.com</td>
-                                <td data-label="Tipo">Distribuidor</td>
-                                <td data-label="Estado"><span class="inactivo">⊗ Inactivo</span></td>
                                 <td data-label="Acciones">
                                     <div class="acciones-group">
-                                        <button class="btn-editar">✏ Editar</button>
+                                        <form th:action="@{/proveedores/editar/{id}(id=${p.idProveedor})}" method="get">
+                                            <button class="btn-editar" type="submit">✏ Editar</button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
@@ -104,59 +94,50 @@
                 <h2>Registrar Proveedor</h2>
             </div>
 
-            <form class="modal-body" method="dialog">
+            <form class="modal-body" th:object="${proveedor}" th:action="@{/proveedores/save}" method="post">
                 <div class="form-grid">
                     <!-- Razón Social -->
                     <div class="form-group form-group-full">
                         <label for="razonSocial">Razón Social</label>
-                        <input type="text" id="razonSocial" class="form-input" placeholder="Laboratorios Bayer S.A."
+                        <input type="text" id="razonSocial" th:field="*{razonSocial}" class="form-input" placeholder="Laboratorios Bayer S.A."
                             required>
                     </div>
 
                     <!-- RUC -->
                     <div class="form-group">
                         <label for="ruc">RUC</label>
-                        <input type="text" id="ruc" class="form-input" placeholder="20123456789" pattern="[0-9]{11}"
+                        <input type="text" id="ruc" th:field="*{ruc}" class="form-input" placeholder="20123456789" pattern="[0-9]{11}"
                             maxlength="11" required>
                     </div>
 
                     <!-- Teléfono -->
                     <div class="form-group">
                         <label for="telefono">Teléfono</label>
-                        <input type="tel" id="telefono" class="form-input" placeholder="(01) 234-5678" required>
+                        <input type="tel" id="telefono" th:field="*{telefono}" class="form-input" placeholder="(01) 234-5678" required>
                     </div>
 
                     <!-- Email -->
                     <div class="form-group">
                         <label for="email">Email</label>
-                        <input type="email" id="email" class="form-input" placeholder="ventas@proveedor.com" required>
+                        <input type="email" id="email" th:field="*{email}" class="form-input" placeholder="ventas@proveedor.com" required>
                     </div>
 
                     <!-- Tipo de Proveedor -->
                     <div class="form-group">
                         <label for="tipo">Tipo de Proveedor</label>
-                        <select id="tipo" class="form-select" required>
+                        <select id="tipo" th:field="*{tipo}" class="form-select" required>
                             <option value="">Seleccione...</option>
-                            <option value="laboratorio">Laboratorio</option>
-                            <option value="distribuidor">Distribuidor</option>
-                            <option value="importador">Importador</option>
+                            <option value="Laboratorio">Laboratorio</option>
+                            <option value="Distribuidor">Distribuidor</option>
+                            <option value="Importador">Importador</option>
                         </select>
                     </div>
 
                     <!-- Dirección -->
                     <div class="form-group form-group-full">
                         <label for="direccion">Dirección</label>
-                        <input type="text" id="direccion" class="form-input"
+                        <input type="text" id="direccion" th:field="*{direccion}" class="form-input"
                             placeholder="Av. Principal 123, Distrito, Ciudad" required>
-                    </div>
-
-                    <!-- Estado -->
-                    <div class="form-group">
-                        <label for="estado">Estado</label>
-                        <select id="estado" class="form-select" required>
-                            <option value="activo">Activo</option>
-                            <option value="inactivo">Inactivo</option>
-                        </select>
                     </div>
                 </div>
 
