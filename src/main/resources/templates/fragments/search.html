@@ -1,5 +1,5 @@
 <div th:fragment="search-fragment(modulo, placeholder)" id="${modulo}" class="flex justify-between self-center m-auto my-6 md:w-11/12">
     <h4 class="text-lg pt-1.5 mr-1 md:mr-4">Buscar: </h4>
-    <input type="text" class="flex-1 border-2 border-purple-900 p-1.5 rounded-md" th:placeholder="${placeholder}" id="search-input-Marcas"
-           onkeyup="filtrarMarcas()">
+    <input type="text" class="flex-1 border-2 border-purple-900 p-1.5 rounded-md" th:placeholder="${placeholder}" th:id="search-input"
+           onkeyup="aplicarFiltros()" />
 </div>

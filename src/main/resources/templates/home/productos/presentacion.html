@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presentaciones</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/styles.css}">
+    <script th:src="@{/script.js}"></script>
+    
+</head>
+
+<body>
+    <main id='main-content' class="flex h-dvh">
+
+        <!-- #region sidebar-->
+        <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
+        <!-- #endregion -->
+        <div class="flex-1 h-screen overflow-y-scroll overflow-x-hidden">
+
+            <div th:replace="~{fragments/header.html :: 
+                              header-info('Presentaciones','Productos > Presentaciones')}"></div>
+            <div class="container">
+                
+                <div th:replace="~{fragments/search.html :: search-fragment('Presentaciones', 'Buscar presentaciones ...')}"></div>
+
+                <div class="filters-container">
+                    <span class="filter-label">Filtrar por:</span>
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label>Estado:</label>
+                            <select id="filtroEstado" onchange="aplicarFiltros()">
+                                <option value="true">Activo</option>
+                                <option value="false">Inactivo</option>
+                                <option value="all">Todos</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Presentacion</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cuerpoTabla">
+                            <tr>
+                                <td data-label="Código">1</td>
+                                <td data-label="Presentacion">Tylenol</td>
+                                <td data-label="Estado"><span class="activo">✓ Activo</span></td>
+                                <td data-label="Acciones">
+                                    <div class="acciones-group">
+                                        <button class="btn-editar" onclick="registrar('modalPresentacion')">✏ Editar</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="Código">2</td>
+                                <td data-label="Presentacion">Advil</td>
+                                <td data-label="Estado"><span class="inactivo">⊗ Inactivo</span></td>
+                                <td data-label="Acciones">
+                                    <div class="acciones-group">
+                                        <button class="btn-editar" onclick="registrar('modalPresentacion')" >✏ Editar</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="botones-contenedor">
+                    <button class="btn-nuevo" onclick="registrar('modalPresentacion')">Nueva Presentacion</button>
+                </div>
+            </div>
+        </div>
+
+        <dialog id="modalPresentacion">
+            <div class="modal-header">
+                <h2>Registrar Presentacion</h2>
+            </div>
+
+            <form class="modal-body" method="dialog">
+                <div class="form-grid">
+                    <!-- Nombre de la categoría -->
+                    <div class="form-group">
+                        <label for="nombre">Nombre de la Presentacion</label>
+                        <input type="text" id="nombrePresentacion" class="form-input" placeholder="Presentacion" required>
+                    </div>
+
+                    <!-- Estado -->
+                    <div class="form-group">
+                        <label for="estado">Estado</label>
+                        <select id="estado" class="form-select" required>
+                            <option value="true">Activo</option>
+                            <option value="false">Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-footer" style=" display: flex; justify-content: center;">
+                    <!-- En tu modal, modifica el botón cancelar -->
+                     
+                    <button type="button" class="btn-cancelar" 
+                            onclick="document.getElementById('modalPresentacion').close(); resetearFormulario();">
+                        Cancelar
+                    </button>
+
+                    <button type="submit" class="btn-registrar" onclick="agregarPresentacion()">Registrar</button>
+                </div>
+            </form>
+        </dialog>
+        
+    </main>
+    <script src="/js/presentaciones.js"></script>
+</body>
+
+</html>
