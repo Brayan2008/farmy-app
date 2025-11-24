@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Métodos de pago</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/marcas.css}">
+    <script th:src="@{/script.js}"></script>
+</head>
+
+<body>
+    <main id='main-content' class="flex h-screen">
+
+        <!-- #region sidebar-->
+        <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
+        <!-- #endregion -->
+        <div class="flex-1 h-full w-screen overflow-y-scroll overflow-x-hidden">
+
+            <div th:replace="~{fragments/header.html :: 
+                              header-info('Métodos de pago','Configuración > Métodos de pago')}"></div>
+
+            <div class="container">
+
+                <div th:replace="~{fragments/search.html :: search-fragment('Métodos de pago', 'Efectivo, Tarjeta...')}"></div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Método</th>
+                            <th>Descripción</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="m : ${listaMetodos}">
+                            <td th:text="${m.idMetodoPago}"></td>
+                            <td th:text="${m.nombreMetodoPago}"></td>
+                            <td th:text="${m.descripcion}"></td>
+                            <td><span th:classappend="${m.estado == 'Activo' ? 'activo' : 'inactivo'}" th:text="${m.estado}"></span></td>
+                            <td>
+                                <form th:action="@{/metodos-pago/editar/{id}(id=${m.idMetodoPago})}" method="get">
+                                    <button class="btn-editar" type="submit">Editar</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="botones-contenedor">
+                    <button class="btn-nuevo" onclick="registrar('modalMetodo')">Nuevo Método</button>
+                </div>
+            </div>
+        </div>
+
+        <dialog id="modalMetodo">
+            <div class="modal-header">
+                <h2>Registrar Método de pago</h2>
+            </div>
+
+            <form class="modal-body" th:object="${metodoPago}" th:action="@{/metodos-pago/save}" method="post">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="metodoPago">Método</label>
+                        <input type="text" th:field="*{nombreMetodoPago}" class="form-input" placeholder="Efectivo, Tarjeta..." required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="descripcion">Descripción</label>
+                        <input type="text" th:field="*{descripcion}" class="form-input" placeholder="Opcional">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancelar" onclick="(document.getElementById('modalMetodo').close())">Cancelar</button>
+                    <button type="submit" class="btn-registrar">Registrar</button>
+                </div>
+            </form>
+        </dialog>
+
+    </main>
+
+</body>
+
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Método de pago</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <link rel="stylesheet" th:href="@{/css/marcas.css}">
+    <script th:src="@{/script.js}"></script>
+</head>
+
+<body>
+    <main id='main-content' class="flex h-screen">
+
+        <!-- #region sidebar-->
+        <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
+        <!-- #endregion -->
+        <div class="flex-1 h-full overflow-y-scroll overflow-x-hidden">
+
+            <div th:replace="~{fragments/header.html :: 
+                              header-info('Editar Método','Configuración > Métodos de pago > Editar Método')}"></div>
+
+            <div class="container">
+                <h1 class="text-xl font-black text-wrap my-2 sm:text-2xl">Editar Método de pago</h1>
+
+                <form class="modal-body" th:object="${metodoEditar}" th:action="@{/metodos-pago/editar/{id}(id=${idMetodo})}" method="post">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="metodoPago">Método</label>
+                            <input type="text" th:field="*{nombreMetodoPago}" class="form-input" placeholder="Efectivo, Tarjeta..." required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="descripcion">Descripción</label>
+                            <input type="text" th:field="*{descripcion}" class="form-input" placeholder="Opcional">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="estado">Estado</label>
+                            <select th:field="*{estado}" class="form-select" required>
+                                <option value="Activo">Activo</option>
+                                <option value="Inactivo">Inactivo</option>
+                            </select>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <a th:href="@{/metodos-pago}" class="btn-cancelar">Cancelar</a>
+                        <button type="submit" class="btn-registrar">Actualizar</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+    </main>
+
+</body>
+
+</html>
