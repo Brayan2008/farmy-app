@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorios</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/marcas.css}">
+    <script th:src="@{/script.js}"></script>
+</head>
+
+<body>
+    <main id='main-content' class="flex h-screen">
+
+        <!-- #region sidebar-->
+        <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
+        <!-- #endregion -->
+        <div class="flex-1 h-full w-screen overflow-y-scroll overflow-x-hidden">
+
+            <div th:replace="~{fragments/header.html :: 
+                              header-info('Laboratorios','Productos > Laboratorios registrados')}"></div>
+
+            <div class="container">
+
+                <div th:replace="~{fragments/search.html :: search-fragment('Laboratorios', 'Bayer ...')}"></div>
+
+                <div class="filters-container">
+                    <span class="filter-label">Filtrar por:</span>
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label>Estado:</label>
+                            <select>
+                                <option>Activo</option>
+                                <option>Inactivo</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>RUC</th>
+                            <th>Teléfono</th>
+                            <th>Email</th>
+                            <th>Dirección</th>
+                            <th>Estado</th>
+                            <th>Fecha Registro</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="l : ${listaLaboratorios}">
+                            <td data-label="Código" th:text="${l.codigo}"></td>
+                            <td data-label="Nombre" th:text="${l.nombre}"></td>
+                            <td data-label="RUC" th:text="${l.ruc}"></td>
+                            <td data-label="Teléfono" th:text="${l.telefono}"></td>
+                            <td data-label="Email" th:text="${l.email}"></td>
+                            <td data-label="Dirección" th:text="${l.direccion}"></td>
+                            <td data-label="Estado">
+                                <span th:classappend="${l.estado == 'Activo' ? 'activo' : 'inactivo'}" th:text="${l.estado}"></span>
+                            </td>
+                            <td data-label="Fecha Registro" th:text="${l.fechaRegistro}"></td>
+                            <td data-label="Acciones">
+                                <div class="acciones-group">
+                                    <form th:action="@{/laboratorios/editar/{id}(id=${l.idLaboratorio})}" method="get">
+                                        <button class="btn-editar" type="submit">✏ Editar</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="botones-contenedor">
+                    <button class="btn-nuevo" onclick="registrar('modalLaboratorio')">Nuevo Laboratorio</button>
+                </div>
+            </div>
+        </div>
+
+        <dialog id="modalLaboratorio">
+            <div class="modal-header">
+                <h2>Registrar Laboratorio</h2>
+            </div>
+
+            <form class="modal-body" th:object="${laboratorio}" th:action="@{/laboratorios/save}" method="post">
+                <div class="form-grid">
+                    <div class="form-group form-group-full">
+                        <label for="nombre">Nombre</label>
+                        <input type="text" id="nombre" th:field="*{nombre}" class="form-input" placeholder="Laboratorios Bayer S.A." required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ruc">RUC</label>
+                        <input type="text" id="ruc" th:field="*{ruc}" class="form-input" placeholder="20123456789" pattern="[0-9]{11}"
+                            maxlength="11" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="telefono">Teléfono</label>
+                        <input type="tel" id="telefono" th:field="*{telefono}" class="form-input" placeholder="(01) 234-5678" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" th:field="*{email}" class="form-input" placeholder="contacto@laboratorio.com" required>
+                    </div>
+
+                    <div class="form-group form-group-full">
+                        <label for="direccion">Dirección</label>
+                        <input type="text" id="direccion" th:field="*{direccion}" class="form-input"
+                            placeholder="Av. Principal 123, Distrito, Ciudad" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="estado">Estado</label>
+                        <select id="estado" th:field="*{estado}" class="form-select" required>
+                            <option value="Activo">Activo</option>
+                            <option value="Inactivo">Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancelar" onclick="(document.getElementById('modalLaboratorio').close())">Cancelar</button>
+                    <button type="submit" class="btn-registrar">Registrar</button>
+                </div>
+            </form>
+        </dialog>
+
+    </main>
+
+</body>
+
+</html>
+
+
