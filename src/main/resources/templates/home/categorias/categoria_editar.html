@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Categoría</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <link rel="stylesheet" th:href="@{/css/marcas.css}">
+    <script th:src="@{/script.js}"></script>
+</head>
+
+<body>
+<main id='main-content' class="flex h-screen">
+
+    <!-- Sidebar -->
+    <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
+
+    <div class="flex-1 h-full overflow-y-scroll overflow-x-hidden">
+
+        <div th:replace="~{fragments/header.html :: 
+                          header-info('Editar Categoría','Productos > Categorías > Editar Categoría')}"></div>
+
+        <div class="container">
+            <h1 class="text-xl font-black text-wrap my-2 sm:text-2xl">Editar Categoría</h1>
+
+            <!-- FORMULARIO -->
+            <form class="modal-body"
+                  th:object="${categoriaEditar}"
+                  th:action="@{/categorias/editar/{id}(id=${idCategoria})}"
+                  method="post">
+
+                <div class="form-grid">
+
+                    <!-- Nombre -->
+                    <div class="form-group">
+                        <label for="nombreCategoria">Nombre de la categoría</label>
+                        <input type="text"
+                               th:field="*{nombreCategoria}"
+                               class="form-input"
+                               placeholder="Nombre de categoría"
+                               required>
+                    </div>
+
+                    <!-- Estado -->
+                    <div class="form-group">
+                        <label for="estado">Estado</label>
+                        <select th:field="*{estado}" class="form-select" required>
+                            <option value="Activo">Activo</option>
+                            <option value="Inactivo">Inactivo</option>
+                        </select>
+                    </div>
+
+                    <!-- Descripción -->
+                    <div class="form-group col-span-2">
+                        <label for="descripcion">Descripción</label>
+                        <textarea th:field="*{descripcion}"
+                                  class="form-textarea"
+                                  placeholder="Descripción..."
+                                  required></textarea>
+                    </div>
+
+                </div>
+
+                <!-- Botones -->
+                <div class="modal-footer">
+                    <a th:href="@{/categorias}" class="btn-cancelar">Cancelar</a>
+                    <button type="submit" class="btn-registrar">Actualizar</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</main>
+</body>
+</html>
