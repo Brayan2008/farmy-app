@@ -18,3 +18,21 @@
 .modal-body::-webkit-scrollbar-thumb:hover {
     background: #5a32a3;
 }
+
+.btn-nuevo-flotante {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background-color: #28a745;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 50px;
+    text-decoration: none;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.btn-nuevo-flotante:hover {
+    background-color: #218838;
+}

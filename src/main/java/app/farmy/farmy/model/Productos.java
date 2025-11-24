@@ -2,6 +2,7 @@ package app.farmy.farmy.model;
 
 import java.time.LocalDate;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
@@ -22,21 +23,31 @@ public class Productos {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     int idProducto;
 
+    @Column(nullable = false)
     String nombreProducto;
-
+    
     String descripcion;
-
+    
     String principioActivo;
-
+    
     String concentracion;
-
-    String formaFarmaceutica; // Ojo esto puede ser un enum o separarlo en una tabla
-
+    
+    String formaFarmaceutica; 
+    
+    @Column(nullable = false)
     boolean requiereReceta;
-
+    
+    @Column(nullable = false)
     String estado;
-
+    
+    @Column(nullable = false)
     LocalDate fechaRegistro;
+    
+    Double precioVenta;
+
+    Integer stock;
+
+    String imgUrl;
 
     @ManyToOne
     @JoinColumn(name = "idPresentacion", foreignKey = @ForeignKey(name = "FK_Presentacion_Productos"))
@@ -50,13 +61,16 @@ public class Productos {
     @JoinColumn(name = "idCategoria", foreignKey = @ForeignKey(name = "FK_Categoria_Productos"))
     private Categoria categoria;
 
+    @ManyToOne
+    @JoinColumn(name = "idLaboratorio", foreignKey = @ForeignKey(name = "FK_Laboratorio_Producto"))
+    private Laboratorio laboratorio;
+
     @PrePersist
     public void preGuardado() {
         fechaRegistro = LocalDate.now();
         estado = "Activo";
     }
 
-    // TODO relacionarlo con Laboratorio
     // TODO realizar el frontend del producto
 
     // TODO llevarlo a Lote e InventarioMovimiento
