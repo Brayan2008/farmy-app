@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marcas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/styles.css}">
+    <script th:src="@{/script.js}"></script>
+    
+</head>
+
+<body>
+    <main id='main-content' class="flex h-dvh">
+
+        <!-- #region sidebar-->
+        <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
+        <!-- #endregion -->
+        <div class="flex-1 h-screen overflow-y-scroll overflow-x-hidden">
+
+            <div th:replace="~{fragments/header.html :: 
+                              header-info('Marcas','Productos > Marcas')}"></div>
+            <div class="container">
+                
+                <div th:replace="~{fragments/search.html :: search-fragment('Marcas', 'Buscar marcas ...')}"></div>
+
+                <div class="filters-container">
+                    <span class="filter-label">Filtrar por:</span>
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label>Estado:</label>
+                            <select id="filtroEstado" onchange="aplicarFiltros()">
+                                <option value="true">Activo</option>
+                                <option value="false">Inactivo</option>
+                                <option value="all">Todos</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Marca</th>
+                                <th>Descripción</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cuerpoTabla">
+                            <tr>
+                                <td data-label="Código">1</td>
+                                <td data-label="Marca">Tylenol</td>
+                                <td data-label="Descripción">Una de las marcas más reconocidas
+                                     globalmente para el alivio del dolor (analgésico) y la reducción 
+                                     de la fiebre (antipirético). Se utiliza para tratar dolores de cabeza, musculares
+                                    , dolores de muelas y los síntomas de resfriados y gripe.</td>
+                                <td data-label="Estado"><span class="activo">✓ Activo</span></td>
+                                <td data-label="Acciones">
+                                    <div class="acciones-group">
+                                        <button class="btn-editar" onclick="registrar('modalMarca')">✏ Editar</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="Código">2</td>
+                                <td data-label="Marca">Advil</td>
+                                <td data-label="Descripción">Una marca líder que contiene ibuprofeno,
+                                     un medicamento 
+                                    antiinflamatorio no esteroideo (AINE). Se utiliza para reducir la 
+                                    inflamación, aliviar dolores leves a moderados y bajar la fiebre, 
+                                    siendo especialmente útil para dolores causados por la inflamación.</td>
+                                <td data-label="Estado"><span class="inactivo">⊗ Inactivo</span></td>
+                                <td data-label="Acciones">
+                                    <div class="acciones-group">
+                                        <button class="btn-editar" onclick="registrar('modalMarca')" >✏ Editar</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="botones-contenedor">
+                    <button class="btn-nuevo" onclick="registrar('modalMarca')">Nueva Marca</button>
+                </div>
+            </div>
+        </div>
+
+        <dialog id="modalMarca">
+            <div class="modal-header">
+                <h2>Registrar Marca</h2>
+            </div>
+
+            <form class="modal-body" method="dialog">
+                <div class="form-grid">
+                    <!-- Nombre de la categoría -->
+                    <div class="form-group">
+                        <label for="nombre">Nombre de la Marca</label>
+                        <input type="text" id="nombreMarca" class="form-input" placeholder="Marca" required>
+                    </div>
+
+                    <!-- Estado -->
+                    <div class="form-group">
+                        <label for="estado">Estado</label>
+                        <select id="estado" class="form-select" required>
+                            <option value="true">Activo</option>
+                            <option value="false">Inactivo</option>
+                        </select>
+                    </div>
+                    <!-- Descripción -->
+                    <div class="form-group">
+                        <label for="descripcion">Descripción</label>
+                        <textarea id="descripcion" class="form-textarea" placeholder="Descripción"
+                            required></textarea>
+                    </div>
+                  
+                </div>
+
+                <div class="modal-footer" style=" display: flex; justify-content: center;">
+                    <!-- En tu modal, modifica el botón cancelar -->
+                     
+                    <button type="button" class="btn-cancelar" 
+                            onclick="document.getElementById('modalMarca').close(); resetearFormulario();">
+                        Cancelar
+                    </button>
+
+                    <button type="submit" class="btn-registrar" onclick="agregarMarca()">Registrar</button>
+                </div>
+            </form>
+        </dialog>
+        
+    </main>
+    <script src="/js/marcas.js"></script>
+</body>
+
+</html>
