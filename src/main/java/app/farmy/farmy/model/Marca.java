@@ -1,11 +1,21 @@
 package app.farmy.farmy.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
+@NoArgsConstructor
+@Getter
+@Setter
 public class Marca {
 
     @Id
@@ -19,46 +29,17 @@ public class Marca {
     private String descripcion;
 
     @Column(nullable = false)
-    private Boolean estado ;
+    private Boolean estado;
     
-    public Marca (){}
-
-    public Marca (String nombre, String descripcion, Boolean estado)
-    {
+    @OneToMany(mappedBy = "marca")
+    private final List<Productos> listaProductos = new ArrayList<>();
+    
+    public Marca (String nombre, String descripcion, Boolean estado){
         nombreMarca=nombre;
         this.descripcion=descripcion;
         this.estado = (estado==null) ? true : estado;
     }
 
-    public Long getIdMarca() {
-        return idMarca;
-    }
 
-    public String getNombreMarca() {
-        return nombreMarca;
-    }
-
-    public void setNombreMarca(String nombreMarca) {
-        this.nombreMarca = nombreMarca;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-
-    public Boolean isEstado() {
-        return estado;
-    }
-
-    public void setEstado(Boolean estado) {
-        this.estado = (estado==null) ? true : estado;
-    }
-    
-    
-    
 
 }

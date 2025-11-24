@@ -1,10 +1,23 @@
 package app.farmy.farmy.model;
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 @Entity
+@NoArgsConstructor
+@Getter
+@Setter
 public class Presentacion {
     
     @Id
@@ -17,36 +30,16 @@ public class Presentacion {
     @Column(nullable = false)
     private Boolean estado;
 
-    Presentacion() {
-    }
 
+    @OneToMany(mappedBy = "presentacion")
+    private final List<Productos> listaProductos = new ArrayList<>();    
+
+    
     Presentacion(String nombre, Boolean estado) {
         this.nombre = nombre;
         this.estado = (estado==null)?true:estado;
     }
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public Boolean getEstado() {
-        return estado;
-    }
-
-    public void setEstado(Boolean estado) {
-        this.estado = estado;
-    }
     
 }
