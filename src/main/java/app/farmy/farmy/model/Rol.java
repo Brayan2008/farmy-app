@@ -53,6 +53,7 @@ public class Rol {
 
     @PrePersist
     public void preGuardado() {
+        estado = "Activo";
         fechaCreación = LocalDate.now();
     }
 

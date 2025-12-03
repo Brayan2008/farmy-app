@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compras</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/compras.css}">
+    <script th:src="@{/script.js}"></script>
+</head>
+
+<body>
+    <main id='main-content' class="flex h-dvh">
+
+        <!-- #region sidebar-->
+        <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
+        <!-- #endregion -->
+        <div class="flex-1 h-screen overflow-y-scroll overflow-x-hidden">
+
+            <div th:replace="~{fragments/header.html :: 
+                              header-info('Gestionar Compras','Compras de productos')}"></div>
+
+            <div class="container">
+
+                <div th:replace="~{fragments/search.html :: search-fragment('compras', 'Buscar compra...')}"></div>
+
+                <div class="filters-container">
+                    <span class="filter-label">Filtrar por:</span>
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label>Estado:</label>
+                            <select>
+                                <option>Activo</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Tipo de Pago:</label>
+                            <select>
+                                <option>Activo</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Proveedor</th>
+                                <th>Deuda (S/.)</th>
+                                <th>Tipo</th>
+                                <th>Total (S/.)</th>
+                                <th>Estado</th>
+                                <th>Fecha y Hora</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="c : ${listaCompras}">
+                                <td data-label="Código" th:text="${c.numeroFactura}"></td>
+                                <td data-label="Proveedor" th:text="${c.proveedor != null ? c.proveedor.razonSocial : '---'}"></td>
+                                <td data-label="Deuda" th:text="${c.saldoPendiente}"></td>
+                                <td data-label="Tipo" th:text="${c.tipoCompra}"></td>
+                                <td data-label="Total" th:text="${c.total}"></td>
+                                <td data-label="Estado"><span th:classappend="${c.estado == 'Anulado' ? 'estado-anulado' : (c.estadoPago != null and c.estadoPago.name() == 'PAGADO') ? 'estado-pagado' : 'estado-pendiente'}" th:text="${c.estadoPago}"></span></td>
+                                <td data-label="Fecha" th:text="${#temporals.format(c.fechaFactura, 'dd/MM/yyyy - HH:mm:ss')}"></td>
+                                <td data-label="Acciones">
+                                    <div class="acciones-group">
+                                        <form th:action="@{/compras/ver/{id}(id=${c.numeroFactura})}" method="get">
+                                            <button class="btn-editar" type="submit" style="background: #FDE68A;">Ver compra</button>
+                                        </form>
+                                        <button type="button" class="btn-anular" style="background: #F87171;" onclick="openAnular('${c.numeroFactura}')">Anular</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="botones-contenedor">
+                    <a class="btn-nuevo" th:href="@{/compras/nueva}">Nueva Compra</a>
+                </div>
+            </div>
+        </div>
+
+        <dialog id="dialogAnular">
+            <div class="modal-header">
+                <h2>Anular Compra</h2>
+            </div>
+            <form th:action="@{/compras/anular}" method="post" class="modal-body">
+                <input type="hidden" id="numeroFacturaHidden" name="numeroFactura" value="">
+                <div class="form-group">
+                    <label for="motivo">Motivo de anulación</label>
+                    <textarea id="motivo" name="motivo" class="form-input" rows="4" required></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancelar" onclick="closeAnular()">Cancelar</button>
+                    <button type="submit" class="btn-anular" style="background: #ef4444;">Anular</button>
+                </div>
+            </form>
+        </dialog>
+
+    </main>
+
+    <script>
+        function openAnular(numero) {
+            const d = document.getElementById('dialogAnular');
+            document.getElementById('numeroFacturaHidden').value = numero;
+            if (typeof d.showModal === 'function') d.showModal(); else d.style.display = 'block';
+        }
+
+        function closeAnular() {
+            const d = document.getElementById('dialogAnular');
+            document.getElementById('motivo').value = '';
+            if (typeof d.close === 'function') d.close(); else d.style.display = 'none';
+        }
+    </script>
+</body>

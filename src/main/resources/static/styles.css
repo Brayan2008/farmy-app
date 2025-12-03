@@ -413,7 +413,7 @@ dialog::backdrop {
         padding: 10px;
         font-size: 14px;
     }
-    
+
     .btn-nuevo {
         width: 100%;
         padding: 14px 20px;
@@ -427,4 +427,16 @@ dialog::backdrop {
         padding: 4px 8px;
     }
 
+}
+
+@keyframes animate-to-up {
+    0% {
+        transform: translateY(150px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }

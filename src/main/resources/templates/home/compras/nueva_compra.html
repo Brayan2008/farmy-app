@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nueva Compra</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/compras.css}">
+    <script th:src="@{/script.js}"></script>
+    <script th:src="@{/js/compras.js}"></script>
+</head>
+
+<body>
+    <main id='main-content' class="flex h-dvh">
+
+        <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
+
+        <div class="flex-1 h-screen overflow-y-scroll overflow-x-hidden">
+            <div th:replace="~{fragments/header.html :: header-info('Registrar Compra','Compras > Nueva Compra')}">
+            </div>
+
+            <div class="container grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                <!-- Left: Products grid -->
+                <div
+                    class="css-mover-arriba h-96 md:col-span-2 shadow-xl shadow-black/60 p-5 mb-5 rounded-xl md:h-auto overflow-y-scroll">
+                    <h2 class="font-bold text-2xl mb-4">Productos</h2>
+                    <div th:replace="~{fragments/search.html :: search-fragment('Productos', 'Paracetamol')}"></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 mt-10">
+                        <div th:each="p : ${productos}"
+                            class="rounded-md shadow-xl shadow-gray-600/60 hover:scale-110 cursor-pointer transition-transform duration-150">
+                            <div>
+                                <img th:if="${p.imgUrl != null and !p.imgUrl.isEmpty()}"
+                                    th:src="@{'/uploads/' + ${p.imgUrl}}" alt="img"
+                                    style="height:120px; width:100%; object-fit:cover;">
+                                <img th:unless="${p.imgUrl != null and !p.imgUrl.isEmpty()}"
+                                    th:src="@{/img/default.webp}" alt="img"
+                                    style="height:120px; width:100%; object-fit:cover;">
+                                <div class="p-2">
+                                    <h3 th:text="${p.nombreProducto}" class="truncate"></h3>
+                                    <p class="text-sm text-gray-600">S/ <span th:text="${p.precioVenta}"></span></p>
+                                    <button class="btn-registrar mt-2" type="button" th:data-id='${p.idProducto}'
+                                        th:data-name='${p.nombreProducto}' th:data-price='${p.precioVenta}'
+                                        th:data-img='${p.imgUrl}' th:data-receta='${p.requiereReceta}'
+                                        th:data-categoria='${p.categoria != null ? p.categoria.nombreCategoria : "Sin categoría"}'
+                                        th:data-descripcion='${p.descripcion}'
+                                        onclick="openProducto(this)">Agregar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Cart -->
+                <div class="mb-5 p-5 shadow-2xl shadow-black/80 rounded-xl cart-column css-mover-arriba-2s">
+                    <h2 class="text-2xl font-bold mb-4">Detalle de compra</h2>
+                    <div id="cartItems">
+                        <p class="text-sm text-gray-500">No hay productos agregados</p>
+                    </div>
+
+                    <div style="margin-top:20px;">
+                        <label>Informacion de la compra</label>
+                        <div class="summary-box flex flex-col gap-1.5">
+                            <label>Tipo de compra: </label>
+                            <select id="tipoCompraSelect" th:field="*{compra.tipoCompra}" class="form-input" onchange="mostrarPagoInicial(this)" required>
+                                <option th:value="0">Contado</option>
+                                <option th:value="1">Credito</option>
+                            </select>
+
+                            <div id="pagoInicial" class="flex p-1 items-center justify-around" style="display:none;">
+                                <input type="checkbox" class="size-4" name="enableInitial" id="enableInitial"
+                                    onclick="activarPagoInicial()">
+                                <p class="text-sm">
+                                    Agregar pago inicial:
+                                </p>
+
+                                <input class="w-1/3 text-center border border-purple-300 rounded-lg" type="number"
+                                    id="initialPayment" min="0" step="0.10" value="0.00" disabled>
+                            </div>
+                            <div id="fechaVencimientoDIV" style="display:none;">
+                                <label for="fechaVencimientoId">Fecha limite de pago</label>
+                                <input type="date" id="fechaVencimientoId" name="fechaVencimiento"
+                                    class="form-input" placeholder="Seleccione fecha">
+                            </div>
+                            
+                            <label id="metodoPagoLabel">Metodo de pago : </label>
+                            <select id="metodoPagoSelect" th:field="*{compra.metodoPago}" class="form-input" required>
+                                <option value="">-- Seleccione metodo de pago --</option>
+                                <option th:each="mp : ${metodosPago}" th:value="${mp.idMetodoPago}"
+                                    th:text="${mp.nombreMetodoPago}"></option>
+                            </select>
+
+                            <label>Proveedor: </label>
+                            <select id="proveedorSelect" th:field="*{compra.proveedor}" class="form-input">
+                                <option value="">-- Seleccione proveedor --</option>
+                                <option th:each="pr : ${proveedores}" th:value="${pr.idProveedor}"
+                                    th:text="${pr.razonSocial}"></option>
+                            </select>
+                        </div>
+
+                        <div style="margin-top:10px;">
+                            <label>Resumen</label>
+                            <div class="summary-box">
+                                <div class="summary-row"><span>Subtotal: </span><span id="subtotal">0.00</span></div>
+                                <div class="summary-row"><span>IGV (18%): </span><span id="igv">0.00</span></div>
+                                <div class="summary-row"><strong>Total: </strong><strong id="total">0.00</strong></div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top:10px; text-align:right;">
+                            <button class="btn-cancelar" onclick="location.href='/compras'">Cancelar</button>
+                            <button class="btn-registrar" onclick="abrirConfirmarRegistro()">Registrar compra</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Modal producto -->
+        <dialog id="dialogProducto" class="rounded-lg shadow-xl p-0 w-full max-w-md backdrop:bg-gray-900/50">
+            <div class="bg-violet-900 modal-header text-white p-4 rounded-t-lg">
+                <h3 class="text-xl font-bold">Detalle del Producto</h3>
+            </div>
+            <div class="modal-body p-6 bg-white">
+                <div class="flex justify-center mb-4">
+                    <img id="prodImg" src="" alt="Producto"
+                        class="h-40 w-40 object-cover rounded-lg shadow-md border border-gray-200">
+                </div>
+
+                <div class="text-center mb-4">
+                    <h4 class="text-xl font-bold text-gray-800 mb-1" id="prodName"></h4>
+                    <span id="prodCategoria"
+                        class="inline-block bg-purple-200 text-violet-900 text-xs px-2 py-1 rounded-full font-semibold uppercase tracking-wide"></span>
+                </div>
+
+                <div class="space-y-3 mb-6 text-sm text-gray-600">
+                    <div class="flex justify-between border-b border-gray-100 pb-2">
+                        <span class="font-medium">Precio:</span>
+                        <span class="text-lg font-bold text-violet-900">S/ <span id="prodPrice"></span></span>
+                    </div>
+                    <div class="flex justify-between border-b border-gray-100 pb-2">
+                        <span class="font-medium">Requiere Receta:</span>
+                        <span id="prodReceta" class="font-bold"></span>
+                    </div>
+                    <div class="border-b border-gray-100 pb-2">
+                        <span class="font-medium block mb-1">Descripción:</span>
+                        <p id="prodDescripcion" class="text-gray-500 italic"></p>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-center gap-3 bg-gray-50 p-3 rounded-lg">
+                    <label for="prodCantidad" class="font-medium text-gray-700">Cantidad a comprar:</label>
+                    <input type="number" id="prodCantidad" value="1" min="1"
+                        class="form-input w-24 text-center font-bold text-lg border-gray-300 focus:border-violet-500 focus:ring-violet-500">
+                </div>
+            </div>
+            <div class="modal-footer bg-gray-50 p-4 rounded-b-lg flex justify-end gap-3 border-t border-gray-200">
+                <button type="button"
+                    class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 font-medium transition-colors"
+                    onclick="closeProducto()">Cancelar</button>
+                <button type="button"
+                    class="px-4 py-2 bg-violet-900 text-white rounded-md hover:bg-violet-800 font-medium shadow-sm transition-colors"
+                    onclick="addToCart()">Agregar al Carrito</button>
+            </div>
+        </dialog>
+
+        <!-- Confirmar registro -->
+        <dialog id="dialogConfirmar">
+            <div class="modal-header">
+                <h3>Confirmar registro</h3>
+            </div>
+            <form th:action="@{/compras/guardar}" method="post" class="modal-body">
+                <input type="hidden" name="proveedorId" id="formProveedorId">
+                <input type="hidden" name="subtotal" id="formSubtotal">
+                <input type="hidden" name="tipoCompra" id="formTipoCompraId">
+                <input type="hidden" name="metodoPago" id="formMetodoPagoId">
+                <input type="hidden" name="fechaVencimientoPago" id="formFechaVencimiento">
+                <input type="hidden" name="igv" id="formIgv">
+                <input type="hidden" name="total" id="formTotal">
+                <input type="hidden" name="itemsJson" id="itemsJson">
+                <p>Confirma registrar la compra con los datos mostrados?</p>
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancelar" onclick="closeConfirmar()">Cancelar</button>
+                    <button type="submit" class="btn-registrar">Registrar</button>
+                </div>
+            </form>
+        </dialog>
+
+    </main>
+</body>
+
+</html>

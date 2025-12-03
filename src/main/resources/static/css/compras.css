@@ -332,7 +332,8 @@
 .additional-box {
     border: 2px solid #e0e0e0;
     border-radius: 10px;
-    padding: 20px;
+    padding: 1rem 3rem;
+    text-align: start;
 }
 
 .summary-table {
@@ -400,6 +401,14 @@
 
 .btn-registrar:hover {
     background: #5a32a3;
+}
+
+.css-mover-arriba{
+    animation: animate-to-up 650ms 10ms forwards;
+}
+
+.css-mover-arriba-2s{
+    animation: animate-to-up 2000ms 10ms forwards;
 }
 
 /* Responsive */

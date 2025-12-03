@@ -48,14 +48,7 @@ public class ProductosController {
         model.addAttribute("listaProductos", productosRepository.findAll());
         model.addAttribute("producto", new Productos());
         cargarListas(model);
-        return "home/productos";
-    }
-
-    @GetMapping("/nuevo")
-    public String nuevoProducto(Model model) {
-        model.addAttribute("producto", new Productos());
-        cargarListas(model);
-        return "home/nuevo-producto";
+        return "home/productos/productos";
     }
 
     @PostMapping("/guardar")
@@ -86,7 +79,7 @@ public class ProductosController {
         }
         model.addAttribute("producto", producto);
         cargarListas(model);
-        return "home/detalles-producto";
+        return "home/productos/detalles-producto";
     }
     
     @PostMapping("/actualizar")

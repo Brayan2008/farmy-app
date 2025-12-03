@@ -1,6 +1,8 @@
 package app.farmy.farmy.model;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import lombok.Getter;
 import lombok.Setter;
@@ -49,6 +52,12 @@ public class Usuario {
     @ManyToOne
     @JoinColumn(name = "idRol", foreignKey = @ForeignKey(name = "FK_Rol_Usuario"))
     private Rol rol;
+
+    @OneToMany(mappedBy = "usuario")
+    private final List<Compra> compras = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "usuario")
+    private final List<PagoCompra> pagoCompras = new ArrayList<>();
 
     @PrePersist
     public void fechaCreacion() {

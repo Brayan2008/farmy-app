@@ -58,21 +58,10 @@
             </div>
 
             <form class="modal-body" th:object="${rol}" th:action="@{/roles}" method="post">
-                <div class="form-grid">
-                    <!-- Nombre del rol -->
-                    <div class="form-group">
-                        <label for="nombreRol">Nombre del rol</label>
-                        <input type="text" th:field="*{nombreRol}" class="form-input" placeholder="Rol" required>
-                    </div>
-
-                    <!-- Estado -->
-                    <div class="form-group">
-                        <label for="estado">Estado</label>
-                        <select th:field="*{estado}" class="form-select" required>
-                            <option value="Activo">Activo</option>
-                            <option value="Inactivo">Inactivo</option>
-                        </select>
-                    </div>
+                <!-- Nombre del rol -->
+                <div class="form-group">
+                    <label for="nombreRol">Nombre del rol</label>
+                    <input type="text" th:field="*{nombreRol}" class="form-input" placeholder="Rol" required>
                 </div>
 
                 <!-- Estado -->

@@ -1,6 +1,8 @@
 package app.farmy.farmy.model;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import lombok.Getter;
 import lombok.Setter;
@@ -65,14 +68,17 @@ public class Productos {
     @JoinColumn(name = "idLaboratorio", foreignKey = @ForeignKey(name = "FK_Laboratorio_Producto"))
     private Laboratorio laboratorio;
 
+    @OneToMany(mappedBy = "producto")
+    private final List<Lote> lotes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "producto")
+    private final List<CompraDetalle> compra = new ArrayList<>();
+
     @PrePersist
     public void preGuardado() {
         fechaRegistro = LocalDate.now();
         estado = "Activo";
     }
 
-    // TODO realizar el frontend del producto
-
-    // TODO llevarlo a Lote e InventarioMovimiento
-
+    // TODO llevarlo a InventarioMovimiento
 }

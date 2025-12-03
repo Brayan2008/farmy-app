@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Compra</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/compras.css}">
+    <script th:src="@{/script.js}"></script>
+</head>
+<body>
+    <main id='main-content' class="flex h-dvh">
+
+        <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
+
+        <div class="flex-1 h-screen overflow-y-scroll overflow-x-hidden">
+            <div th:replace="~{fragments/header.html :: header-info('Detalle de Compra','Compras > Detalle')}"></div>
+
+            <div class="container">
+                <h1 class="text-xl font-black my-2">Detalle de la compra <span th:text="${compra.numeroFactura}"></span></h1>
+                <div class="card">
+                    <p><strong>Proveedor:</strong> <span th:text="${compra.proveedor != null ? compra.proveedor.razonSocial : '---'}"></span></p>
+                    <p><strong>Fecha:</strong> <span th:text="${#temporals.format(compra.fechaFactura, 'dd/MM/yyyy - HH:mm:ss')}"></span></p>
+                    <p><strong>Tipo:</strong> <span th:text="${compra.tipoCompra}"></span></p>
+                    <p><strong>Observaciones:</strong> <span th:text="${compra.observaciones}"></span></p>
+                </div>
+
+                <div class="table-wrapper" style="margin-top:20px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Precio Unit.</th>
+                                <th>IGV</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="d,stat : ${detalles}">
+                                <td th:text="${stat.count}"></td>
+                                <td th:text="${d.producto != null ? d.producto.nombreProducto : '---'}"></td>
+                                <td th:text="${d.cantidad}"></td>
+                                <td th:text="${d.precioCompra}"></td>
+                                <td th:text="${(d.precioCompra * d.cantidad) * 0.18}"></td>
+                                <td th:text="${d.precioCompra * d.cantidad}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="margin-top:20px; text-align:right;">
+                    <a th:href="@{/compras}" class="btn-cancelar">Volver</a>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

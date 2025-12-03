@@ -64,8 +64,10 @@ public class UsuarioController {
         ufetch.setNombreUsuario(usuarioEditar.getNombreUsuario());
         ufetch.setNombreCompleto(usuarioEditar.getNombreCompleto());
         ufetch.setTelefono(usuarioEditar.getTelefono());
+
         // si el binding del rol llega como entidad con id, se actualizará correctamente
         ufetch.setRol(usuarioEditar.getRol());
+        
         // Campo Estado en la entidad se llama 'Estado' (con mayúscula)
         ufetch.setEstado(usuarioEditar.getEstado());
 
