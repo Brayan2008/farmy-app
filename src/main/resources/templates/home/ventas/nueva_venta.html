@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nueva Venta</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/ventas.css}">
+    <script th:src="@{/script.js}"></script>
+    <script th:src="@{/js/ventas.js}"></script>
+</head>
+
+<body>
+    <main id='main-content' class="flex h-dvh">
+
+        <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
+
+        <div class="flex-1 h-screen overflow-y-scroll overflow-x-hidden">
+            <div th:replace="~{fragments/header.html :: header-info('Registrar Venta','Ventas > Nueva Venta')}">
+            </div>
+
+            <div class="container grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                <!-- Left: Products grid -->
+                <div
+                    class="css-mover-arriba h-96 md:col-span-2 shadow-xl shadow-black/60 p-5 mb-5 rounded-xl md:h-auto overflow-y-scroll">
+                    <h2 class="font-bold text-2xl mb-4">Productos Disponibles</h2>
+                    
+                    <!-- Search Bar -->
+                    <div class="mb-6">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                                </svg>
+                            </div>
+                            <input type="text" id="searchProduct" onkeyup="filterProducts()" 
+                                class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500" 
+                                placeholder="Buscar producto..." required />
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 mt-10">
+                        <div th:each="lote : ${lotes}"
+                            class="product-card-container rounded-md shadow-xl shadow-gray-600/60 hover:scale-110 cursor-pointer transition-transform duration-150"
+                            th:data-name="${lote.producto.nombreProducto}">
+                            <div>
+                                <img th:if="${lote.producto.imgUrl != null and !lote.producto.imgUrl.isEmpty()}"
+                                    th:src="@{'/uploads/' + ${lote.producto.imgUrl}}" alt="img"
+                                    style="height:120px; width:100%; object-fit:cover;">
+                                <img th:unless="${lote.producto.imgUrl != null and !lote.producto.imgUrl.isEmpty()}"
+                                    th:src="@{/img/default.webp}" alt="img"
+                                    style="height:120px; width:100%; object-fit:cover;">
+                                <div class="p-2">
+                                    <h3 th:text="${lote.producto.nombreProducto}" class="truncate font-bold"></h3>
+                                    <p class="text-xs text-gray-500">Lote: <span th:text="${lote.numeroLote}"></span></p>
+                                    <p class="text-sm text-gray-600">Stock: <span th:text="${lote.cantidadActual}" class="font-bold text-green-600"></span></p>
+                                    <p class="text-sm font-bold text-violet-700">S/. <span th:text="${lote.precioVenta}"></span></p>
+                                    
+                                    <button class="btn-registrar mt-2 w-full" type="button" 
+                                        th:data-id='${lote.idLote}'
+                                        th:data-name='${lote.producto.nombreProducto}'
+                                        th:data-price='${lote.precioVenta}'
+                                        th:data-stock='${lote.cantidadActual}'
+                                        th:data-lote='${lote.numeroLote}'
+                                        th:data-vencimiento='${lote.fechaVencimiento}'
+                                        th:data-img='${lote.producto.imgUrl}' 
+                                        th:data-receta='${lote.producto.requiereReceta}'
+                                        th:data-categoria='${lote.producto.categoria != null ? lote.producto.categoria.nombreCategoria : "Sin categoría"}'
+                                        th:data-descripcion='${lote.producto.descripcion}'
+                                        onclick="openProducto(this)">Agregar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Cart -->
+                <div class="mb-5 p-5 shadow-2xl shadow-black/80 rounded-xl cart-column css-mover-arriba-2s bg-white">
+                    <h2 class="text-2xl font-bold mb-4">Detalle de Venta</h2>
+                    <div id="cartItems" class="max-h-60 overflow-y-auto mb-4">
+                        <p class="text-sm text-gray-500">No hay productos agregados</p>
+                    </div>
+
+                    <div style="margin-top:20px;">
+                        <label class="font-bold block mb-2">Información de la Venta</label>
+                        <div class="summary-box flex flex-col gap-3">
+                            
+                            <div>
+                                <label class="text-sm font-semibold">Cliente:</label>
+                                <select id="clienteSelect" class="form-input w-full" required>
+                                    <option value="">-- Seleccione Cliente --</option>
+                                    <option th:each="c : ${clientes}" th:value="${c.idCliente}"
+                                        th:text="${c.nombre + ' ' + c.apellidos}"></option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-sm font-semibold">Tipo de Venta:</label>
+                                <select id="tipoVentaSelect" class="form-input w-full"
+                                    onchange="mostrarPagoInicial(this)" required>
+                                    <option value="CONTADO">Contado</option>
+                                    <option value="CREDITO">Crédito</option>
+                                </select>
+                            </div>
+
+                            <div id="pagoInicial" class="flex flex-col gap-2 p-2 bg-purple-50 rounded-lg border border-purple-100" style="display:none;">
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" class="size-4 text-purple-600" id="enableInitial"
+                                        onclick="activarPagoInicial()">
+                                    <label for="enableInitial" class="text-sm font-medium">Agregar pago inicial</label>
+                                </div>
+                                
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm">S/.</span>
+                                    <input class="w-full text-right border border-purple-300 rounded-lg p-1" type="number"
+                                        id="initialPayment" min="0" step="0.10" value="0.00" disabled
+                                        oninput="let total = parseFloat(document.getElementById('total').innerText); if(this.value > total) this.value = total;">
+                                </div>
+                            </div>
+
+                            <div id="fechaVencimientoDIV" style="display:none;">
+                                <label for="fechaVencimientoId" class="text-sm font-semibold">Fecha límite de pago:</label>
+                                <input type="date" id="fechaVencimientoId" class="form-input w-full">
+                            </div>
+
+                            <div>
+                                <label id="metodoPagoLabel" class="text-sm font-semibold">Método de Pago:</label>
+                                <select id="metodoPagoSelect" class="form-input w-full" required>
+                                    <option value="">-- Seleccione --</option>
+                                    <option th:each="mp : ${metodosPago}" th:value="${mp.idMetodoPago}"
+                                        th:text="${mp.nombreMetodoPago}"></option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="margin-top:20px;">
+                            <label class="font-bold block mb-2">Resumen</label>
+                            <div class="summary-box bg-gray-50 p-3 rounded-lg">
+                                <div class="flex justify-between mb-1 text-sm"><span>Subtotal: </span><span>S/. <span id="subtotal">0.00</span></span></div>
+                                <div class="flex justify-between mb-1 text-sm"><span>IGV (18%): </span><span>S/. <span id="igv">0.00</span></span></div>
+                                <div class="flex justify-between mt-2 text-lg font-bold border-t pt-2"><span>Total: </span><span>S/. <span id="total">0.00</span></span></div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top:20px; text-align:right; display: flex; gap: 10px; justify-content: flex-end;">
+                            <a href="/ventas" class="btn-cancelar text-center" style="text-decoration: none;">Cancelar</a>
+                            <button class="btn-registrar" onclick="abrirConfirmarRegistro()">Registrar Venta</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Modal producto -->
+        <dialog id="dialogProducto" class="rounded-lg shadow-xl p-0 w-full max-w-md backdrop:bg-gray-900/50">
+            <div class="bg-violet-900 modal-header text-white p-4 rounded-t-lg">
+                <h3 class="text-xl font-bold">Detalle del Producto</h3>
+            </div>
+            <div class="modal-body p-6 bg-white">
+                <div class="flex justify-center mb-4">
+                    <img id="prodImg" src="" alt="Producto"
+                        class="h-40 w-40 object-cover rounded-lg shadow-md border border-gray-200">
+                </div>
+
+                <div class="text-center mb-4">
+                    <h4 class="text-xl font-bold text-gray-800 mb-1" id="prodName"></h4>
+                    <span id="prodCategoria"
+                        class="inline-block bg-purple-200 text-violet-900 text-xs px-2 py-1 rounded-full font-semibold uppercase tracking-wide"></span>
+                </div>
+
+                <div class="space-y-3 mb-6 text-sm text-gray-600">
+                    <div class="flex justify-between border-b border-gray-100 pb-2">
+                        <span class="font-medium self-center">Precio Venta:</span>
+                        <div class="flex items-center">
+                            <span class="text-lg font-bold text-violet-900 mr-2">S/</span>
+                            <span id="prodPrice" class="text-lg font-bold text-gray-800"></span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between border-b border-gray-100 pb-2">
+                        <span class="font-medium">Stock Disponible:</span>
+                        <span id="prodStock" class="font-bold text-green-600"></span>
+                    </div>
+                    <div class="flex justify-between border-b border-gray-100 pb-2">
+                        <span class="font-medium">Lote:</span>
+                        <span id="prodLote" class="font-bold"></span>
+                    </div>
+                    <div class="flex justify-between border-b border-gray-100 pb-2">
+                        <span class="font-medium">Vencimiento:</span>
+                        <span id="prodVencimiento" class="font-bold"></span>
+                    </div>
+                    <div class="flex justify-between border-b border-gray-100 pb-2">
+                        <span class="font-medium">Requiere Receta:</span>
+                        <span id="prodReceta" class="font-bold"></span>
+                    </div>
+                    <div class="border-b border-gray-100 pb-2">
+                        <span class="font-medium block mb-1">Descripción:</span>
+                        <p id="prodDescripcion" class="text-gray-500 italic"></p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center justify-center gap-3 bg-gray-50 p-3 rounded-lg">
+                    <label for="prodCantidad" class="font-medium text-gray-700">Cantidad a Vender:</label>
+                    <input type="number" id="prodCantidad" value="1" min="1"
+                        class="form-input w-24 text-center font-bold text-lg border-gray-300 focus:border-violet-500 focus:ring-violet-500" required>
+                </div>
+
+            </div>
+            <div class="modal-footer bg-gray-50 p-4 rounded-b-lg flex justify-end gap-3 border-t border-gray-200">
+                <button type="button"
+                    class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 font-medium transition-colors"
+                    onclick="closeProducto()">Cancelar</button>
+                <button type="button"
+                    class="px-4 py-2 bg-violet-900 text-white rounded-md hover:bg-violet-800 font-medium shadow-sm transition-colors"
+                    onclick="addToCart()">Agregar al Carrito</button>
+            </div>
+        </dialog>
+
+        <!-- Confirmar registro -->
+        <dialog id="dialogConfirmar">
+            <div class="modal-header">
+                <h3>Confirmar Venta</h3>
+            </div>
+            <form th:action="@{/ventas/guardar}" method="post" class="modal-body">
+                <!-- Hidden fields populated by JS -->
+                <input type="hidden" name="idCliente" id="formClienteId">
+                <input type="hidden" name="tipoVenta" id="formTipoVenta">
+                <input type="hidden" name="metodoPago" id="formMetodoPagoId">
+                <input type="hidden" name="fechaVencimientoPago" id="formFechaVencimiento">
+                <input type="hidden" name="montoPagoInicial" id="formMontoPagoInicial">
+                <input type="hidden" name="subtotal" id="formSubtotal">
+                <input type="hidden" name="igv" id="formIgv">
+                <input type="hidden" name="total" id="formTotal">
+                <input type="hidden" name="itemsJson" id="formItemsJson">
+
+                
+                <p class="text-center text-lg mb-4">¿Confirma registrar la venta con los datos ingresados?</p>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancelar" onclick="closeConfirmar()">Cancelar</button>
+                    <button type="submit" class="btn-registrar">Registrar</button>
+                </div>
+            </form>
+        </dialog>
+
+    </main>
+</body>
+
+</html>

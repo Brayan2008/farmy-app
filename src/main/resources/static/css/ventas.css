@@ -1,4 +1,5 @@
 @import url('../styles.css');
+@import url('compras.css');
 
 .estado-registrada {
     background: #d4edda;
@@ -429,6 +430,26 @@
     background: #5a32a3;
 }
 
+/* Animations from compras.css */
+@keyframes animate-to-up {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.css-mover-arriba{
+    animation: animate-to-up 650ms 10ms forwards;
+}
+
+.css-mover-arriba-2s{
+    animation: animate-to-up 2000ms 10ms forwards;
+}
+
 /* Responsive */
 @media screen and (max-width: 1024px) {
 
@@ -438,6 +459,10 @@
     }
 
     .small-fields {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .form-grid-4 {
         grid-template-columns: 1fr 1fr;
     }
 }

@@ -19,10 +19,12 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Getter
 @Setter
+@ToString
 @Table(uniqueConstraints = @UniqueConstraint(name = "AK_Lote", columnNames = { "numeroLote" }))
 public class Lote {
 
@@ -59,6 +61,10 @@ public class Lote {
 
     @OneToMany(mappedBy = "lote")
     private final List<InventarioMovimiento> inventarioMovimientos = new ArrayList<>();
+
+    @OneToMany(mappedBy = "lote")
+    private final List<VentaDetalle> ventaDetalles = new ArrayList<>();
+
 
     @PrePersist
     public void preSave() {

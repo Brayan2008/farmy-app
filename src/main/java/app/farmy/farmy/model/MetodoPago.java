@@ -34,7 +34,15 @@ public class MetodoPago {
     private final List<Compra> compras = new ArrayList<>();
 
     @OneToMany(mappedBy = "metodoPago")
+    private final List<Ventas> ventas = new ArrayList<>();
+
+    @OneToMany(mappedBy = "metodoPago")
     private final List<PagoCompra> pagoCompras = new ArrayList<>();
+
+    @OneToMany(mappedBy = "metodoPago")
+    private final List<VentaPago> pagoVentas = new ArrayList<>();
+
+
 
     @PrePersist
     public void preSave(){

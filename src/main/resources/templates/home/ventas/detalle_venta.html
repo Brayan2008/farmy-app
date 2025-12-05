@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Venta</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/ventas.css}">
+    <script th:src="@{/script.js}"></script>
+</head>
+<body>
+    <main id='main-content' class="flex h-dvh">
+        <!-- #region sidebar-->
+        <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
+        <!-- #endregion -->
+        <div class="flex-1 h-screen overflow-y-scroll overflow-x-hidden">
+            <div th:replace="~{fragments/header.html :: header-info('Detalle de Venta','Información completa de la venta')}"></div>
+            
+            <div class="container">
+                <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-gray-800">Venta #<span th:text="${venta.idVenta}"></span></h2>
+                        <span th:classappend="${venta.estado == 'Anulado' ? 'bg-red-100 text-red-800' : (venta.estadoPago != null and venta.estadoPago.name() == 'PAGADO') ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}" 
+                              class="px-3 py-1 rounded-full text-sm font-semibold"
+                              th:text="${venta.estadoPago}"></span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="flex flex-col items-start">
+                            <h3 class="text-lg text-left font-semibold mb-2 border-b pb-1">Información General</h3>
+                            <p><strong>Cliente:</strong> <span th:text="${venta.cliente != null ? venta.cliente.nombre + ' ' + venta.cliente.apellidos : '---'}"></span></p>
+                            <p><strong>Fecha:</strong> <span th:text="${#temporals.format(venta.fechaVenta, 'dd/MM/yyyy HH:mm')}"></span></p>
+                            <p><strong>Tipo de Venta:</strong> <span th:text="${venta.tipoVenta}"></span></p>
+                            <p><strong>Usuario:</strong> <span th:text="${venta.usuario != null ? venta.usuario.username : '---'}"></span></p>
+                        </div>
+                        <div class="flex flex-col items-start">
+                            <h3 class="text-lg font-semibold text-left mb-2 border-b pb-1">Información Financiera</h3>
+                            <p><strong>Total:</strong> S/. <span th:text="${venta.total}"></span></p>
+                            <p><strong>Saldo Pendiente:</strong> S/. <span th:text="${venta.saldoPendiente}"></span></p>
+                            <p th:if="${venta.tipoVenta.name() == 'CREDITO'}"><strong>Fecha Vencimiento:</strong> <span th:text="${venta.fechaVencimientoPago}"></span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                    <h3 class="text-lg font-semibold mb-4">Productos Vendidos</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-purple-800">
+                                    <th class="p-3 border-b">Producto</th>
+                                    <th class="p-3 border-b">Lote</th>
+                                    <th class="p-3 border-b">Precio Unit.</th>
+                                    <th class="p-3 border-b">Cantidad</th>
+                                    <th class="p-3 border-b">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="d : ${detalles}">
+                                    <td class="p-3 border-b" th:text="${d.lote.producto.nombreProducto}"></td>
+                                    <td class="p-3 border-b" th:text="${d.lote.numeroLote}"></td>
+                                    <td class="p-3 border-b">S/. <span th:text="${d.lote.precioVenta}"></span></td>
+                                    <td class="p-3 border-b" th:text="${d.cantidad}"></td>
+                                    <td class="p-3 border-b">S/. <span th:text="${d.lote.precioVenta * d.cantidad}"></span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-md mb-6" th:if="${not #lists.isEmpty(pagos)}">
+                    <h3 class="text-lg font-semibold mb-4">Historial de Pagos</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="p-3 border-b">ID Pago</th>
+                                    <th class="p-3 border-b">Fecha</th>
+                                    <th class="p-3 border-b">Monto</th>
+                                    <th class="p-3 border-b">Método</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="p : ${pagos}">
+                                    <td class="p-3 border-b" th:text="${p.idPago}"></td>
+                                    <td class="p-3 border-b" th:text="${#temporals.format(p.fechaPago, 'dd/MM/yyyy HH:mm')}"></td>
+                                    <td class="p-3 border-b">S/. <span th:text="${p.monto}"></span></td>
+                                    <td class="p-3 border-b" th:text="${p.metodoPago.nombreMetodoPago}"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="flex justify-end">
+                    <a th:href="@{/ventas}" class="btn-cancelar bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">Volver</a>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

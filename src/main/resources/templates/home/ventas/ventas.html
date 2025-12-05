@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ventas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/ventas.css}">
+    <script th:src="@{/script.js}"></script>
+</head>
+
+<body>
+    <main id='main-content' class="flex h-dvh">
+
+        <!-- #region sidebar-->
+        <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
+        <!-- #endregion -->
+        <div class="flex-1 h-screen overflow-y-scroll overflow-x-hidden">
+
+            <div th:replace="~{fragments/header.html :: 
+                              header-info('Gestionar Ventas','Ventas de productos')}"></div>
+
+            <div class="container">
+
+                <div th:replace="~{fragments/search.html :: search-fragment('ventas', 'Buscar venta...')}"></div>
+
+                <div class="filters-container">
+                    <span class="filter-label">Filtrar por:</span>
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label>Estado:</label>
+                            <select>
+                                <option>Activo</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Tipo de Pago:</label>
+                            <select>
+                                <option>Activo</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Cliente</th>
+                                <th>Deuda (S/.)</th>
+                                <th>Tipo</th>
+                                <th>Total (S/.)</th>
+                                <th>Estado</th>
+                                <th>Fecha y Hora</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="v : ${listaVentas}">
+                                <td data-label="Código" th:text="${v.idVenta}"></td>
+                                <td data-label="Cliente" th:text="${v.cliente != null ? v.cliente.nombre + ' ' + v.cliente.apellidos : '---'}"></td>
+                                <td data-label="Deuda" th:text="${v.saldoPendiente}"></td>
+                                <td data-label="Tipo" th:text="${v.tipoVenta}"></td>
+                                <td data-label="Total" th:text="${v.total}"></td>
+                                <td data-label="Estado"><span th:classappend="${v.estado == 'Anulado' ? 'estado-anulado' : (v.estadoPago != null and v.estadoPago.name() == 'PAGADO') ? 'estado-pagado' : 'estado-pendiente'}" th:text="${v.estadoPago}"></span></td>
+                                <td data-label="Fecha" th:text="${#temporals.format(v.fechaVenta, 'dd/MM/yyyy - HH:mm:ss')}"></td>
+                                <td data-label="Acciones">
+                                    <div class="flex flex-col w-full gap-2 md:flex-row justify-around">
+                                        <form th:action="@{/ventas/ver/{id}(id=${v.idVenta})}" method="get">
+                                            <button class="btn-editar" type="submit" style="background: #FDE68A;">Ver venta</button>
+                                        </form>
+                                        <button type="button" class="btn-pagar" style="background: #10B981;"
+                                            th:style="${v.tipoVenta != null and v.tipoVenta.name() == 'CREDITO' and v.estadoPago != null and v.estadoPago.name() != 'PAGADO' and v.estado != 'Anulado'} ? 'background: #10B981;' : 'background: #9CA3AF; cursor: not-allowed;'"
+                                            th:disabled="${not (v.tipoVenta != null and v.tipoVenta.name() == 'CREDITO' and v.estadoPago != null and v.estadoPago.name() != 'PAGADO' and v.estado != 'Anulado')}"
+                                            th:onclick="'openPagar(' + ${v.idVenta} + ', ' + ${v.saldoPendiente} + ')'">Pagar</button>
+                                        <button type="button" class="btn-anular" 
+                                            th:style="${v.estado != 'Anulado'} ? 'background: #F87171;' : 'background: #9CA3AF; cursor: not-allowed;'"
+                                            th:disabled="${v.estado == 'Anulado'}"
+                                            th:data-id="${v.idVenta}" 
+                                            onclick="openAnular(this)">Anular</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="botones-contenedor">
+                    <a class="btn-nuevo" th:href="@{/ventas/nueva}">Nueva Venta</a>
+                </div>
+            </div>
+        </div>
+
+        <dialog id="dialogAnular">
+            <div class="modal-header">
+                <h2>Anular Venta</h2>
+            </div>
+            <form th:action="@{/ventas/anular}" method="post" class="modal-body">
+                <input type="hidden" id="idVentaHidden" name="idVenta" value="">
+                <div class="form-group">
+                    <label for="motivo">Motivo de anulación</label>
+                    <textarea id="motivo" name="motivo" class="form-input" rows="4" required></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancelar" onclick="closeAnular()">Cancelar</button>
+                    <button type="submit" class="btn-anular" style="background: #ef4444;">Anular</button>
+                </div>
+            </form>
+        </dialog>
+
+        <dialog id="dialogPagar">
+            <div class="modal-header">
+                <h2>Registrar Pago</h2>
+            </div>
+            <form th:action="@{/pagos/venta/guardar}" th:object="${ventaPago}" method="post" class="modal-body">
+                <input type="hidden" id="idVentaPago" th:field="*{venta.idVenta}">
+                
+                <div class="form-group">
+                    <label>Deuda Pendiente: S/. <span id="deudaPendienteText"></span></label>
+                </div>
+    
+                <div class="form-grid form-grid-2">
+                    <div class="form-group">
+                        <label for="montoPago">Monto a Pagar *</label>
+                        <input type="number" step="0.01" min="0" th:field="*{monto}" id="montoPago" class="form-input" required>
+                    </div>
+    
+                    <div class="form-group">
+                        <label for="metodoPago">Método de Pago *</label>
+                        <select th:field="*{metodoPago}" class="form-select" required>
+                            <option value="">Seleccione...</option>
+                            <option th:each="m : ${metodosPago}" th:value="${m.idMetodoPago}" th:text="${m.nombreMetodoPago}"></option>
+                        </select>
+                    </div>
+                </div>
+    
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancelar" onclick="closePagar()">Cancelar</button>
+                    <button type="submit" class="btn-registrar">Registrar Pago</button>
+                </div>
+            </form>
+        </dialog>
+
+    </main>
+
+    <script>
+        function openAnular(button) {
+            const numero = button.dataset.id;
+            const d = document.getElementById('dialogAnular');
+            document.getElementById('idVentaHidden').value = numero;
+            if (typeof d.showModal === 'function') d.showModal(); else d.style.display = 'block';
+        }
+
+        function closeAnular() {
+            const d = document.getElementById('dialogAnular');
+            document.getElementById('motivo').value = '';
+            if (typeof d.close === 'function') d.close(); else d.style.display = 'none';
+        }
+
+        function openPagar(idVenta, saldoPendiente) {
+            const d = document.getElementById('dialogPagar');
+            document.getElementById('idVentaPago').value = idVenta;
+            document.getElementById('deudaPendienteText').innerText = saldoPendiente;
+            
+            const inputMonto = document.getElementById('montoPago');
+            if (inputMonto) {
+                inputMonto.max = saldoPendiente;
+            }
+
+            if (typeof d.showModal === 'function') d.showModal(); else d.style.display = 'block';
+        }
+
+        function closePagar() {
+            const d = document.getElementById('dialogPagar');
+            if (typeof d.close === 'function') d.close(); else d.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
