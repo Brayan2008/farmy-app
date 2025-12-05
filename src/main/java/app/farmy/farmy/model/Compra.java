@@ -1,10 +1,12 @@
 package app.farmy.farmy.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
@@ -32,11 +34,14 @@ public class Compra {
 
     LocalDateTime fechaFactura;
 
-    double subtotal;
+    @Column(precision = 10, scale = 2)
+    BigDecimal subtotal;
 
-    double igv;
+    @Column(precision = 10, scale = 2)
+    BigDecimal igv;
 
-    double total;
+    @Column(precision = 10, scale = 2)
+    BigDecimal total;
 
     String estado;
 
@@ -46,8 +51,9 @@ public class Compra {
 
     EstadoPago estadoPago;
 
-    double saldoPendiente;
-
+    @Column(precision = 10, scale = 2)
+    BigDecimal saldoPendiente;
+    
     LocalDate fechaVencimientoPago; //Esto es por si el TipoCompra = CREDITO
 
     String motivoAnulacion;
@@ -77,7 +83,7 @@ public class Compra {
     )
     private final List<Lote> lotes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "numeroFactura")
+    @OneToMany(mappedBy = "compra")
     private final List<PagoCompra> pagoCompras = new ArrayList<>();
 
 }

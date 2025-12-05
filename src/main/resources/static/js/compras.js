@@ -227,6 +227,19 @@ function abrirConfirmarRegistro() {
     document.getElementById('formSubtotal').value = subtotal;
     document.getElementById('formIgv').value = igv;
     document.getElementById('formTotal').value = total;
+
+    // Handle initial payment
+    const initialPaymentInput = document.getElementById('initialPayment');
+    let initialPayment = 0;
+    if (!initialPaymentInput.disabled) {
+        initialPayment = parseFloat(initialPaymentInput.value || '0');
+        if (initialPayment > total) {
+            alert('El pago inicial no puede ser mayor al total de la compra.');
+            return;
+        }
+    }
+    document.getElementById('formMontoPagoInicial').value = initialPayment;
+
     alert(fechaVencimiento)
     // construir itemsJson desde el carrito
 

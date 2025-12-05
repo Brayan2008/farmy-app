@@ -1,5 +1,6 @@
 package app.farmy.farmy.controllers;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,11 +41,11 @@ public class PagoCompraController {
             pagoCompraRepository.save(pagoCompra);
             
             // Update Compra saldo
-            double nuevoSaldo = compra.getSaldoPendiente() - pagoCompra.getMontoPago();
-            if (nuevoSaldo < 0) nuevoSaldo = 0;
+            BigDecimal nuevoSaldo = compra.getSaldoPendiente().subtract(pagoCompra.getMontoPago());
+            if (nuevoSaldo.compareTo(BigDecimal.ZERO) < 0) nuevoSaldo = BigDecimal.ZERO;
             compra.setSaldoPendiente(nuevoSaldo);
             
-            if (nuevoSaldo == 0) {
+            if (nuevoSaldo.compareTo(BigDecimal.ZERO) == 0) {
                 compra.setEstadoPago(EstadoPago.PAGADO);
             }
             

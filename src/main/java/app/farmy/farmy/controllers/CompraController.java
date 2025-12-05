@@ -1,6 +1,8 @@
 package app.farmy.farmy.controllers;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +26,8 @@ import app.farmy.farmy.repository.CompraRepository;
 import app.farmy.farmy.repository.ProveedorRepository;
 import app.farmy.farmy.repository.ProductosRepository;
 import app.farmy.farmy.repository.LoteRepository;
+import app.farmy.farmy.model.PagoCompra;
+import app.farmy.farmy.repository.PagoCompraRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
@@ -47,6 +51,9 @@ public class CompraController {
 
     @Autowired
     private LoteRepository loteRepository;
+
+    @Autowired
+    private PagoCompraRepository pagoCompraRepository;
 
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -107,7 +114,8 @@ public class CompraController {
             @RequestParam(required = false) String estadoPago,
             @RequestParam(required = false) String fechaVencimientoPago,
             @RequestParam(required = false) Integer metodoPago,
-            @RequestParam String itemsJson) {
+            @RequestParam String itemsJson,
+            @RequestParam(required = false, defaultValue = "0") Double montoPagoInicial) {
 
         Compra compra = new Compra();
 
@@ -116,10 +124,10 @@ public class CompraController {
             compra.setProveedor(p);
         }
 
-        compra.setSubtotal(subtotal == null ? 0.0 : subtotal);
-        compra.setSaldoPendiente(total == null ? 0.0 : total);
-        compra.setIgv(igv == null ? 0.0 : igv);
-        compra.setTotal(total == null ? 0.0 : total);
+        compra.setSubtotal(subtotal == null ? BigDecimal.ZERO : BigDecimal.valueOf(subtotal));
+        compra.setSaldoPendiente(total == null ? BigDecimal.ZERO : BigDecimal.valueOf(total));
+        compra.setIgv(igv == null ? BigDecimal.ZERO : BigDecimal.valueOf(igv));
+        compra.setTotal(total == null ? BigDecimal.ZERO : BigDecimal.valueOf(total));
 
         compra.setTipoCompra(switch (tipoCompra) {
             case 1 -> {
@@ -138,6 +146,21 @@ public class CompraController {
 
         if (metodoPago != null) {
             metodoPagoRepository.findById(metodoPago).ifPresent(compra::setMetodoPago);
+        }
+
+        // Handle initial payment for CREDIT purchases
+        if (compra.getTipoCompra() == TipoCompra.CREDITO && montoPagoInicial != null && montoPagoInicial > 0) {
+
+            if (BigDecimal.valueOf(montoPagoInicial).compareTo(compra.getTotal()) > 0) {
+                montoPagoInicial = compra.getTotal().doubleValue();
+            }
+
+            BigDecimal nuevoSaldo = compra.getSaldoPendiente().subtract(BigDecimal.valueOf(montoPagoInicial));
+            compra.setSaldoPendiente(nuevoSaldo);
+
+            if (nuevoSaldo.compareTo(BigDecimal.ZERO) == 0) {
+                compra.setEstadoPago(EstadoPago.PAGADO);
+            }
         }
 
 
@@ -160,6 +183,9 @@ public class CompraController {
                 List<Map<String, Object>> items = mapper.readValue(itemsJson,
                         new TypeReference<List<Map<String, Object>>>() {
                         });
+                
+                // Save compra first to get ID
+                compraRepository.save(compra);
 
                 for (Map<String, Object> it : items) {
 
@@ -179,6 +205,7 @@ public class CompraController {
                     lote.setNumeroLote(idLote);
                     lote.setEstado("Activo");
                     lote.setCantidadInicial(cantidad);
+                    lote.setCantidadActual(cantidad);
                     lote.setPrecioCompra(precio_compra);
                     lote.setPrecioVenta(precio_venta);
                     lote.setFechaVencimiento(fecha_vencimiento);
@@ -191,10 +218,19 @@ public class CompraController {
                     compra.getLotes().add(lote);
 
                     compraRepository.save(compra);
-
-
-
                 }
+
+                if (compra.getTipoCompra() == TipoCompra.CREDITO && montoPagoInicial != null && montoPagoInicial > 0) {
+                    PagoCompra pago = new PagoCompra();
+                    pago.setCompra(compra);
+                    pago.setMontoPago(BigDecimal.valueOf(montoPagoInicial));
+                    pago.setFechaPago(LocalDateTime.now());
+                    pago.setMetodoPago(compra.getMetodoPago());
+                    pago.setObservaciones("Pago inicial al registrar compra");
+                    
+                    pagoCompraRepository.save(pago);
+                }
+
             } catch (Exception ex) {
                 // parsing error -> ignore or log
                 ex.printStackTrace();

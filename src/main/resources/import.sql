@@ -1,1 +1,10 @@
 INSERT INTO `permisos` (`id_permiso`, `modulo`) VALUES ('1', 'Caja'), ('2', 'Compras'), ('3', 'Productos'), ('4', 'Reportes'), ('5', 'Roles'), ('6', 'Usuarios'), ('7', 'Ventas');
+
+/*Son solo para pruebas de desarrollo*/
+INSERT INTO `rol` (`fecha_creación`, `id_rol`, `nombre_rol`, `descripcion`, `estado`) VALUES ('2025-12-05', '1', 'Administrador', 'Control total del sistema', 'Activo');
+INSERT INTO `marca` (`estado`, `id_marca`, `nombre_marca`, `descripcion`) VALUES (b'1', NULL, 'Marca 1', 'Marquitos');
+INSERT INTO `laboratorio` (`fecha_registro`, `id_laboratorio`, `ruc`, `codigo`, `telefono`, `email`, `direccion`, `nombre`, `estado`) VALUES ('2025-12-05', '1', '12412895715', 'LAB001', '4891724', 'lab@prueba.com', 'Av. Los rosales.com', 'Laboratorio 1', 'Activo');
+INSERT INTO `proveedor` (`fecha_registro`, `id_proveedor`, `tipo`, `ruc`, `codigo`, `telefono`, `email`, `direccion`, `razon_social`, `estado`) VALUES ('2025-12-05', '1', '0', '12312512351', 'PROV001', '1258971', 'ventas@carranza.com', 'Av. Joanlus 69', 'Carranza SAC', 'Activo');
+INSERT INTO `metodo_pago` (`id_metodo_pago`, `descripcion`, `estado`, `nombre_metodo_pago`) VALUES ('1', 'Billetes, Monedas', 'Activo', 'Efectivo'), ('2', 'Credito, Debito', 'Activo', 'Tarjeta')
+/*A tener cuidado con los nombres de las imagenes */
+INSERT INTO `productos` (`fecha_registro`, `id_categoria`, `id_laboratorio`, `id_producto`, `requiere_receta`, `stock`, `id_marca`, `id_presentacion`, `concentracion`, `descripcion`, `estado`, `forma_farmaceutica`, `img_url`, `nombre_producto`, `principio_activo`) VALUES ('2025-12-05', NULL, '1', '1', b'1', '12', '1', NULL, '', 'Curitas ', 'Activo', '', 'b3421308-9884-4e2d-a0af-9a4781acf9af_fan9.webp', 'Vendas', ''), ('2025-12-05', NULL, '1', '2', b'1', '12', '1', NULL, '', 'Para la fiebre', 'Activo', '', '49171293-f55c-490b-82c3-231ebef9c2fc_fan2.png', 'Panadol', '')
