@@ -67,11 +67,18 @@
                                 <td data-label="Estado"><span th:classappend="${c.estado == 'Anulado' ? 'estado-anulado' : (c.estadoPago != null and c.estadoPago.name() == 'PAGADO') ? 'estado-pagado' : 'estado-pendiente'}" th:text="${c.estadoPago}"></span></td>
                                 <td data-label="Fecha" th:text="${#temporals.format(c.fechaFactura, 'dd/MM/yyyy - HH:mm:ss')}"></td>
                                 <td data-label="Acciones">
-                                    <div class="acciones-group">
+                                    <div class="flex flex-col w-full gap-2 md:flex-row justify-around">
                                         <form th:action="@{/compras/ver/{id}(id=${c.numeroFactura})}" method="get">
                                             <button class="btn-editar" type="submit" style="background: #FDE68A;">Ver compra</button>
                                         </form>
-                                        <button type="button" class="btn-anular" style="background: #F87171;" onclick="openAnular('${c.numeroFactura}')">Anular</button>
+                                        <button type="button" class="btn-pagar" style="background: #10B981;"
+                                            th:if="${c.tipoCompra != null and c.tipoCompra.name() == 'CREDITO' and c.estadoPago != null and c.estadoPago.name() != 'PAGADO'}" 
+                                            th:onclick="'openPagar(' + ${c.numeroFactura} + ', ' + ${c.saldoPendiente} + ')'">Pagar</button>
+                                        <button type="button" class="btn-anular" 
+                                            th:style="${c.estadoPago != null and c.estadoPago.name() == 'PAGADO'} ? 'background: #F87171;' : 'background: #9CA3AF; cursor: not-allowed;'"
+                                            th:disabled="${c.estadoPago == null or c.estadoPago.name() != 'PAGADO'}"
+                                            th:data-id="${c.numeroFactura}" 
+                                            onclick="openAnular(this)">Anular</button>
                                     </div>
                                 </td>
                             </tr>
@@ -105,7 +112,8 @@
     </main>
 
     <script>
-        function openAnular(numero) {
+        function openAnular(button) {
+            const numero = button.dataset.id;
             const d = document.getElementById('dialogAnular');
             document.getElementById('numeroFacturaHidden').value = numero;
             if (typeof d.showModal === 'function') d.showModal(); else d.style.display = 'block';
@@ -116,5 +124,60 @@
             document.getElementById('motivo').value = '';
             if (typeof d.close === 'function') d.close(); else d.style.display = 'none';
         }
+
+        function openPagar(numeroFactura, saldoPendiente) {
+            const d = document.getElementById('dialogPagar');
+            document.getElementById('numeroFacturaPago').value = numeroFactura;
+            document.getElementById('deudaPendienteText').innerText = saldoPendiente;
+            if (typeof d.showModal === 'function') d.showModal(); else d.style.display = 'block';
+        }
+
+        function closePagar() {
+            const d = document.getElementById('dialogPagar');
+            if (typeof d.close === 'function') d.close(); else d.style.display = 'none';
+        }
     </script>
+    
+    <dialog id="dialogPagar">
+        <div class="modal-header">
+            <h2>Registrar Pago</h2>
+        </div>
+        <form th:action="@{/pagos/guardar}" th:object="${pagoCompra}" method="post" class="modal-body">
+            <input type="hidden" id="numeroFacturaPago" th:field="*{numeroFactura.numeroFactura}">
+            
+            <div class="form-group">
+                <label>Deuda Pendiente: S/. <span id="deudaPendienteText"></span></label>
+            </div>
+
+            <div class="form-grid form-grid-2">
+                <div class="form-group">
+                    <label for="montoPago">Monto a Pagar *</label>
+                    <input type="number" step="0.01" th:field="*{montoPago}" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="metodoPago">Método de Pago *</label>
+                    <select th:field="*{metodoPago}" class="form-select" required>
+                        <option value="">Seleccione...</option>
+                        <option th:each="m : ${metodosPago}" th:value="${m.idMetodoPago}" th:text="${m.nombreMetodoPago}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 20px;">
+                <label for="numeroRecibo">Número de Recibo</label>
+                <input type="text" th:field="*{numeroRecibo}" class="form-input">
+            </div>
+
+            <div class="form-group" style="margin-top: 20px;">
+                <label for="observaciones">Observaciones</label>
+                <textarea th:field="*{observaciones}" class="form-input" rows="3"></textarea>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-cancelar" onclick="closePagar()">Cancelar</button>
+                <button type="submit" class="btn-registrar">Registrar Pago</button>
+            </div>
+        </form>
+    </dialog>
 </body>

@@ -1,14 +1,14 @@
 package app.farmy.farmy.model;
 
 import java.time.LocalDateTime;
-
 import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ForeignKey;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,18 +17,9 @@ import lombok.Setter;
 @Setter
 public class PagoCompra {
 
-    @EmbeddedId
-    private PagoCompraId pagoCompraId;
-
-    @ManyToOne
-    @MapsId("numeroFactura")
-    @JoinColumn(name = "numero_factura", foreignKey = @ForeignKey(name = "FK_Compra_PagoCompra"))
-    private Compra numeroFactura;
-    
-    @ManyToOne
-    @MapsId("idMetodoPago")
-    @JoinColumn(name = "id_metodo_pago", foreignKey = @ForeignKey(name = "FK_MetodoPago_PagoCompra"))
-    private MetodoPago metodoPago;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private int idPagoCompra;
 
     @Column(nullable = false)
     private double montoPago;
@@ -43,6 +34,15 @@ public class PagoCompra {
     @ManyToOne
     @JoinColumn(name = "idUsuario", foreignKey = @ForeignKey(name = "FK_Usuario_PagoCompra"))
     private Usuario usuario;
+
+    @ManyToOne
+    @JoinColumn(name = "compra", foreignKey = @ForeignKey(name = "FK_Compra_PagoCompra"))
+    private Compra compra;
+    
+    @ManyToOne
+    @JoinColumn(name = "id_metodo_pago", foreignKey = @ForeignKey(name = "FK_MetodoPago_PagoCompra"))
+    private MetodoPago metodoPago;
+
 
 }
 

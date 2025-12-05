@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" th:href="@{/css/compras.css}">
     <script th:src="@{/script.js}"></script>
 </head>
+
 <body>
     <main id='main-content' class="flex h-dvh">
 
@@ -17,12 +19,35 @@
             <div th:replace="~{fragments/header.html :: header-info('Detalle de Compra','Compras > Detalle')}"></div>
 
             <div class="container">
-                <h1 class="text-xl font-black my-2">Detalle de la compra <span th:text="${compra.numeroFactura}"></span></h1>
-                <div class="card">
-                    <p><strong>Proveedor:</strong> <span th:text="${compra.proveedor != null ? compra.proveedor.razonSocial : '---'}"></span></p>
-                    <p><strong>Fecha:</strong> <span th:text="${#temporals.format(compra.fechaFactura, 'dd/MM/yyyy - HH:mm:ss')}"></span></p>
-                    <p><strong>Tipo:</strong> <span th:text="${compra.tipoCompra}"></span></p>
-                    <p><strong>Observaciones:</strong> <span th:text="${compra.observaciones}"></span></p>
+
+                <h1 class="text-2xl font-black my-2 text-center">Detalle de la Compra: N°. <span
+                        th:text="${compra.numeroFactura}"></span>
+                </h1>
+                <div class="card text-left mx-8 border border-purple-900 rounded-lg p-4">
+                    <p><strong class="font-bold text-gray-700">Proveedor:</strong> <span
+                            th:text="${compra.proveedor != null ? compra.proveedor.razonSocial : '---'}"></span></p>
+                    <p><strong class="font-bold text-gray-700">Fecha:</strong> <span
+                            th:text="${#temporals.format(compra.fechaFactura, 'dd/MM/yyyy - HH:mm:ss')}"></span></p>
+                    <p><strong class="font-bold text-gray-700">Tipo:</strong> <span
+                            th:text="${compra.tipoCompra}"></span></p>
+                    <p><strong class="font-bold text-gray-700">Total:</strong> S/. <span
+                            th:text="${compra.total}"></span></p>
+                    <p>
+                        <strong class="font-bold text-gray-700">Estado Pago:</strong>
+                        <span th:text="${compra.estadoPago}"
+                            th:classappend="${compra.estadoPago == 'PENDIENTE' ? 'text-yellow-600 font-bold' : 
+                                                                  (compra.estadoPago == 'ANULADO' ? 'text-red-600 font-bold' : 
+                                                                  (compra.estadoPago == 'PAGADO' ? 'text-green-600 font-bold' : ''))}">
+                        </span>
+                    </p>
+                    <p th:if="${compra.observaciones == null }">
+                        <strong class="font-bold text-gray-700">Observaciones:</strong>
+                        <span>Sin observaciones</span>
+                    </p>
+                    <p th:if="${compra.observaciones != null && !#strings.isEmpty(compra.observaciones)}">
+                        <strong class="font-bold text-gray-700">Observaciones:</strong>
+                        <span th:text="${compra.observaciones}"></span>
+                    </p>
                 </div>
 
                 <div class="table-wrapper" style="margin-top:20px;">
@@ -32,7 +57,7 @@
                                 <th>#</th>
                                 <th>Producto</th>
                                 <th>Cantidad</th>
-                                <th>Precio Unit.</th>
+                                <th>Precio Unit. de Compra</th>
                                 <th>IGV</th>
                                 <th>Subtotal</th>
                             </tr>
@@ -41,10 +66,10 @@
                             <tr th:each="d,stat : ${detalles}">
                                 <td th:text="${stat.count}"></td>
                                 <td th:text="${d.producto != null ? d.producto.nombreProducto : '---'}"></td>
-                                <td th:text="${d.cantidad}"></td>
+                                <td th:text="${d.cantidadInicial}"></td>
                                 <td th:text="${d.precioCompra}"></td>
-                                <td th:text="${(d.precioCompra * d.cantidad) * 0.18}"></td>
-                                <td th:text="${d.precioCompra * d.cantidad}"></td>
+                                <td th:text="${(d.precioCompra * d.cantidadInicial) * 0.18}"></td>
+                                <td th:text="${d.precioCompra * d.cantidadInicial}"></td>
                             </tr>
                         </tbody>
                     </table>

@@ -39,10 +39,11 @@
                                     style="height:120px; width:100%; object-fit:cover;">
                                 <div class="p-2">
                                     <h3 th:text="${p.nombreProducto}" class="truncate"></h3>
-                                    <p class="text-sm text-gray-600">S/ <span th:text="${p.precioVenta}"></span></p>
+                                    <p class="text-sm text-gray-600"><span th:text="${p.descripcion}"></span></p>
                                     <button class="btn-registrar mt-2" type="button" th:data-id='${p.idProducto}'
-                                        th:data-name='${p.nombreProducto}' th:data-price='${p.precioVenta}'
-                                        th:data-img='${p.imgUrl}' th:data-receta='${p.requiereReceta}'
+                                        th:data-name='${p.nombreProducto}'
+                                        th:data-img='${p.imgUrl}' 
+                                        th:data-receta='${p.requiereReceta}'
                                         th:data-categoria='${p.categoria != null ? p.categoria.nombreCategoria : "Sin categoría"}'
                                         th:data-descripcion='${p.descripcion}'
                                         onclick="openProducto(this)">Agregar</button>
@@ -63,7 +64,8 @@
                         <label>Informacion de la compra</label>
                         <div class="summary-box flex flex-col gap-1.5">
                             <label>Tipo de compra: </label>
-                            <select id="tipoCompraSelect" th:field="*{compra.tipoCompra}" class="form-input" onchange="mostrarPagoInicial(this)" required>
+                            <select id="tipoCompraSelect" th:field="*{compra.tipoCompra}" class="form-input"
+                                onchange="mostrarPagoInicial(this)" required>
                                 <option th:value="0">Contado</option>
                                 <option th:value="1">Credito</option>
                             </select>
@@ -74,16 +76,16 @@
                                 <p class="text-sm">
                                     Agregar pago inicial:
                                 </p>
-
+                                
                                 <input class="w-1/3 text-center border border-purple-300 rounded-lg" type="number"
                                     id="initialPayment" min="0" step="0.10" value="0.00" disabled>
                             </div>
                             <div id="fechaVencimientoDIV" style="display:none;">
                                 <label for="fechaVencimientoId">Fecha limite de pago</label>
-                                <input type="date" id="fechaVencimientoId" name="fechaVencimiento"
-                                    class="form-input" placeholder="Seleccione fecha">
+                                <input type="date" id="fechaVencimientoId" name="fechaVencimiento" class="form-input"
+                                    placeholder="Seleccione fecha">
                             </div>
-                            
+
                             <label id="metodoPagoLabel">Metodo de pago : </label>
                             <select id="metodoPagoSelect" th:field="*{compra.metodoPago}" class="form-input" required>
                                 <option value="">-- Seleccione metodo de pago --</option>
@@ -137,8 +139,20 @@
 
                 <div class="space-y-3 mb-6 text-sm text-gray-600">
                     <div class="flex justify-between border-b border-gray-100 pb-2">
-                        <span class="font-medium">Precio:</span>
-                        <span class="text-lg font-bold text-violet-900">S/ <span id="prodPrice"></span></span>
+                        <span class="font-medium self-center">Precio Compra:</span>
+                        <div class="flex items-center">
+                            <span class="text-lg font-bold text-violet-900 mr-2">S/</span>
+                            <input type="number" id="prodPrice" step="0.1" min="0"
+                                class="form-input w-24 text-right font-bold text-lg border-gray-300 focus:border-violet-500 focus:ring-violet-500 rounded-md" required>
+                        </div>
+                    </div>
+                    <div class="flex justify-between border-b border-gray-100 pb-2">
+                        <span class="font-medium self-center">Precio Venta:</span>
+                        <div class="flex items-center">
+                            <span class="text-lg font-bold text-violet-900 mr-2">S/</span>
+                            <input type="number" id="prodSalePrice" step="0.1" min="0"
+                                class="form-input w-24 text-right font-bold text-lg border-gray-300 focus:border-violet-500 focus:ring-violet-500 rounded-md" required>
+                        </div>
                     </div>
                     <div class="flex justify-between border-b border-gray-100 pb-2">
                         <span class="font-medium">Requiere Receta:</span>
@@ -149,12 +163,29 @@
                         <p id="prodDescripcion" class="text-gray-500 italic"></p>
                     </div>
                 </div>
+                <div class="flex items-center justify-center gap-3 bg-gray-50 p-3 rounded-lg mb-2">
+                    <label for="prodLote" class="font-medium text-gray-700">N° Lote:</label>
+                    <input type="text" id="prodLote"
+                        class="form-input w-36 text-center font-bold text-lg border-gray-300 focus:border-violet-500 focus:ring-violet-500 rounded-md" required>
+                </div>
+                <div class="flex items-center justify-center gap-3 bg-gray-50 p-3 rounded-lg">
+                    <label for="prodCantidad" class="font-medium text-gray-700">Cantidad (Stock):</label>
+                    <input type="number" id="prodCantidad" value="1" min="1"
+                        class="form-input w-24 text-center font-bold text-lg border-gray-300 focus:border-violet-500 focus:ring-violet-500" required>
+                </div>
 
                 <div class="flex items-center justify-center gap-3 bg-gray-50 p-3 rounded-lg">
-                    <label for="prodCantidad" class="font-medium text-gray-700">Cantidad a comprar:</label>
-                    <input type="number" id="prodCantidad" value="1" min="1"
-                        class="form-input w-24 text-center font-bold text-lg border-gray-300 focus:border-violet-500 focus:ring-violet-500">
+                    <label for="prodFechaVencimiento" class="font-medium text-gray-700"> Fecha de Vencimiento:</label>
+                    <input type="date" id="prodFechaVencimiento"
+                        class="form-input w-36 text-center font-bold text-lg border-gray-300 focus:border-violet-500 focus:ring-violet-500">
                 </div>
+             
+                <div class="flex items-center justify-center gap-3 bg-gray-50 p-3 rounded-lg">
+                    <label for="prodFechaFabricacion" class="font-medium text-gray-700"> Fecha de Fabricacion:</label>
+                    <input type="date" id="prodFechaFabricacion"
+                        class="form-input w-36 text-center font-bold text-lg border-gray-300 focus:border-violet-500 focus:ring-violet-500">
+                </div>
+
             </div>
             <div class="modal-footer bg-gray-50 p-4 rounded-b-lg flex justify-end gap-3 border-t border-gray-200">
                 <button type="button"

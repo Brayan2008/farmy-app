@@ -59,6 +59,9 @@ public class Usuario {
     @OneToMany(mappedBy = "usuario")
     private final List<PagoCompra> pagoCompras = new ArrayList<>();
 
+    @OneToMany(mappedBy = "usuario")
+    private final List<InventarioMovimiento> inventarioMovimientos = new ArrayList<>();
+
     @PrePersist
     public void fechaCreacion() {
         fechaCreacion = LocalDate.now();

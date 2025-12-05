@@ -5,7 +5,6 @@ function openProducto(btn) {
     currentProduct = {
         id: parseInt(btn.dataset.id),
         name: btn.dataset.name,
-        price: parseFloat(btn.dataset.price),
         img: btn.dataset.img ? '/uploads/' + btn.dataset.img : '/img/default.webp',
         receta: btn.dataset.receta === 'true',
         categoria: btn.dataset.categoria,
@@ -16,7 +15,6 @@ function openProducto(btn) {
 
     document.getElementById('prodImg').src = currentProduct.img;
     document.getElementById('prodName').innerText = currentProduct.name;
-    document.getElementById('prodPrice').innerText = currentProduct.price.toFixed(2);
     document.getElementById('prodCategoria').innerText = currentProduct.categoria;
     document.getElementById('prodDescripcion').innerText = currentProduct.descripcion;
 
@@ -28,8 +26,6 @@ function openProducto(btn) {
         recetaSpan.innerText = 'NO';
         recetaSpan.className = 'font-bold text-green-600';
     }
-
-    document.getElementById('prodCantidad').value = 1;
 
     const d = document.getElementById('dialogProducto');
 
@@ -43,29 +39,61 @@ function openProducto(btn) {
 function closeProducto() {
     const d = document.getElementById('dialogProducto');
 
+    // Reset inputs
+    document.getElementById('prodCantidad').value = '1';
+    document.getElementById('prodSalePrice').value = '';
+    document.getElementById('prodPrice').value = '';
+    document.getElementById('prodLote').value = '';
+    document.getElementById('prodFechaVencimiento').value = '';
+
     if (typeof d.close === 'function') {
         d.close();
-    }
-    else {
+    } else {
         d.style.display = 'none';
     }
-
 }
 
 function addToCart() {
     const qty = parseInt(document.getElementById('prodCantidad').value || '1');
+    const precioVenta = parseFloat(document.getElementById('prodSalePrice').value || '0');
+    const precioCompra = parseFloat(document.getElementById('prodPrice').value || '0');
+    const lote = document.getElementById('prodLote').value || '';
+    const fechaVencimiento = document.getElementById('prodFechaVencimiento').value || '';
+    const fechaFabricacion = document.getElementById('prodFechaFabricacion').value || '';
+    
+    if (qty <= 0) {
+        alert('La cantidad debe ser mayor a 0.');
+        return;
+    }
+    if (precioCompra <= 0) {
+        alert('El precio de compra debe ser mayor a 0.');
+        return;
+    }
+    if (precioVenta <= 0) {
+        alert('El precio de venta debe ser mayor a 0.');
+        return;
+    }
+    if (!lote) {
+        alert('El campo Lote es obligatorio.');
+        return;
+    }
 
     const item = {
-        id: currentProduct.id,
+        id_producto: currentProduct.id,
         nombre: currentProduct.name,
-        precio: currentProduct.price,
+        precio_venta: precioVenta,
+        precio_compra: precioCompra,
         img: currentProduct.img,
-        cantidad: qty
+        cantidad: qty,
+        lote: lote,
+        fechaVencimiento: fechaVencimiento,
+        fechaFabricacion: fechaFabricacion
     };
 
     cart.push(item);
     renderCart();
     closeProducto();
+
 }
 
 function renderCart() {
@@ -108,7 +136,7 @@ function renderCart() {
                     </div>
                 </div>
                 <div class="w-1/2 self-center flex items-center justify-around pr-2">
-                    <span> S/ ${it.precio.toFixed(2)} </span>
+                    <span> S/ ${it.precio_compra.toFixed(2)} </span>
                     <button type="button" aria-label="Eliminar producto" title="Eliminar" class="bg-red-600 text-white rounded-md hover:text-red-800 hover:bg-red-400 font-bold px-2" onclick="cart.splice(${idx},1); renderCart();">
                         ×
                     </button>
@@ -130,7 +158,7 @@ function updateQty(idx, qty) {
 }
 
 function updateSummary() {
-    const subtotal = cart.reduce((s, i) => s + i.precio * i.cantidad, 0);
+    const subtotal = cart.reduce((s, i) => s + i.precio_compra * i.cantidad, 0);
     const igv = subtotal * 0.18;
     const total = subtotal + igv;
 
@@ -166,6 +194,7 @@ function abrirConfirmarRegistro() {
     const metodoPagoId = document.getElementById('metodoPagoSelect').value;
     const tipoCompraId = document.querySelector('#tipoCompraSelect').value;
     const fechaVencimiento = document.getElementById('fechaVencimientoId').value;
+    const fechaFabricacion = document.getElementById('prodFechaFabricacion').value;
 
     if (!proveedorId) {
         alert('Seleccione un proveedor o registre uno.');
@@ -198,12 +227,17 @@ function abrirConfirmarRegistro() {
     document.getElementById('formSubtotal').value = subtotal;
     document.getElementById('formIgv').value = igv;
     document.getElementById('formTotal').value = total;
+    alert(fechaVencimiento)
     // construir itemsJson desde el carrito
 
     const items = cart.map(it => ({
-        id: it.id,
+        id: it.id_producto,
         cantidad: it.cantidad,
-        precio: it.precio
+        precio_venta: it.precio_venta,
+        precio_compra: it.precio_compra,
+        lote: it.lote,
+        fechaVencimiento: it.fechaVencimiento,
+        fechaFabricacion: it.fechaFabricacion
     }));
 
     document.getElementById('itemsJson').value = JSON.stringify(items);
@@ -263,4 +297,5 @@ d.setDate(d.getDate() - 1);
 const today = d.toISOString().split('T')[0];
 document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('fechaVencimientoId').setAttribute('min', today);
+    document.getElementById('prodFechaVencimiento').setAttribute('min', today);
 });

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Movimientos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/inventario.css}">
+    <script th:src="@{/script.js}"></script>
+</head>
+
+<body>
+    <main id='main-content' class="flex h-dvh">
+
+        <!-- #region sidebar-->
+        <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
+        <!-- #endregion -->
+        <div class="flex-1 h-screen overflow-y-scroll overflow-x-hidden">
+
+            <div th:replace="~{fragments/header.html :: 
+                              header-info('Historial de Movimientos','Registro de entradas y salidas')}"></div>
+
+            <div class="container">
+
+                <div th:replace="~{fragments/search.html :: search-fragment('movimientos', 'Buscar movimiento...')}"></div>
+
+                <div class="filters-container">
+                    <span class="filter-label">Filtrar por:</span>
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label>Tipo:</label>
+                            <select>
+                                <option>Todos</option>
+                                <option>ENTRADA</option>
+                                <option>SALIDA</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Tipo</th>
+                                <th>Producto</th>
+                                <th>Lote</th>
+                                <th>Cantidad</th>
+                                <th>Stock Ant.</th>
+                                <th>Stock Nuevo</th>
+                                <th>Usuario</th>
+                                <th>Fecha</th>
+                                <th>Descripción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="m : ${movimientos}">
+                                <td data-label="ID" th:text="${m.idInventarioMovimiento}"></td>
+                                <td data-label="Tipo">
+                                    <span th:classappend="${m.tipoMovimiento.name() == 'ENTRADA' ? 'estado-pagado' : 'estado-anulado'}" 
+                                          th:text="${m.tipoMovimiento}"></span>
+                                </td>
+                                <td data-label="Producto" th:text="${m.lote.producto.nombreProducto}"></td>
+                                <td data-label="Lote" th:text="${m.lote.numeroLote}"></td>
+                                <td data-label="Cantidad" th:text="${m.cantidad}"></td>
+                                <td data-label="Stock Ant." th:text="${m.stockAnterior}"></td>
+                                <td data-label="Stock Nuevo" th:text="${m.stockNuevo}"></td>
+                                <td data-label="Usuario" th:text="${(m.usuario != null and m.usuario.nombreUsuario != null) ? m.usuario.nombreUsuario : '---'}"></td>
+                                <td data-label="Fecha" th:text="${#temporals.format(m.fechaMovimiento, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td data-label="Observaciones" th:text="${m.observaciones}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="botones-contenedor">
+                    <a class="btn-nuevo" th:href="@{/inventario}">Volver a Inventario</a>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>

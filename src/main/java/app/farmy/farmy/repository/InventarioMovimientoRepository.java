@@ -3,9 +3,9 @@ package app.farmy.farmy.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import app.farmy.farmy.model.PagoCompra;
+import app.farmy.farmy.model.InventarioMovimiento;
 
 @Repository
-public interface PagoCompraRepository extends JpaRepository<PagoCompra, Integer> {
+public interface InventarioMovimientoRepository extends JpaRepository<InventarioMovimiento, Integer> {
 
 }

@@ -46,8 +46,6 @@ public class Productos {
     @Column(nullable = false)
     LocalDate fechaRegistro;
     
-    Double precioVenta;
-
     Integer stock;
 
     String imgUrl;
@@ -71,14 +69,9 @@ public class Productos {
     @OneToMany(mappedBy = "producto")
     private final List<Lote> lotes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "producto")
-    private final List<CompraDetalle> compra = new ArrayList<>();
-
     @PrePersist
     public void preGuardado() {
         fechaRegistro = LocalDate.now();
         estado = "Activo";
     }
-
-    // TODO llevarlo a InventarioMovimiento
 }

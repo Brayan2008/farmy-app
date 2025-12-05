@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
@@ -30,7 +31,7 @@ public class Lote {
     int idLote;
 
     @Column(nullable = false)
-    int numeroLote;
+    String numeroLote;
 
     LocalDate fechaFabricacion;
 
@@ -40,6 +41,10 @@ public class Lote {
     int cantidadInicial;
 
     int cantidadActual;
+    
+    double precioCompra;
+    
+    double precioVenta;
 
     String estado;
 
@@ -49,11 +54,15 @@ public class Lote {
     @JoinColumn(name = "idProducto", foreignKey = @ForeignKey(name="FK_Producto_Lote"))
     private Productos producto;
 
+    @ManyToMany(mappedBy = "lotes")
+    private final List<Compra> compras = new ArrayList<>();
+
     @OneToMany(mappedBy = "lote")
-    private final List<CompraDetalle> compra = new ArrayList<>();
+    private final List<InventarioMovimiento> inventarioMovimientos = new ArrayList<>();
 
     @PrePersist
     public void preSave() {
+        cantidadActual = cantidadInicial;
         fechaRegistro = LocalDate.now();
     }
 

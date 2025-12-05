@@ -11,6 +11,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
@@ -67,8 +69,13 @@ public class Compra {
     @JoinColumn(name = "idMetodoPago", foreignKey = @ForeignKey(name = "FK_MetodoPago_Compra"))
     private MetodoPago metodoPago;
 
-    @OneToMany(mappedBy = "compra")
-    private final List<CompraDetalle> compra = new ArrayList<>();
+    @ManyToMany
+    @JoinTable(
+        name = "compra_lote",
+            joinColumns = @JoinColumn(name = "numeroFactura", nullable = false, foreignKey = @ForeignKey(name = "FK_Compra_CompraLote")),
+            inverseJoinColumns = @JoinColumn(name="idLote", nullable = false, foreignKey = @ForeignKey(name = "FK_Lote_CompraLote"))
+    )
+    private final List<Lote> lotes = new ArrayList<>();
 
     @OneToMany(mappedBy = "numeroFactura")
     private final List<PagoCompra> pagoCompras = new ArrayList<>();

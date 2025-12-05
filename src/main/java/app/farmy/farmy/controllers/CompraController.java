@@ -16,14 +16,11 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
 import app.farmy.farmy.model.Compra;
-import app.farmy.farmy.model.CompraDetalle;
-import app.farmy.farmy.model.CompraDetalleId;
 import app.farmy.farmy.model.Proveedor;
 import app.farmy.farmy.model.EstadoPago;
-import app.farmy.farmy.model.MetodoPago;
+import app.farmy.farmy.model.Lote;
 import app.farmy.farmy.model.TipoCompra;
 import app.farmy.farmy.repository.CompraRepository;
-import app.farmy.farmy.repository.CompraDetalleRepository;
 import app.farmy.farmy.repository.ProveedorRepository;
 import app.farmy.farmy.repository.ProductosRepository;
 import app.farmy.farmy.repository.LoteRepository;
@@ -38,9 +35,6 @@ public class CompraController {
 
     @Autowired
     private CompraRepository compraRepository;
-
-    @Autowired
-    private CompraDetalleRepository compraDetalleRepository;
 
     @Autowired
     private ProveedorRepository proveedorRepository;
@@ -59,16 +53,20 @@ public class CompraController {
     @GetMapping
     public String listaCompras(Model model) {
         model.addAttribute("listaCompras", compraRepository.findAll());
+        model.addAttribute("metodosPago", metodoPagoRepository.findAll());
+        model.addAttribute("pagoCompra", new app.farmy.farmy.model.PagoCompra());
         return "home/compras/compras";
     }
 
     @GetMapping("/ver/{id}")
     public String verCompra(@PathVariable int id, Model model) {
         Optional<Compra> c = compraRepository.findById(id);
+
         if (c.isPresent()) {
             Compra compra = c.get();
-            List<CompraDetalle> detalles = compraDetalleRepository.findByCompra_NumeroFactura(id);
+            List<Lote> detalles = compra.getLotes();
             model.addAttribute("compra", compra);
+
             model.addAttribute("detalles", detalles);
             return "home/compras/detalle_compra";
         }
@@ -77,6 +75,7 @@ public class CompraController {
 
     @PostMapping("/anular")
     public String anularCompra(@RequestParam int numeroFactura, @RequestParam String motivo) {
+        System.out.println("\n".repeat(20) + "Anulando compra " + numeroFactura + " por motivo: " + motivo + "\n".repeat(20));
         var c = compraRepository.findById(numeroFactura);
         if (c.isPresent()) {
             Compra compra = c.get();
@@ -98,6 +97,7 @@ public class CompraController {
         return "home/compras/nueva_compra";
     }
 
+    //TODO Realizar pago inicial
     @PostMapping("/guardar")
     public String guardarCompra(@RequestParam Integer proveedorId,
             @RequestParam Double subtotal,
@@ -117,6 +117,7 @@ public class CompraController {
         }
 
         compra.setSubtotal(subtotal == null ? 0.0 : subtotal);
+        compra.setSaldoPendiente(total == null ? 0.0 : total);
         compra.setIgv(igv == null ? 0.0 : igv);
         compra.setTotal(total == null ? 0.0 : total);
 
@@ -131,73 +132,68 @@ public class CompraController {
             }
         });
 
-        compra.setFechaVencimientoPago(LocalDate.parse(fechaVencimientoPago));
-        
+        if (fechaVencimientoPago != null && fechaVencimientoPago != "") {
+            compra.setFechaVencimientoPago(LocalDate.parse(fechaVencimientoPago));
+        }
+
         if (metodoPago != null) {
             metodoPagoRepository.findById(metodoPago).ifPresent(compra::setMetodoPago);
         }
 
-        // persist compra first to get generated numeroFactura
-        compraRepository.save(compra);
-        System.out.println("\n".repeat(20) + "Esta es la compra" + compra.toString() + "\n".repeat(20));
 
+        /*
+         * Ejemplo del JSON
+         * 
+         * 
+         * 
+         * 
+         * 
+         * Esta es el
+         * json[{"id":2,"cantidad":15,"precio_venta":13,"precio_compra":12,"lote":"1414"
+         * ,"fechaVencimiento":"2025-12-05", "fechaFabricacion":"2025-12-05"}]
+         * 
+         * 
+         */
         // si vienen items en JSON, parsearlos y persistir CompraDetalle
         if (itemsJson != null && !itemsJson.isBlank()) {
             try {
                 List<Map<String, Object>> items = mapper.readValue(itemsJson,
                         new TypeReference<List<Map<String, Object>>>() {
                         });
+
                 for (Map<String, Object> it : items) {
-                    Integer idProd = null;
-                    if (it.get("id") != null)
-                        idProd = (Integer) ((Number) it.get("id")).intValue();
-                    else if (it.get("idProducto") != null)
-                        idProd = (Integer) ((Number) it.get("idProducto")).intValue();
 
-                    Integer cantidad = (it.get("cantidad") != null) ? ((Number) it.get("cantidad")).intValue() : 0;
-                    Double precio = (it.get("precio") != null) ? ((Number) it.get("precio")).doubleValue() : 0.0;
-                    Integer idLote = null;
+                    int idProd = (Integer) (it.get("id"));
+                    String idLote = it.get("lote").toString();
+                    int cantidad = (it.get("cantidad") != null) ? ((Integer) it.get("cantidad")) : 0;
+                    Double precio_venta = (it.get("precio_venta") != null)
+                            ? ((Number) it.get("precio_venta")).doubleValue()
+                            : 0.0;
+                    Double precio_compra = (it.get("precio_compra") != null)
+                            ? ((Number) it.get("precio_compra")).doubleValue()
+                            : 0.0;
+                    LocalDate fecha_vencimiento = LocalDate.parse(it.get("fechaVencimiento").toString() != "" ? it.get("fechaVencimiento").toString() : null);
+                    LocalDate fecha_fabricacion = LocalDate.parse(it.get("fechaFabricacion").toString() != ""  ? it.get("fechaFabricacion").toString() : null);
 
-                    if (it.get("idLote") != null)
-                        idLote = ((Number) it.get("idLote")).intValue();
+                    Lote lote = new Lote();
+                    lote.setNumeroLote(idLote);
+                    lote.setEstado("Activo");
+                    lote.setCantidadInicial(cantidad);
+                    lote.setPrecioCompra(precio_compra);
+                    lote.setPrecioVenta(precio_venta);
+                    lote.setFechaVencimiento(fecha_vencimiento);
+                    lote.setFechaFabricacion(fecha_fabricacion);
 
-                    CompraDetalle detalle = new CompraDetalle();
+                    lote.setProducto(productosRepository.findById(idProd).get());
 
-                    CompraDetalleId detId = new CompraDetalleId(compra.getNumeroFactura(), idProd == null ? 0 : idProd,
-                            idLote == null ? 0 : idLote);
-                    detalle.setCompraDetalleId(detId);
-                    detalle.setCompra(compra);
+                    loteRepository.save(lote);
 
-                    if (idProd != null) {
-                        var prodOpt = productosRepository.findById(idProd);
-                        if (prodOpt.isPresent()) {
-                            var prod = prodOpt.get();
-                            detalle.setProducto(prod);
-                            // aumentar stock del producto
-                            if (prod.getStock() == null)
-                                prod.setStock(cantidad);
-                            else
-                                prod.setStock(prod.getStock() + cantidad);
-                            productosRepository.save(prod);
-                        }
-                    }
+                    compra.getLotes().add(lote);
 
-                    if (idLote != null && idLote != 0) {
-                        var loteOpt = loteRepository.findById(idLote);
-                        if (loteOpt.isPresent()) {
-                            var lote = loteOpt.get();
-                            detalle.setLote(lote);
-                            // aumentar cantidad en lote
-                            lote.setCantidadActual(lote.getCantidadActual() + cantidad);
-                            loteRepository.save(lote);
-                        }
-                    }
+                    compraRepository.save(compra);
 
-                    detalle.setCantidad(cantidad);
-                    detalle.setPrecioCompra(precio);
-                    detalle.setPrecioVenta(precio);
 
-                    compraDetalleRepository.save(detalle);
+
                 }
             } catch (Exception ex) {
                 // parsing error -> ignore or log
