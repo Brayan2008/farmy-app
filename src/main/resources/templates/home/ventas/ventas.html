@@ -11,17 +11,28 @@
 </head>
 
 <body>
+
+
     <main id='main-content' class="flex h-dvh">
+
 
         <!-- #region sidebar-->
         <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
         <!-- #endregion -->
         <div class="flex-1 h-screen overflow-y-scroll overflow-x-hidden">
-
+        
             <div th:replace="~{fragments/header.html :: 
                               header-info('Gestionar Ventas','Ventas de productos')}"></div>
 
             <div class="container">
+
+                <div id="protector-ventas" th:class="${ estado_caja_usuario ? 'hidden' : 'flex fixed items-center bg-white w-[80%] h-[90%]' }" >
+                <div class="m-auto text-center">
+                    <h2 class="text-2xl font-bold mb-4">La caja está cerrada</h2>
+                    <p class="mb-4 ">No puede gestionar ventas hasta que la caja esté abierta.</p>
+                    <a th:href="@{/arqueo}" class="btn-nuevo" >Abrir Caja</a>
+                </div>
+                </div>
 
                 <div th:replace="~{fragments/search.html :: search-fragment('ventas', 'Buscar venta...')}"></div>
 

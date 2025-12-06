@@ -70,6 +70,7 @@ public class VentaController {
         model.addAttribute("listaVentas", ventasRepository.findAll());
         model.addAttribute("metodosPago", metodoPagoRepository.findAll());
         model.addAttribute("ventaPago", new VentaPago());
+        model.addAttribute("estado_caja_usuario",false);
         return "home/ventas/ventas";
     }
 

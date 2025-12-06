@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Categoría</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <link rel="stylesheet" th:href="@{/css/marcas.css}">
+    <script th:src="@{/script.js}"></script>
+</head>
+
+<body>
+<main id='main-content' class="flex h-screen">
+
+    <!-- Sidebar -->
+    <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
+
+    <div class="flex-1 h-full overflow-y-scroll overflow-x-hidden">
+
+        <div th:replace="~{fragments/header.html :: 
+                          header-info(${estado_caja_usuario}? 'Cerrar caja':'Aperturar caja', ${estado_caja_usuario}? 'Caja > Cerrar' : ' Caja > Aperturar')}"></div>
+
+        <div class="container">
+            
+            <div class=" flex flex-col items-center w-full h-full">
+
+                <h2 class="text-2xl mb-40 font-bold" th:text="${estado_caja_usuario}? 'Cerrar caja':'Aperturar caja'"></h2>
+                <input type="text" class=" mb-6 w-80 border-2 border-purple-900 p-1.5 rounded-md" th:placeholder="${estado_caja_usuario}? 'Ingrese el monto con el que cerrará la caja' : 'Ingrese el monto con el que aperturará la caja'" >
+                <button class="btn-nuevo w-36 " th:text="${estado_caja_usuario}? 'Cerrar' : 'Aperturar'"></button>
+            </div>
+
+        </div>
+    </div>
+
+</main>
+</body>
+</html>
