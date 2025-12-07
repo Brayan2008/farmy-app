@@ -60,31 +60,31 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td data-label="Código">CAJ001</td>
-                                <td data-label="Tipo"><span class="tipo-ingreso">💰 Ingreso</span></td>
-                                <td data-label="Descripción">Venta de medicamentos - Factura #001</td>
-                                <td data-label="Monto (S/.)">850.00</td>
-                                <td data-label="Fecha">27/10/2025</td>
-                                <td data-label="Hora">09:15</td>
-                                <td data-label="Estado"><span class="estado-confirmado">✓ Confirmado</span></td>
-                                <td data-label="Acciones">
-                                    <div class="acciones-group">
-                                        <button class="btn-editar">✏ Editar</button>
-                                    </div>
+                            <tr th:each="c : ${listaCajas}">
+                                <td data-label="Código" th:text="${c.codigo}"></td>
+                                <td data-label="Tipo">
+                                    <span th:if="${c.tipo?.name() == 'Ingreso'}" class="tipo-ingreso">💰 Ingreso</span>
+                                    <span th:if="${c.tipo?.name() == 'Egreso'}" class="tipo-egreso">💸 Egreso</span>
                                 </td>
-                            </tr>
-                            <tr>
-                                <td data-label="Código">CAJ005</td>
-                                <td data-label="Tipo"><span class="tipo-ingreso">💰 Ingreso</span></td>
-                                <td data-label="Descripción">Venta de medicamentos - Factura #002</td>
-                                <td data-label="Monto (S/.)">675.25</td>
-                                <td data-label="Fecha">27/10/2025</td>
-                                <td data-label="Hora">15:10</td>
-                                <td data-label="Estado"><span class="estado-anulado">⊗ Anulado</span></td>
+                                <td data-label="Descripción" th:text="${c.descripcion}"></td>
+                                <td data-label="Monto (S/.)" th:text="${#numbers.formatDecimal(c.monto, 1, 2)}"></td>
+                                <td data-label="Fecha" th:text="${#temporals.format(c.fecha, 'dd/MM/yyyy')}"></td>
+                                <td data-label="Hora" th:text="${#temporals.format(c.hora, 'HH:mm')}"></td>
+                                <td data-label="Estado">
+                                    <span th:if="${c.estado?.name() == 'Confirmado'}" class="estado-confirmado">✓ Confirmado</span>
+                                    <span th:if="${c.estado?.name() == 'Pendiente'}" class="estado-pendiente">⏳ Pendiente</span>
+                                    <span th:if="${c.estado?.name() == 'Anulado'}" class="estado-anulado">⊗ Anulado</span>
+                                </td>
                                 <td data-label="Acciones">
                                     <div class="acciones-group">
-                                        <button class="btn-editar">✏ Editar</button>
+                                        <form th:action="@{/caja/editar/{id}(id=${c.idCaja})}" method="get" style="display: inline;">
+                                            <button class="btn-editar" type="submit">✏ Editar</button>
+                                        </form>
+                                        <form th:action="@{/caja/eliminar/{id}(id=${c.idCaja})}" method="post" style="display: inline;" 
+                                              th:if="${c.estado?.name() != 'Anulado'}"
+                                              onsubmit="return confirm('¿Está seguro de anular este movimiento?');">
+                                            <button class="btn-eliminar" type="submit">🗑 Anular</button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
@@ -95,15 +95,15 @@
                 <div class="resumen-caja">
                     <div class="resumen-item ingreso">
                         <span class="resumen-label">Total Ingresos:</span>
-                        <span class="resumen-valor">S/ 1,946.55</span>
+                        <span class="resumen-valor" th:text="'S/ ' + ${#numbers.formatDecimal(totalIngresos, 1, 2)}"></span>
                     </div>
                     <div class="resumen-item egreso">
                         <span class="resumen-label">Total Egresos:</span>
-                        <span class="resumen-valor">S/ 1,380.75</span>
+                        <span class="resumen-valor" th:text="'S/ ' + ${#numbers.formatDecimal(totalEgresos, 1, 2)}"></span>
                     </div>
                     <div class="resumen-item saldo">
                         <span class="resumen-label">Saldo del Día:</span>
-                        <span class="resumen-valor">S/ 565.80</span>
+                        <span class="resumen-valor" th:text="'S/ ' + ${#numbers.formatDecimal(saldoDia, 1, 2)}"></span>
                     </div>
                 </div>
 
@@ -118,98 +118,97 @@
                 <h2>Registrar Movimiento</h2>
             </div>
 
-            <form class="modal-body" method="dialog">
+            <form class="modal-body" th:object="${caja}" th:action="@{/caja/save}" method="post">
                 <div class="form-grid">
                     <!-- Tipo de Movimiento -->
                     <div class="form-group">
                         <label for="tipo">Tipo de Movimiento</label>
-                        <select id="tipo" class="form-select" required>
+                        <select th:field="*{tipo}" id="tipo" class="form-select" required>
                             <option value="">Seleccione...</option>
-                            <option value="ingreso">💰 Ingreso</option>
-                            <option value="egreso">💸 Egreso</option>
+                            <option value="Ingreso">💰 Ingreso</option>
+                            <option value="Egreso">💸 Egreso</option>
                         </select>
                     </div>
 
                     <!-- Estado -->
                     <div class="form-group">
                         <label for="estado">Estado</label>
-                        <select id="estado" class="form-select" required>
-                            <option value="confirmado">✓ Confirmado</option>
-                            <option value="pendiente">⏳ Pendiente</option>
-                            <option value="anulado">⊗ Anulado</option>
+                        <select th:field="*{estado}" id="estado" class="form-select" required>
+                            <option value="Confirmado">✓ Confirmado</option>
+                            <option value="Pendiente">⏳ Pendiente</option>
+                            <option value="Anulado">⊗ Anulado</option>
                         </select>
                     </div>
 
                     <!-- Monto -->
                     <div class="form-group">
                         <label for="monto">Monto (S/.)</label>
-                        <input type="number" id="monto" class="form-input" placeholder="0.00" step="0.01" min="0"
+                        <input type="number" th:field="*{monto}" id="monto" class="form-input" placeholder="0.00" step="0.01" min="0"
                             required>
                     </div>
 
                     <!-- Fecha -->
                     <div class="form-group">
                         <label for="fecha">Fecha</label>
-                        <input type="date" id="fecha" class="form-input" required>
+                        <input type="date" th:field="*{fecha}" id="fecha" class="form-input" required>
                     </div>
 
                     <!-- Hora -->
                     <div class="form-group">
                         <label for="hora">Hora</label>
-                        <input type="time" id="hora" class="form-input" required>
+                        <input type="time" th:field="*{hora}" id="hora" class="form-input" required>
                     </div>
 
                     <!-- Categoría -->
                     <div class="form-group">
                         <label for="categoria">Categoría</label>
-                        <select id="categoria" class="form-select" required>
+                        <select th:field="*{categoria}" id="categoria" class="form-select" required>
                             <option value="">Seleccione...</option>
-                            <option value="ventas">Ventas</option>
-                            <option value="compras">Compras</option>
-                            <option value="pagos-proveedor">Pagos a Proveedor</option>
-                            <option value="gastos-operativos">Gastos Operativos</option>
-                            <option value="servicios">Servicios Públicos</option>
-                            <option value="salarios">Salarios</option>
-                            <option value="otros">Otros</option>
+                            <option value="Ventas">Ventas</option>
+                            <option value="Compras">Compras</option>
+                            <option value="Pagos a Proveedor">Pagos a Proveedor</option>
+                            <option value="Gastos Operativos">Gastos Operativos</option>
+                            <option value="Servicios Públicos">Servicios Públicos</option>
+                            <option value="Salarios">Salarios</option>
+                            <option value="Otros">Otros</option>
                         </select>
                     </div>
 
                     <!-- Descripción -->
                     <div class="form-group form-group-full">
                         <label for="descripcion">Descripción</label>
-                        <textarea id="descripcion" class="form-textarea" placeholder="Describa el movimiento de caja..."
+                        <textarea th:field="*{descripcion}" id="descripcion" class="form-textarea" placeholder="Describa el movimiento de caja..."
                             required></textarea>
                     </div>
 
                     <!-- Método de Pago -->
                     <div class="form-group">
-                        <label for="metodoPago">Método de Pago</label>
-                        <select id="metodoPago" class="form-select" required>
+                        <label for="metodoPagoId">Método de Pago</label>
+                        <select name="metodoPagoId" id="metodoPagoId" class="form-select">
                             <option value="">Seleccione...</option>
-                            <option value="efectivo">Efectivo</option>
-                            <option value="tarjeta">Tarjeta</option>
-                            <option value="transferencia">Transferencia</option>
-                            <option value="cheque">Cheque</option>
+                            <option th:each="metodo : ${metodosPago}" 
+                                    th:value="${metodo.idMetodoPago}" 
+                                    th:text="${metodo.nombreMetodoPago}"></option>
                         </select>
                     </div>
 
                     <!-- Responsable -->
                     <div class="form-group">
                         <label for="responsable">Responsable</label>
-                        <input type="text" id="responsable" class="form-input" placeholder="Nombre del responsable"
+                        <input type="text" th:field="*{responsable}" id="responsable" class="form-input" placeholder="Nombre del responsable"
                             required>
                     </div>
 
                     <!-- Número de Comprobante -->
                     <div class="form-group">
-                        <label for="comprobante">N° Comprobante</label>
-                        <input type="text" id="comprobante" class="form-input" placeholder="Factura/Boleta #">
+                        <label for="numeroComprobante">N° Comprobante</label>
+                        <input type="text" th:field="*{numeroComprobante}" id="numeroComprobante" class="form-input" placeholder="Factura/Boleta #">
                     </div>
 
                     <!-- Referencia -->
                     <div class="form-group">
                         <label for="referencia">Referencia</label>
-                        <input type="text" id="referencia" class="form-input" placeholder="Código de referencia">
+                        <input type="text" th:field="*{referencia}" id="referencia" class="form-input" placeholder="Código de referencia">
                     </div>
                 </div>
 

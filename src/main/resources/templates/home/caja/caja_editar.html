@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Movimiento de Caja</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/caja.css}">
+    <script th:src="@{/script.js}"></script>
+</head>
+
+<body>
+    <main id='main-content' class="flex h-dvh">
+
+        <!-- #region sidebar-->
+        <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
+        <!-- #endregion -->
+        <div class="flex-1 h-screen overflow-y-scroll overflow-x-hidden">
+
+            <div th:replace="~{fragments/header.html :: 
+                              header-info('Editar Movimiento de Caja','Caja > Editar Movimiento')}"></div>
+            <div class="container">
+
+                <h1 class="text-xl font-black text-wrap my-2 sm:text-2xl">Editar Movimiento de Caja</h1>
+
+                <form class="modal-body" th:object="${cajaEditar}" th:action="@{/caja/editar/{id}(id=${idCaja})}" method="post">
+                    <div class="form-grid">
+                        <!-- Tipo de Movimiento -->
+                        <div class="form-group">
+                            <label for="tipo">Tipo de Movimiento</label>
+                            <select th:field="*{tipo}" id="tipo" class="form-select" required>
+                                <option value="">Seleccione...</option>
+                                <option value="Ingreso">💰 Ingreso</option>
+                                <option value="Egreso">💸 Egreso</option>
+                            </select>
+                        </div>
+
+                        <!-- Estado -->
+                        <div class="form-group">
+                            <label for="estado">Estado</label>
+                            <select th:field="*{estado}" id="estado" class="form-select" required>
+                                <option value="Confirmado">✓ Confirmado</option>
+                                <option value="Pendiente">⏳ Pendiente</option>
+                                <option value="Anulado">⊗ Anulado</option>
+                            </select>
+                        </div>
+
+                        <!-- Monto -->
+                        <div class="form-group">
+                            <label for="monto">Monto (S/.)</label>
+                            <input type="number" th:field="*{monto}" id="monto" class="form-input" placeholder="0.00" step="0.01" min="0"
+                                required>
+                        </div>
+
+                        <!-- Fecha -->
+                        <div class="form-group">
+                            <label for="fecha">Fecha</label>
+                            <input type="date" th:field="*{fecha}" id="fecha" class="form-input" required>
+                        </div>
+
+                        <!-- Hora -->
+                        <div class="form-group">
+                            <label for="hora">Hora</label>
+                            <input type="time" th:field="*{hora}" id="hora" class="form-input" required>
+                        </div>
+
+                        <!-- Categoría -->
+                        <div class="form-group">
+                            <label for="categoria">Categoría</label>
+                            <select th:field="*{categoria}" id="categoria" class="form-select" required>
+                                <option value="">Seleccione...</option>
+                                <option value="Ventas">Ventas</option>
+                                <option value="Compras">Compras</option>
+                                <option value="Pagos a Proveedor">Pagos a Proveedor</option>
+                                <option value="Gastos Operativos">Gastos Operativos</option>
+                                <option value="Servicios Públicos">Servicios Públicos</option>
+                                <option value="Salarios">Salarios</option>
+                                <option value="Otros">Otros</option>
+                            </select>
+                        </div>
+
+                        <!-- Descripción -->
+                        <div class="form-group form-group-full">
+                            <label for="descripcion">Descripción</label>
+                            <textarea th:field="*{descripcion}" id="descripcion" class="form-textarea" placeholder="Describa el movimiento de caja..."
+                                required></textarea>
+                        </div>
+
+                        <!-- Método de Pago -->
+                        <div class="form-group">
+                            <label for="metodoPagoId">Método de Pago</label>
+                            <select name="metodoPagoId" id="metodoPagoId" class="form-select">
+                                <option value="">Seleccione...</option>
+                                <option th:each="metodo : ${metodosPago}" 
+                                        th:value="${metodo.idMetodoPago}" 
+                                        th:text="${metodo.nombreMetodoPago}"
+                                        th:selected="${cajaEditar.metodoPago != null && cajaEditar.metodoPago.idMetodoPago == metodo.idMetodoPago}"></option>
+                            </select>
+                        </div>
+
+                        <!-- Responsable -->
+                        <div class="form-group">
+                            <label for="responsable">Responsable</label>
+                            <input type="text" th:field="*{responsable}" id="responsable" class="form-input" placeholder="Nombre del responsable"
+                                required>
+                        </div>
+
+                        <!-- Número de Comprobante -->
+                        <div class="form-group">
+                            <label for="numeroComprobante">N° Comprobante</label>
+                            <input type="text" th:field="*{numeroComprobante}" id="numeroComprobante" class="form-input" placeholder="Factura/Boleta #">
+                        </div>
+
+                        <!-- Referencia -->
+                        <div class="form-group">
+                            <label for="referencia">Referencia</label>
+                            <input type="text" th:field="*{referencia}" id="referencia" class="form-input" placeholder="Código de referencia">
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <a th:href="@{/caja}" class="btn-cancelar">Cancelar</a>
+                        <button type="submit" class="btn-registrar">Actualizar</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+    </main>
+
+</body>
+
+</html>
+

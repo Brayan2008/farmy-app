@@ -154,3 +154,28 @@
         padding-left: 15px;
     }
 }
+
+/* Botón eliminar/anular */
+.btn-eliminar {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 12px;
+    margin-left: 5px;
+}
+
+.btn-eliminar:hover {
+    background: #c82333;
+}
+
+@media screen and (max-width: 768px) {
+    .btn-eliminar {
+        width: 100%;
+        margin-left: 0;
+        margin-top: 5px;
+    }
+}
