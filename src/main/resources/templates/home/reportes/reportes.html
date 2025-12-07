@@ -1,13 +1,14 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reportes</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" th:href="@{/css/reportes.css}">
+    <link rel="stylesheet" th:href="@{/styles.css}">
     <script th:src="@{/script.js}"></script>
+    <script th:src="@{/js/reportes.js}" defer></script>
 </head>
 
 <body>
@@ -16,10 +17,12 @@
         <!-- #region sidebar-->
         <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
         <!-- #endregion -->
+        
         <div class="flex-1 h-screen overflow-y-scroll overflow-x-hidden">
 
             <div th:replace="~{fragments/header.html :: 
                               header-info('Reportes','Reportes del sistema')}"></div>
+            
             <div class="container">
 
                 <div th:replace="~{fragments/search.html :: search-fragment('reportes', 'Buscar reporte...')}"></div>
@@ -29,26 +32,32 @@
                     <div class="filter-row">
                         <div class="filter-group">
                             <label>Tipo:</label>
-                            <select>
-                                <option>Ventas</option>
-                                <option>Inventario</option>
-                                <option>Financiero</option>
-                                <option>Proveedores</option>
+                            <select id="filtroTipo" onchange="Reportes.filtrarReportes()">
+                                <option value="">Todos</option>
+                                <option value="ventas">Ventas</option>
+                                <option value="compras">Compras</option>
+                                <option value="inventario">Inventario</option>
+                                <option value="financiero">Financiero</option>
+                                <option value="proveedores">Proveedores</option>
+                                <option value="clientes">Clientes</option>
+                                <option value="productos">Productos</option>
+                                <option value="caja">Caja</option>
                             </select>
                         </div>
                         <div class="filter-group">
                             <label>Estado:</label>
-                            <select>
-                                <option>Generado</option>
-                                <option>En Proceso</option>
-                                <option>Error</option>
+                            <select id="filtroEstado" onchange="Reportes.filtrarReportes()">
+                                <option value="">Todos</option>
+                                <option value="generado">Generado</option>
+                                <option value="proceso">En Proceso</option>
+                                <option value="error">Error</option>
                             </select>
                         </div>
                     </div>
                 </div>
 
                 <div>
-                    <table>
+                    <table id="tablaReportes">
                         <thead>
                             <tr>
                                 <th>Código</th>
@@ -60,255 +69,203 @@
                                 <th>Acciones</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td data-label="Código">RPT001</td>
-                                <td data-label="Nombre del Reporte">Ventas Mensuales - Octubre 2025</td>
-                                <td data-label="Tipo"><span class="tipo-ventas"> Ventas</span></td>
-                                <td data-label="Formato">PDF</td>
-                                <td data-label="Fecha Generación">27/10/2025 08:30</td>
-                                <td data-label="Estado"><span class="estado-generado"> Generado</span></td>
+                        <tbody id="cuerpoTablaReportes">
+                            <!-- Reportes cargados dinámicamente -->
+                            <tr th:each="reporte : ${reportes}" class="reporte-fila" 
+                                th:data-tipo="${reporte.tipo}" th:data-estado="${reporte.estado}">
+                                <td data-label="Código" th:text="${reporte.codigo}">RPT001</td>
+                                <td data-label="Nombre del Reporte" th:text="${reporte.nombre}">Ventas Mensuales - Octubre 2025</td>
+                                <td data-label="Tipo">
+                                    <span th:class="${'tipo-' + reporte.tipo}">
+                                        <span th:text="${#strings.capitalize(reporte.tipo)}">Ventas</span>
+                                    </span>
+                                </td>
+                                <td data-label="Formato" th:text="${reporte.formato}">PDF</td>
+                                <td data-label="Fecha Generación" th:text="${#dates.format(reporte.fechaGeneracion, 'dd/MM/yyyy HH:mm')}">27/10/2025 08:30</td>
+                                <td data-label="Estado">
+                                    <span th:class="${'estado-' + reporte.estado}">
+                                        <span th:text="${reporte.estado == 'generado' ? 'Generado' : (reporte.estado == 'proceso' ? 'En Proceso' : 'Error')}">
+                                            Generado
+                                        </span>
+                                    </span>
+                                </td>
                                 <td data-label="Acciones">
                                     <div class="acciones-group">
-                                        <button class="btn-editar">✏ Editar</button>
+                                        <a th:href="@{${reporte.urlAccion}}" th:if="${reporte.urlAccion != null}" 
+                                           class="btn-ver">Ver</a>
+                                        <button class="btn-editar" th:if="${reporte.estado == 'proceso'}"
+                                                th:onclick="'Reportes.editarReporte(\'' + ${reporte.codigo} + '\')'">
+                                            ✏ Editar
+                                        </button>
+                                        <button class="btn-eliminar" 
+                                                th:onclick="'Reportes.eliminarReporte(\'' + ${reporte.codigo} + '\')'">
+                                            🗑 Eliminar
+                                        </button>
+                                        <a th:href="@{/reportes/descargar/{codigo}(codigo=${reporte.codigo})}" 
+                                           th:if="${reporte.estado == 'generado' && reporte.archivo != null}"
+                                           class="btn-descargar">
+                                            📥 Descargar
+                                        </a>
+                                        <a th:href="@{/ventas/reportes}" 
+                                           th:if="${reporte.tipo == 'ventas' && reporte.estado == 'proceso'}"
+                                           class="btn-continuar">
+                                            ➔ Continuar Ventas
+                                        </a>
+                                        <a th:href="@{/compras/reportes}" 
+                                           th:if="${reporte.tipo == 'compras' && reporte.estado == 'proceso'}"
+                                           class="btn-continuar">
+                                            ➔ Continuar Compras
+                                        </a>
                                     </div>
                                 </td>
                             </tr>
-                            <tr>
-                                <td data-label="Código">RPT002</td>
-                                <td data-label="Nombre del Reporte">Inventario por Categorías</td>
-                                <td data-label="Tipo"><span class="tipo-inventario"> Inventario</span></td>
-                                <td data-label="Formato">Excel</td>
-                                <td data-label="Fecha Generación">27/10/2025 09:15</td>
-                                <td data-label="Estado"><span class="estado-generado"> Generado</span></td>
-                                <td data-label="Acciones">
-                                    <div class="acciones-group">
-                                        <button class="btn-editar">✏ Editar</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td data-label="Código">RPT003</td>
-                                <td data-label="Nombre del Reporte">Estado Financiero - Trimestre Q4</td>
-                                <td data-label="Tipo"><span class="tipo-financiero"> Financiero</span></td>
-                                <td data-label="Formato">PDF</td>
-                                <td data-label="Fecha Generación">27/10/2025 10:00</td>
-                                <td data-label="Estado"><span class="estado-proceso"> En Proceso</span></td>
-                                <td data-label="Acciones">
-                                    <div class="acciones-group">
-                                        <button class="btn-editar">✏ Editar</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td data-label="Código">RPT004</td>
-                                <td data-label="Nombre del Reporte">Proveedores - Pagos Pendientes</td>
-                                <td data-label="Tipo"><span class="tipo-proveedores"> Proveedores</span></td>
-                                <td data-label="Formato">Excel</td>
-                                <td data-label="Fecha Generación">27/10/2025 11:20</td>
-                                <td data-label="Estado"><span class="estado-generado"> Generado</span></td>
-                                <td data-label="Acciones">
-                                    <div class="acciones-group">
-                                        <button class="btn-editar">✏ Editar</button>
-                                    </div>
-                                </td>
-                            </tr>
-
                         </tbody>
                     </table>
                 </div>
 
                 <div class="estadisticas-reportes">
                     <div class="estadistica-item">
-                        <span class="estadistica-numero">12</span>
+                        <span class="estadistica-numero" id="totalGenerados">0</span>
                         <span class="estadistica-label">Reportes Generados</span>
                     </div>
                     <div class="estadistica-item">
-                        <span class="estadistica-numero">2</span>
+                        <span class="estadistica-numero" id="totalProceso">0</span>
                         <span class="estadistica-label">En Proceso</span>
                     </div>
                     <div class="estadistica-item">
-                        <span class="estadistica-numero">1</span>
+                        <span class="estadistica-numero" id="totalErrores">0</span>
                         <span class="estadistica-label">Con Errores</span>
                     </div>
                 </div>
 
                 <div class="botones-contenedor">
-                    <button class="btn-nuevo" onclick="registrar('modalReporte')">Nuevo Reporte</button>
+                    <button class="btn-nuevo" onclick="Reportes.mostrarModalNuevoReporte()">
+                        <span class="btn-icon">➕</span>
+                        Nuevo Reporte
+                    </button>
                 </div>
 
             </div>
         </div>
 
-        <dialog id="modalReporte">
-            <div class="modal-header">
-                <h2>Generar Reporte</h2>
+        <!-- Modal para nuevo reporte -->
+        <div id="modalReporte" class="modal-reporte" style="display: none;">
+            <div class="modal-reporte-contenido">
+                <div class="modal-reporte-header">
+                    <h2>Generar Reporte</h2>
+                    <button class="modal-cerrar" onclick="Reportes.cerrarModalNuevoReporte()">&times;</button>
+                </div>
+                
+                <!-- Formulario modificado -->
+                <form th:action="@{/reportes/crear}" method="post" id="formNuevoReporte" class="modal-reporte-body">
+                    <div class="form-grid">
+                        <!-- Nombre del Reporte -->
+                        <div class="form-group form-group-full">
+                            <label for="nombreReporte">Nombre del Reporte *</label>
+                            <input type="text" id="nombreReporte" class="form-input" name="nombre"
+                                placeholder="Ej: Ventas Mensuales - Octubre 2025" required>
+                        </div>
+
+                        <!-- Tipo de Reporte -->
+                        <div class="form-group">
+                            <label for="tipoReporte">Tipo de Reporte *</label>
+                            <select id="tipoReporte" class="form-select" name="tipo" required 
+                                    onchange="Reportes.cambiarTipoReporte()">
+                                <option value="">Seleccione...</option>
+                                <option value="ventas">Ventas</option>
+                                <option value="compras">Compras</option>
+                                <option value="inventario">Inventario</option>
+                                <option value="financiero">Financiero</option>
+                                <option value="proveedores">Proveedores</option>
+                                <option value="clientes">Clientes</option>
+                                <option value="productos">Productos</option>
+                                <option value="caja">Caja</option>
+                            </select>
+                        </div>
+
+                        <!-- Formato de Salida -->
+                        <div class="form-group">
+                            <label for="formato">Formato de Salida *</label>
+                            <select id="formato" class="form-select" name="formato" required>
+                                <option value="pdf">PDF</option>
+                                <option value="excel">Excel</option>
+                                <option value="csv">CSV</option>
+                            </select>
+                        </div>
+
+                        <!-- Período -->
+                        <div class="form-group">
+                            <label for="periodo">Período *</label>
+                            <select id="periodo" class="form-select" name="periodo" 
+                                    onchange="Reportes.cambiarPeriodo()" required>
+                                <option value="personalizado">Personalizado</option>
+                                <option value="hoy">Hoy</option>
+                                <option value="ayer">Ayer</option>
+                                <option value="semana-actual">Semana Actual</option>
+                                <option value="mes-actual">Mes Actual</option>
+                                <option value="trimestre">Trimestre</option>
+                                <option value="anio">Año</option>
+                            </select>
+                        </div>
+
+                        <!-- Estado -->
+                        <div class="form-group">
+                            <label for="estado">Estado Inicial *</label>
+                            <select id="estado" class="form-select" name="estado" required>
+                                <option value="proceso">En Proceso</option>
+                                <option value="programado">Programado</option>
+                            </select>
+                        </div>
+
+                        <!-- Fecha Desde -->
+                        <div class="form-group">
+                            <label for="fechaDesde">Fecha Desde *</label>
+                            <input type="date" id="fechaDesde" class="form-input" name="fechaDesde" required>
+                        </div>
+
+                        <!-- Fecha Hasta -->
+                        <div class="form-group">
+                            <label for="fechaHasta">Fecha Hasta *</label>
+                            <input type="date" id="fechaHasta" class="form-input" name="fechaHasta" required>
+                        </div>
+
+                        <!-- Descripción -->
+                        <div class="form-group form-group-full">
+                            <label for="descripcion">Descripción (Opcional)</label>
+                            <textarea id="descripcion" class="form-textarea" name="descripcion" rows="3"
+                                placeholder="Agregue una descripción breve del reporte..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-reporte-footer">
+                        <div class="footer-buttons">
+                            <button type="button" class="btn-cancelar"
+                                onclick="Reportes.cerrarModalNuevoReporte()">Cancelar</button>
+                            <!-- Botón modificado -->
+                            <button type="button" class="btn-registrar" id="btnGenerarReporte" onclick="Reportes.generarReporte()">
+                                Generar Reporte
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
+        </div>
 
-            <form class="modal-body" method="dialog">
-                <div class="form-grid">
-                    <!-- Nombre del Reporte -->
-                    <div class="form-group form-group-full">
-                        <label for="nombreReporte">Nombre del Reporte</label>
-                        <input type="text" id="nombreReporte" class="form-input"
-                            placeholder="Ej: Ventas Mensuales - Octubre 2025" required>
-                    </div>
-
-                    <!-- Tipo de Reporte -->
-                    <div class="form-group">
-                        <label for="tipoReporte">Tipo de Reporte</label>
-                        <select id="tipoReporte" class="form-select" required>
-                            <option value="">Seleccione...</option>
-                            <option value="ventas">Ventas</option>
-                            <option value="inventario"> Inventario</option>
-                            <option value="financiero"> Financiero</option>
-                            <option value="proveedores"> Proveedores</option>
-                            <option value="clientes"> Clientes</option>
-                            <option value="productos"> Productos</option>
-                            <option value="caja"> Caja</option>
-                        </select>
-                    </div>
-
-                    <!-- Formato de Salida -->
-                    <div class="form-group">
-                        <label for="formato">Formato de Salida</label>
-                        <select id="formato" class="form-select" required>
-                            <option value="pdf">PDF</option>
-                            <option value="excel">Excel</option>
-                            <option value="csv">CSV</option>
-                        </select>
-                    </div>
-
-                    <!-- Período -->
-                    <div class="form-group">
-                        <label for="periodo">Período</label>
-                        <select id="periodo" class="form-select" required>
-                            <option value="personalizado">Personalizado</option>
-                            <option value="hoy">Hoy</option>
-                            <option value="ayer">Ayer</option>
-                            <option value="semana-actual">Semana Actual</option>
-                            <option value="mes-actual">Mes Actual</option>
-                            <option value="trimestre">Trimestre</option>
-                            <option value="anio">Año</option>
-                        </select>
-                    </div>
-
-                    <!-- Estado -->
-                    <div class="form-group">
-                        <label for="estado">Estado Inicial</label>
-                        <select id="estado" class="form-select" required>
-                            <option value="proceso"> En Proceso</option>
-                            <option value="programado"> Programado</option>
-                        </select>
-                    </div>
-
-                    <!-- Fecha Desde -->
-                    <div class="form-group">
-                        <label for="fechaDesde">Fecha Desde</label>
-                        <input type="date" id="fechaDesde" class="form-input" required>
-                    </div>
-
-                    <!-- Fecha Hasta -->
-                    <div class="form-group">
-                        <label for="fechaHasta">Fecha Hasta</label>
-                        <input type="date" id="fechaHasta" class="form-input" required>
-                    </div>
-
-                    <!-- Descripción -->
-                    <div class="form-group form-group-full">
-                        <label for="descripcion">Descripción (Opcional)</label>
-                        <textarea id="descripcion" class="form-textarea"
-                            placeholder="Agregue una descripción breve del reporte..."></textarea>
-                    </div>
+        <!-- Modal de confirmación -->
+        <div id="modalConfirmacion" class="modal-confirmacion" style="display: none;">
+            <div class="modal-confirmacion-contenido">
+                <div class="modal-confirmacion-header">
+                    <h3>Confirmar acción</h3>
                 </div>
-
-                <!-- Sección: Filtros Avanzados -->
-                <div class="form-section">
-                    <div class="section-title">
-                        Filtros Avanzados
-                    </div>
-                    <div class="section-content">
-                        <!-- Filtrar por Categoría -->
-                        <div class="form-group">
-                            <label for="categoria">Categoría</label>
-                            <select id="categoria" class="form-select">
-                                <option value="">Todas</option>
-                                <option value="analgésicos">Analgésicos</option>
-                                <option value="antibióticos">Antibióticos</option>
-                                <option value="vitaminas">Vitaminas y Minerales</option>
-                            </select>
-                        </div>
-
-                        <!-- Filtrar por Estado -->
-                        <div class="form-group">
-                            <label for="filtroEstado">Estado de Datos</label>
-                            <select id="filtroEstado" class="form-select">
-                                <option value="">Todos</option>
-                                <option value="activo">Activos</option>
-                                <option value="inactivo">Inactivos</option>
-                            </select>
-                        </div>
-
-                        <!-- Agrupar por -->
-                        <div class="form-group">
-                            <label for="agruparPor">Agrupar por</label>
-                            <select id="agruparPor" class="form-select">
-                                <option value="ninguno">Ninguno</option>
-                                <option value="dia">Día</option>
-                                <option value="semana">Semana</option>
-                                <option value="mes">Mes</option>
-                                <option value="categoria">Categoría</option>
-                                <option value="proveedor">Proveedor</option>
-                            </select>
-                        </div>
-
-                        <!-- Ordenar por -->
-                        <div class="form-group">
-                            <label for="ordenarPor">Ordenar por</label>
-                            <select id="ordenarPor" class="form-select">
-                                <option value="fecha-desc">Fecha (Más reciente)</option>
-                                <option value="fecha-asc">Fecha (Más antiguo)</option>
-                                <option value="monto-desc">Monto (Mayor a menor)</option>
-                                <option value="monto-asc">Monto (Menor a mayor)</option>
-                                <option value="alfabetico">Alfabético</option>
-                            </select>
-                        </div>
-                    </div>
+                <div class="modal-confirmacion-body">
+                    <p id="mensajeConfirmacion"></p>
                 </div>
-
-                <!-- Sección: Configuración de Entrega -->
-                <div class="form-section">
-                    <div class="section-title">
-                        Configuración de Entrega
-                    </div>
-                    <div class="section-content">
-                        <div class="form-group">
-                            <label for="emailDestino">Email de Destino</label>
-                            <input type="email" id="emailDestino" class="form-input" placeholder="correo@ejemplo.com">
-                        </div>
-                        <div class="form-group">
-                            <label for="frecuencia">Frecuencia (Opcional)</label>
-                            <select id="frecuencia" class="form-select">
-                                <option value="unica">Generación única</option>
-                                <option value="diaria">Diaria</option>
-                                <option value="semanal">Semanal</option>
-                                <option value="mensual">Mensual</option>
-                            </select>
-                        </div>
-                    </div>
+                <div class="modal-confirmacion-footer">
+                    <button type="button" class="btn-cancelar" onclick="Reportes.cerrarModalConfirmacion()">Cancelar</button>
+                    <button type="button" class="btn-eliminar" id="btnConfirmarAccion">Confirmar</button>
                 </div>
-
-                <div class="modal-footer">
-                    <div class="footer-buttons">
-                        <button type="button" class="btn-cancelar"
-                            onclick="(document.getElementById('modalReporte').close())">Cancelar</button>
-                        <button type="submit" class="btn-registrar">Generar</button>
-                    </div>
-                </div>
-            </form>
-        </dialog>
+            </div>
+        </div>
     </main>
-
 </body>
-
 </html>

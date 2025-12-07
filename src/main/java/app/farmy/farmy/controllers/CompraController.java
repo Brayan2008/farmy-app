@@ -3,8 +3,10 @@ package app.farmy.farmy.controllers;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
+//import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.http.HttpStatus;
 
 import app.farmy.farmy.model.Compra;
@@ -248,4 +251,222 @@ public class CompraController implements FarmySesion {
         return "redirect:/compras";
     }
 
+    @GetMapping("/reportes")
+    public String reporteCompras(
+            @RequestParam(required = false) String fechaInicio,
+            @RequestParam(required = false) String horaInicio,
+            @RequestParam(required = false) String fechaFin,
+            @RequestParam(required = false) String horaFin,
+            @RequestParam(required = false) String numeroFactura,
+            @RequestParam(required = false) String rucProveedor,
+            @RequestParam(required = false) String razonSocial,
+            @RequestParam(required = false) Boolean tipoContado,
+            @RequestParam(required = false) Boolean tipoCredito,
+            @RequestParam(required = false) String estadoCompra,
+            @RequestParam(required = false) Double totalMinimo,
+            @RequestParam(required = false) Double totalMaximo,
+            @RequestParam(required = false) String ordenarPor,
+            @RequestParam(required = false) String orden,
+            // Nuevos parámetros del modal
+            @RequestParam(required = false) Boolean fromModal,
+            @RequestParam(required = false) String nombre,
+            @RequestParam(required = false) String tipo,
+            @RequestParam(required = false) String formato,
+            @RequestParam(required = false) String periodo,
+            @RequestParam(required = false) String estado,
+            @RequestParam(required = false) String fechaDesde,
+            @RequestParam(required = false) String fechaHasta,
+            Model model) {
+        
+        // Hacer copias locales de las variables para usar en el lambda
+        final String fechaInicioFinal = fechaInicio;
+        final String horaInicioFinal = horaInicio;
+        final String fechaFinFinal = fechaFin;
+        final String horaFinFinal = horaFin;
+        final String numeroFacturaFinal = numeroFactura;
+        final String rucProveedorFinal = rucProveedor;
+        final String razonSocialFinal = razonSocial;
+        final Boolean tipoContadoFinal = tipoContado;
+        final Boolean tipoCreditoFinal = tipoCredito;
+        final String estadoCompraFinal = estadoCompra;
+        final Double totalMinimoFinal = totalMinimo;
+        final Double totalMaximoFinal = totalMaximo;
+        
+        // Establecer fechas desde el modal si vienen de allí
+        if (fromModal != null && fromModal) {
+            if (fechaInicioFinal == null && fechaDesde != null) {
+                fechaInicio = fechaDesde;
+                horaInicio = "00:00";
+            }
+            if (fechaFinFinal == null && fechaHasta != null) {
+                fechaFin = fechaHasta;
+                horaFin = "23:59";
+            }
+            
+            // Guardar datos del modal para mostrar en la vista
+            Map<String, Object> reporteData = new HashMap<>();
+            reporteData.put("nombre", nombre);
+            reporteData.put("tipo", tipo);
+            reporteData.put("formato", formato);
+            reporteData.put("periodo", periodo);
+            reporteData.put("estado", estado);
+            reporteData.put("fechaDesde", fechaDesde);
+            reporteData.put("fechaHasta", fechaHasta);
+            
+            model.addAttribute("reporteData", reporteData);
+            model.addAttribute("fromModal", true);
+        }
+        
+        // Obtener todas las compras
+        List<Compra> compras = compraRepository.findAll();
+        
+        // Aplicar filtros
+        List<Compra> comprasFiltradas = compras.stream()
+            .filter(c -> {
+                boolean pasaFiltro = true;
+                
+                // Filtrar por fecha
+                if (fechaInicioFinal != null && !fechaInicioFinal.isEmpty() && 
+                    fechaFinFinal != null && !fechaFinFinal.isEmpty()) {
+                    try {
+                        LocalDateTime fechaInicioCompleta = LocalDateTime.parse(
+                            fechaInicioFinal + "T" + (horaInicioFinal != null ? horaInicioFinal : "00:00"));
+                        LocalDateTime fechaFinCompleta = LocalDateTime.parse(
+                            fechaFinFinal + "T" + (horaFinFinal != null ? horaFinFinal : "23:59"));
+                        
+                        if (c.getFechaFactura() != null) {
+                            pasaFiltro = pasaFiltro && 
+                                    !c.getFechaFactura().isBefore(fechaInicioCompleta) && 
+                                    !c.getFechaFactura().isAfter(fechaFinCompleta);
+                        }
+                    } catch (Exception e) {
+                        // Si hay error en el parsing, ignorar filtro de fecha
+                    }
+                }
+                
+                // Filtrar por número de factura
+                if (numeroFacturaFinal != null && !numeroFacturaFinal.isEmpty()) {
+                    pasaFiltro = pasaFiltro && String.valueOf(c.getNumeroFactura()).contains(numeroFacturaFinal);
+                }
+                
+                // Filtrar por RUC proveedor
+                if (rucProveedorFinal != null && !rucProveedorFinal.isEmpty() && c.getProveedor() != null) {
+                    pasaFiltro = pasaFiltro && c.getProveedor().getRuc().contains(rucProveedorFinal);
+                }
+                
+                // Filtrar por razón social
+                if (razonSocialFinal != null && !razonSocialFinal.isEmpty() && c.getProveedor() != null) {
+                    pasaFiltro = pasaFiltro && c.getProveedor().getRazonSocial().toLowerCase().contains(razonSocialFinal.toLowerCase());
+                }
+                
+                // Filtrar por tipo de compra
+                if (tipoContadoFinal != null || tipoCreditoFinal != null) {
+                    boolean pasaTipo = true;
+                    if (tipoContadoFinal != null && tipoContadoFinal && tipoCreditoFinal != null && tipoCreditoFinal) {
+                        // Ambos seleccionados, mostrar todos
+                    } else if (tipoContadoFinal != null && tipoContadoFinal) {
+                        pasaTipo = c.getTipoCompra() == TipoCompra.CONTADO;
+                    } else if (tipoCreditoFinal != null && tipoCreditoFinal) {
+                        pasaTipo = c.getTipoCompra() == TipoCompra.CREDITO;
+                    }
+                    pasaFiltro = pasaFiltro && pasaTipo;
+                }
+                
+                // Filtrar por estado de compra
+                if (estadoCompraFinal != null && !estadoCompraFinal.isEmpty() && !estadoCompraFinal.equals("todos")) {
+                    if (c.getEstadoPago() != null) {
+                        pasaFiltro = pasaFiltro && c.getEstadoPago().name().equals(estadoCompraFinal);
+                    } else {
+                        pasaFiltro = false;
+                    }
+                }
+                
+                // Filtrar por total mínimo
+                if (totalMinimoFinal != null && totalMinimoFinal > 0 && c.getTotal() != null) {
+                    pasaFiltro = pasaFiltro && c.getTotal().doubleValue() >= totalMinimoFinal;
+                }
+                
+                // Filtrar por total máximo
+                if (totalMaximoFinal != null && totalMaximoFinal > 0 && c.getTotal() != null) {
+                    pasaFiltro = pasaFiltro && c.getTotal().doubleValue() <= totalMaximoFinal;
+                }
+                
+                return pasaFiltro;
+            })
+            .sorted((c1, c2) -> {
+                // Ordenar según criterio seleccionado
+                String ordenPor = ordenarPor != null ? ordenarPor : "fecha";
+                boolean descendente = orden != null && orden.equals("desc");
+                
+                int resultado = 0;
+                
+                switch (ordenPor) {
+                    case "codigo":
+                        resultado = Integer.compare(c1.getNumeroFactura(), c2.getNumeroFactura());
+                        break;
+                    case "total":
+                        resultado = c1.getTotal().compareTo(c2.getTotal());
+                        break;
+                    case "proveedor":
+                        String prov1 = c1.getProveedor() != null ? c1.getProveedor().getRazonSocial() : "";
+                        String prov2 = c2.getProveedor() != null ? c2.getProveedor().getRazonSocial() : "";
+                        resultado = prov1.compareTo(prov2);
+                        break;
+                    case "fecha":
+                    default:
+                        resultado = c1.getFechaFactura().compareTo(c2.getFechaFactura());
+                        break;
+                }
+                
+                return descendente ? -resultado : resultado;
+            })
+            .collect(Collectors.toList());
+        
+        // Calcular totales en Java (no en Thymeleaf)
+        BigDecimal totalGeneral = BigDecimal.ZERO;
+        BigDecimal totalPendiente = BigDecimal.ZERO;
+        BigDecimal totalPagado = BigDecimal.ZERO;
+        
+        for (Compra compra : comprasFiltradas) {
+            if (compra.getTotal() != null) {
+                totalGeneral = totalGeneral.add(compra.getTotal());
+                
+                if (compra.getEstadoPago() != null) {
+                    if (compra.getEstadoPago() == EstadoPago.PENDIENTE) {
+                        totalPendiente = totalPendiente.add(compra.getTotal());
+                    } else if (compra.getEstadoPago() == EstadoPago.PAGADO) {
+                        totalPagado = totalPagado.add(compra.getTotal());
+                    }
+                }
+            }
+        }
+        
+        // Agregar datos al modelo
+        model.addAttribute("compras", comprasFiltradas);
+        model.addAttribute("proveedores", proveedorRepository.findAll());
+        model.addAttribute("metodosPago", metodoPagoRepository.findAll());
+        
+        // Agregar totales al modelo
+        model.addAttribute("totalGeneral", totalGeneral);
+        model.addAttribute("totalPendiente", totalPendiente);
+        model.addAttribute("totalPagado", totalPagado);
+        
+        // Mantener valores de filtros
+        model.addAttribute("fechaInicio", fechaInicio != null ? fechaInicio : LocalDate.now().minusDays(30).toString());
+        model.addAttribute("horaInicio", horaInicio != null ? horaInicio : "00:00");
+        model.addAttribute("fechaFin", fechaFin != null ? fechaFin : LocalDate.now().toString());
+        model.addAttribute("horaFin", horaFin != null ? horaFin : "23:59");
+        model.addAttribute("numeroFactura", numeroFactura != null ? numeroFactura : "");
+        model.addAttribute("rucProveedor", rucProveedor != null ? rucProveedor : "");
+        model.addAttribute("razonSocial", razonSocial != null ? razonSocial : "");
+        model.addAttribute("tipoContado", tipoContado != null ? tipoContado : true);
+        model.addAttribute("tipoCredito", tipoCredito != null ? tipoCredito : true);
+        model.addAttribute("estadoCompraSeleccionado", estadoCompra != null ? estadoCompra : "todos");
+        model.addAttribute("totalMinimo", totalMinimo != null ? totalMinimo : "");
+        model.addAttribute("totalMaximo", totalMaximo != null ? totalMaximo : "");
+        model.addAttribute("ordenarPor", ordenarPor != null ? ordenarPor : "fecha");
+        model.addAttribute("orden", orden != null ? orden : "desc");
+        
+        return "home/reportes/reporte_compras";
+    }
 }

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes de Ventas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/ventas.css}">
+    <link rel="stylesheet" th:href="@{/css/reporte_ventas.css}">
+    <script th:src="@{/script.js}"></script>
+    <script th:src="@{/js/reporte_ventas.js}" defer></script>
+</head>
+
+<body>
+    <main id='main-content' class="flex h-dvh">
+        <!-- #region sidebar-->
+        <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
+        <!-- #endregion -->
+        
+        <div class="flex-1 h-screen overflow-y-scroll overflow-x-hidden">
+            <!-- #region header-->
+            <div th:replace="~{fragments/header.html :: 
+                          header-info('Reportes de Ventas','Generar reportes detallados de ventas')}"></div>
+            <!-- #endregion -->
+
+            <div class="container p-4 md:p-6">
+                <!-- Sección: Información del reporte desde modal -->
+                <div th:if="${fromModal}" class="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h3 class="text-lg font-semibold text-blue-800">
+                                <span th:text="${nombre != null ? nombre : 'Reporte de Ventas'}">Reporte de Ventas</span>
+                            </h3>
+                            <p class="text-sm text-gray-600 mt-1">
+                                Configura los filtros específicos para personalizar tu reporte
+                            </p>
+                        </div>
+                        <button onclick="ReporteVentas.cancelarReporte()" 
+                                class="text-sm text-red-600 hover:text-red-800 font-medium">
+                            Cancelar reporte
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
+                        <div>
+                            <span class="font-medium text-gray-600">Tipo:</span>
+                            <span class="ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
+                                <span th:text="${tipo != null ? #strings.capitalize(tipo) : 'Ventas'}">Ventas</span>
+                            </span>
+                        </div>
+                        <div>
+                            <span class="font-medium text-gray-600">Formato:</span>
+                            <span class="ml-2" th:text="${formato != null ? formato : 'PDF'}">PDF</span>
+                        </div>
+                        <div>
+                            <span class="font-medium text-gray-600">Período:</span>
+                            <span class="ml-2" th:text="${periodo != null ? periodo : 'Personalizado'}">Personalizado</span>
+                        </div>
+                        <div>
+                            <span class="font-medium text-gray-600">Estado:</span>
+                            <span class="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs">
+                                <span th:text="${estado != null ? estado : 'En Proceso'}">En Proceso</span>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div th:if="${descripcion != null && !descripcion.isEmpty()}" class="mt-3 pt-3 border-t border-blue-200">
+                        <span class="font-medium text-gray-600">Descripción:</span>
+                        <p class="text-gray-700 mt-1" th:text="${descripcion}"></p>
+                    </div>
+                    
+                    <div class="mt-3 pt-3 border-t border-blue-200">
+                        <div class="grid grid-cols-2 gap-3 text-sm">
+                            <div>
+                                <span class="font-medium text-gray-600">Fecha desde:</span>
+                                <span class="ml-2" th:text="${fechaDesde != null ? #temporals.format(#temporals.create(fechaDesde), 'dd/MM/yyyy') : 'No especificado'}">
+                                    01/10/2025
+                                </span>
+                            </div>
+                            <div>
+                                <span class="font-medium text-gray-600">Fecha hasta:</span>
+                                <span class="ml-2" th:text="${fechaHasta != null ? #temporals.format(#temporals.create(fechaHasta), 'dd/MM/yyyy') : 'No especificado'}">
+                                    31/10/2025
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <form th:action="@{/ventas/reportes/generar}" method="post" id="filtroForm">
+                    <!-- Campos ocultos para los datos del modal -->
+                    <input type="hidden" name="nombreReporte" th:value="${nombre != null ? nombre : 'Reporte de Ventas'}">
+                    <input type="hidden" name="tipoReporte" th:value="${tipo != null ? tipo : 'ventas'}">
+                    <input type="hidden" name="formato" th:value="${formato != null ? formato : 'pdf'}">
+                    <input type="hidden" name="descripcion" th:value="${descripcion != null ? descripcion : ''}">
+                    
+                    <!-- Sección: Filtrar períodos -->
+                    <div class="reporte-section">
+                        <h2 class="reporte-title">Filtrar períodos</h2>
+                        
+                        <div class="filtro-grid">
+                            <div class="filtro-group">
+                                <label class="filtro-label">Fecha inicio *</label>
+                                <div class="flex gap-2">
+                                    <input type="date" class="filtro-input" name="fechaInicio" 
+                                           th:value="${fechaDesde != null ? fechaDesde : fechaInicio}" 
+                                           required>
+                                    <input type="time" class="filtro-input w-32" name="horaInicio" 
+                                           th:value="${horaInicio != null ? horaInicio : '00:00'}">
+                                </div>
+                            </div>
+                            
+                            <div class="filtro-group">
+                                <label class="filtro-label">N° de documento</label>
+                                <input type="text" class="filtro-input" name="numeroDocumento" 
+                                       th:value="${numeroDocumento}" placeholder="Ej: 8888888">
+                            </div>
+                            
+                            <div class="filtro-group">
+                                <label class="filtro-label">Fecha fin *</label>
+                                <div class="flex gap-2">
+                                    <input type="date" class="filtro-input" name="fechaFin" 
+                                           th:value="${fechaHasta != null ? fechaHasta : fechaFin}" 
+                                           required>
+                                    <input type="time" class="filtro-input w-32" name="horaFin" 
+                                           th:value="${horaFin != null ? horaFin : '23:59'}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sección: Filtrar clientes -->
+                    <div class="reporte-section">
+                        <h2 class="reporte-title">Filtrar clientes</h2>
+                        
+                        <div class="filtro-grid">
+                            <div class="filtro-group">
+                                <label class="filtro-label">Tipo de documento</label>
+                                <div class="radio-group">
+                                    <div class="radio-option">
+                                        <input type="radio" id="doc-todos" name="tipoDocumento" value="todos" 
+                                               th:checked="${tipoDocumentoSeleccionado == 'todos'}">
+                                        <label for="doc-todos">Todos</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="doc-dni" name="tipoDocumento" value="DNI"
+                                               th:checked="${tipoDocumentoSeleccionado == 'DNI'}">
+                                        <label for="doc-dni">DNI</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="doc-ruc" name="tipoDocumento" value="RUC"
+                                               th:checked="${tipoDocumentoSeleccionado == 'RUC'}">
+                                        <label for="doc-ruc">RUC</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="filtro-group">
+                                <label class="filtro-label">N° de documento cliente</label>
+                                <input type="text" class="filtro-input" name="numeroDocumentoCliente" 
+                                       placeholder="Ingrese número de documento" 
+                                       th:value="${numeroDocumentoCliente}">
+                            </div>
+                            
+                            <div class="filtro-group">
+                                <label class="filtro-label">Nombre del cliente</label>
+                                <input type="text" class="filtro-input" name="nombreCliente" 
+                                       th:value="${nombreCliente}" 
+                                       placeholder="Ej: Joseph Cabrera Espinoza">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sección: Filtros de ventas -->
+                    <div class="reporte-section">
+                        <h2 class="reporte-title">Filtros de ventas</h2>
+                        
+                        <table class="filtro-tabla">
+                            <thead>
+                                <tr>
+                                    <th>Método de pago:</th>
+                                    <th>Importe máximo (S/):</th>
+                                    <th>Ordenar por:</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <select class="filtro-input" name="metodoPagoNombre">
+                                            <option value="">Todos</option>
+                                            <option th:each="metodo : ${metodosPago}" 
+                                                    th:value="${metodo.nombreMetodoPago}"
+                                                    th:text="${metodo.nombreMetodoPago}"
+                                                    th:selected="${metodoPagoSeleccionado == metodo.nombreMetodoPago}">
+                                            </option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="number" class="filtro-input" name="importeMaximo" 
+                                               th:value="${importeMaximo}" placeholder="1000.00" step="0.01" min="0">
+                                    </td>
+                                    <td>
+                                        <select class="filtro-input" name="ordenarPor">
+                                            <option value="fecha" th:selected="${ordenarPor == 'fecha'}">Fecha</option>
+                                            <option value="importe" th:selected="${ordenarPor == 'importe'}">Importe</option>
+                                            <option value="cliente" th:selected="${ordenarPor == 'cliente'}">Cliente</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn-eliminar-filtros" onclick="ReporteVentas.eliminarFiltros()">
+                                            Eliminar filtros
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <label>Estado de venta:</label>
+                                        <select class="filtro-input mt-1" name="estadoVenta">
+                                            <option value="todos" th:selected="${estadoVentaSeleccionado == 'todos'}">Todos</option>
+                                            <option value="Registrada" th:selected="${estadoVentaSeleccionado == 'Registrada'}">Registrada</option>
+                                            <option value="Anulada" th:selected="${estadoVentaSeleccionado == 'Anulada'}">Anulada</option>
+                                            <option value="Pendiente" th:selected="${estadoVentaSeleccionado == 'Pendiente'}">Pendiente</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <label>Importe mínimo (S/):</label>
+                                        <input type="number" class="filtro-input mt-1" name="importeMinimo" 
+                                               th:value="${importeMinimo}" placeholder="10.00" step="0.01" min="0">
+                                    </td>
+                                    <td>
+                                        <label>Orden:</label>
+                                        <select class="filtro-input mt-1" name="orden">
+                                            <option value="desc" th:selected="${orden == 'desc'}">Descendente</option>
+                                            <option value="asc" th:selected="${orden == 'asc'}">Ascendente</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn-filtro" onclick="ReporteVentas.aplicarFiltros()">
+                                            Aplicar filtros
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+
+                <!-- Sección: Registros filtrados -->
+                <div class="reporte-section">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="reporte-title">Registros filtrados</h2>
+                        <div class="flex items-center gap-4">
+                            <div class="text-sm font-semibold text-purple-700">
+                                Total: <span id="totalRegistros" th:text="${ventas.size()}">0</span> registros
+                            </div>
+                            <button type="button" onclick="ReporteVentas.exportarDatos()" 
+                                    class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                                 Exportar datos
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="reporte-table-container">
+                        <table class="reporte-table" id="tablaVentas">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Cliente</th>
+                                    <th>Tipo de documento</th>
+                                    <th>Nº Documento</th>
+                                    <th>Vendedor</th>
+                                    <th>Método de Pago</th>
+                                    <th>Importe Total (S/)</th>
+                                    <th>Estado</th>
+                                    <th>Fecha</th>
+                                    <th>Hora</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="venta : ${ventas}" th:if="${ventas.size() > 0}">
+                                    <td th:text="${venta.idVenta}">PNO01</td>
+                                    <td th:text="${venta.cliente != null ? venta.cliente.nombre + ' ' + venta.cliente.apellidos : 'Cliente no registrado'}">
+                                        Ceko
+                                    </td>
+                                    <td>
+                                        <div class="documento-info">
+                                            <span class="documento-tipo" 
+                                                  th:text="${venta.cliente != null && venta.cliente.tipoDocumento != null ? venta.cliente.tipoDocumento.name() : '---'}">
+                                                DNI
+                                            </span>
+                                            <span th:text="${venta.cliente != null ? venta.cliente.numeroDocumento : '---'}">
+                                                43563234
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td th:text="${venta.cliente != null ? venta.cliente.numeroDocumento : '---'}">
+                                        43563234
+                                    </td>
+                                    <td th:text="${venta.usuario != null ? venta.usuario.nombre + ' ' + venta.usuario.apellidos : '---'}">
+                                        Gerardo OO1
+                                    </td>
+                                    <td th:text="${venta.metodoPago != null ? venta.metodoPago.nombreMetodoPago : '---'}">
+                                        Efectivo
+                                    </td>
+                                    <td th:text="${venta.total != null ? #numbers.formatDecimal(venta.total, 0, 2) : '0.00'}">
+                                        80.00
+                                    </td>
+                                    <td>
+                                        <span th:classappend="${venta.estado == 'Anulada' ? 'estado-anulada' : 'estado-registrada'}"
+                                              th:text="${venta.estado}">
+                                            Registrada
+                                        </span>
+                                    </td>
+                                    <td th:text="${venta.fechaVenta != null ? #temporals.format(venta.fechaVenta, 'dd/MM/yyyy') : '---'}">
+                                        9/10/2025
+                                    </td>
+                                    <td th:text="${venta.fechaVenta != null ? #temporals.format(venta.fechaVenta, 'HH:mm') : '---'}">
+                                        8.45
+                                    </td>
+                                </tr>
+                                <tr th:if="${ventas.size() == 0}">
+                                    <td colspan="10" class="text-center py-8 text-gray-500">
+                                        <div class="flex flex-col items-center">
+                                            <p class="text-lg font-medium text-gray-600 mb-1">No se encontraron ventas</p>
+                                            <p class="text-gray-500">Ajusta los filtros o selecciona otro período</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="flex justify-between items-center mt-4">
+                        <div class="text-sm text-gray-600">
+                            Mostrando <span class="font-semibold" th:text="${ventas.size()}">0</span> registros
+                        </div>
+                        <div class="flex gap-2">
+                            <!-- Información de paginación -->
+                            <span class="text-sm text-gray-600">
+                                Página 1 de 1
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="botones-accion">
+                    <button type="button" class="btn-reporte btn-cancelar" onclick="ReporteVentas.cancelarReporte()">
+                        Cancelar
+                    </button>
+                    <button type="button" class="btn-reporte btn-generar" onclick="ReporteVentas.generarReporte()">
+                        <span id="btnGenerarTexto">Generar Reporte</span>
+                        <span id="btnGenerarLoading" class="hidden">
+                            <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

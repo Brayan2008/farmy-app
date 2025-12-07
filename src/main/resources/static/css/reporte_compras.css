@@ -1,0 +1,292 @@
+/* Estilos específicos para reporte de compras */
+.reporte-section {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.reporte-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.filtro-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.filtro-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.filtro-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #6b7280;
+    margin-bottom: 6px;
+}
+
+.filtro-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+}
+
+.filtro-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.filtro-tabla {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.filtro-tabla th {
+    text-align: left;
+    padding: 12px;
+    background: #f9fafb;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.filtro-tabla td {
+    padding: 12px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.radio-group {
+    display: flex;
+    gap: 16px;
+    margin-top: 8px;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.radio-option input[type="radio"] {
+    width: 16px;
+    height: 16px;
+}
+
+.radio-option label {
+    font-size: 0.875rem;
+    color: #374151;
+    cursor: pointer;
+}
+
+.btn-eliminar-filtros {
+    padding: 8px 16px;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-eliminar-filtros:hover {
+    background: #dc2626;
+}
+
+.btn-filtro {
+    padding: 10px 24px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-filtro:hover {
+    background: #2563eb;
+}
+
+.btn-filtro:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+.reporte-table-container {
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.reporte-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1200px;
+}
+
+.reporte-table thead {
+    background: #f9fafb;
+}
+
+.reporte-table th {
+    padding: 16px;
+    text-align: left;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 2px solid #e5e7eb;
+    white-space: nowrap;
+}
+
+.reporte-table td {
+    padding: 16px;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 0.875rem;
+    color: #4b5563;
+}
+
+.reporte-table tbody tr:hover {
+    background: #f9fafb;
+}
+
+/* Estados */
+.tipo-credito {
+    display: inline-block;
+    padding: 4px 12px;
+    background: #fef3c7;
+    color: #92400e;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.tipo-contado {
+    display: inline-block;
+    padding: 4px 12px;
+    background: #d1fae5;
+    color: #065f46;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.estado-pagado {
+    display: inline-block;
+    padding: 4px 12px;
+    background: #d1fae5;
+    color: #065f46;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.estado-pendiente {
+    display: inline-block;
+    padding: 4px 12px;
+    background: #fef3c7;
+    color: #92400e;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.estado-anulado {
+    display: inline-block;
+    padding: 4px 12px;
+    background: #fee2e2;
+    color: #991b1b;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Botones de acción */
+.botones-accion {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.btn-reporte {
+    padding: 12px 32px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 160px;
+}
+
+.btn-cancelar {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.btn-cancelar:hover {
+    background: #e5e7eb;
+}
+
+.btn-generar {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-generar:hover {
+    background: #2563eb;
+}
+
+.btn-generar:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .filtro-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .filtro-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .filtro-tabla {
+        display: block;
+    }
+    
+    .botones-accion {
+        flex-direction: column;
+    }
+    
+    .btn-reporte {
+        width: 100%;
+    }
+}
