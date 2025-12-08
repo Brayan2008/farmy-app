@@ -30,7 +30,7 @@ import lombok.Setter;
 public class Rol {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int idRol;
 
     @Column(length = 20)

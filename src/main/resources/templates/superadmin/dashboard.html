@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuperAdmin | Gestión Farmacias</title>
+    
+    <link rel="stylesheet" th:href="@{/styles.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+<div class="dashboard-container">
+    
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <div class="sidebar" id="sidebar">
+        <h3>Super Admin</h3>
+        
+        <div class="user-profile-card">
+            <div class="avatar-circle"><i class="fas fa-user-tie"></i></div>
+            <div class="user-info">
+                <span id="lblUsuario">Cargando...</span>
+                <small id="lblRol">Administrador Global</small>
+            </div>
+        </div>
+        <hr style="border-color: rgba(255,255,255,0.1); margin-bottom: 20px;">
+
+        <a href="/superadmin/dashboard" class="active"><i class="fas fa-clinic-medical"></i> Farmacias</a>
+        <a href="/superadmin/usuarios"><i class="fas fa-users"></i> Usuarios Globales</a>
+        <a href="#" onclick="confirmarLogout()" style="margin-top: 50px; color: #ff6b6b;">
+            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+        </a>
+    </div>
+
+    <div class="main-content">
+        <div class="header-content">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <button class="menu-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h2>Gestión de Farmacias</h2>
+            </div>
+            
+            <button class="btn" style="background-color: var(--color-business);" onclick="abrirModalFarmacia()">
+                <i class="fas fa-plus"></i> <span>Nueva Farmacia</span>
+            </button>
+        </div>
+
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre Comercial</th>
+                        <th>RUC</th>
+                        <th>Dirección</th>
+                        <th>Estado</th>
+                        <th style="text-align: center;">Acciones</th> </tr>
+                </thead>
+                <tbody id="tablaFarmacias">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="modalFarmacia" class="modal-overlay">
+    <div class="modal-content">
+        <h3 id="modalTitle">Registrar Farmacia</h3>
+        <form id="formFarmacia">
+            <input type="hidden" id="farmaciaId">
+            <div class="form-row">
+                <label>Nombre Comercial</label>
+                <input type="text" id="nombre" required>
+            </div>
+            <div class="form-row">
+                <label>RUC</label>
+                <input type="text" id="ruc" required maxlength="20">
+            </div>
+            <div class="form-row">
+                <label>Dirección</label>
+                <input type="text" id="direccion">
+            </div>
+            <div class="form-row">
+                <label>Teléfono</label>
+                <input type="text" id="telefono">
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button type="button" class="btn" style="background: #6c757d;" onclick="cerrarModal('modalFarmacia')">Cancelar</button>
+                <button type="submit" class="btn" style="background: var(--color-business);">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="modalUsuario" class="modal-overlay">
+    <div class="modal-content"> <h3>Asignar Administrador</h3>
+        <p style="font-size: 0.9em; color: #666; margin-bottom: 15px;">
+            Creando acceso para: <strong id="nombreFarmaciaUser" style="color: var(--color-business);"></strong>
+        </p>
+        <form id="formUsuario">
+            <input type="hidden" id="usuarioFarmaciaId">
+            <div class="form-row">
+                <label>Nombre Completo</label>
+                <input type="text" id="uNombre" required placeholder="Ej: Juan Pérez">
+            </div>
+            <div class="form-row">
+                <label>Alias o Nombre de Usuario</label>
+                <input type="text" id="uAlias" required placeholder="Ej: juanperez">
+            </div>
+            <div class="form-row">
+                <label>Email (Login)</label>
+                <input type="email" id="uEmail" required placeholder="admin@farmacia.com">
+            </div>
+            <div class="form-row">
+                <label>Contraseña</label>
+                <input type="password" id="uPassword" required>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button type="button" class="btn" style="background: #6c757d;" onclick="cerrarModal('modalUsuario')">Cancelar</button>
+                <button type="submit" class="btn" style="background: var(--color-superadmin);">Crear Usuario</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // --- UI RESPONSIVE ---
+    function toggleSidebar() {
+        $('#sidebar').toggleClass('active');
+        $('.sidebar-overlay').toggleClass('active');
+    }
+
+    function cerrarModal(modalId) {
+        $('#' + modalId).css('display', 'none');
+    }
+
+    // --- LOGICA FARMACIAS ---
+    $(document).ready(function() {
+        cargarFarmacias();
+
+        $.get('/api/session/info', function(data) {
+            $('#lblUsuario').text(data.nombre);
+            // El rol ya lo sabemos, pero si quieres cambiarlo dinamicamente:
+            // $('#lblRol').text(data.rol); 
+        });
+
+        // Submit Farmacia
+        $('#formFarmacia').submit(function(e) {
+            e.preventDefault();
+            const data = {
+                id: $('#farmaciaId').val() || null,
+                nombreComercial: $('#nombre').val(),
+                ruc: $('#ruc').val(),
+                direccion: $('#direccion').val(),
+                telefono: $('#telefono').val()
+            };
+
+            $.ajax({
+                url: '/api/superadmin/farmacias',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function() {
+                    cerrarModal('modalFarmacia');
+                    cargarFarmacias();
+                    Swal.fire({ icon: 'success', title: 'Guardado', timer: 1500, showConfirmButton: false });
+                },
+                error: function() { Swal.fire('Error', 'Verifica el RUC o datos duplicados.', 'error'); }
+            });
+        });
+
+        // Submit Usuario
+        $('#formUsuario').submit(function(e) {
+            e.preventDefault();
+            const data = {
+                farmaciaId: $('#usuarioFarmaciaId').val(),
+                nombreCompleto: $('#uNombre').val(),
+                alias: $('#uAlias').val(),
+                email: $('#uEmail').val(),
+                password: $('#uPassword').val()
+            };
+
+            $.ajax({
+                url: '/api/superadmin/farmacias/crear-admin-farmacia',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function() {
+                    cerrarModal('modalUsuario');
+                    Swal.fire('Éxito', 'Administrador creado. Ve a "Usuarios Globales" para gestionarlo.', 'success');
+                },
+                error: function(xhr) { Swal.fire('Error', xhr.responseText || 'Error al crear usuario', 'error'); }
+            });
+        });
+    });
+
+    function cargarFarmacias() {
+        $.get('/api/superadmin/farmacias', function(farmacias) {
+            let html = '';
+            farmacias.forEach(f => {
+                const estadoClass = f.estado ? 'bg-active' : 'bg-inactive';
+                const estadoText = f.estado ? 'Activo' : 'Inactivo';
+                
+                // Botón Estado (Activar/Desactivar Farmacia)
+                const btnEstado = f.estado 
+                    ? `<button class="btn" style="background: #dc3545; padding: 6px 10px;" onclick="cambiarEstado(${f.id}, '${f.nombreComercial}', true)" title="Deshabilitar Farmacia"><i class="fas fa-ban"></i></button>`
+                    : `<button class="btn" style="background: #28a745; padding: 6px 10px;" onclick="cambiarEstado(${f.id}, '${f.nombreComercial}', false)" title="Habilitar Farmacia"><i class="fas fa-check"></i></button>`;
+
+                html += `
+                    <tr>
+                        <td>${f.id}</td>
+                        <td><strong>${f.nombreComercial}</strong></td>
+                        <td>${f.ruc}</td>
+                        <td>${f.direccion || '-'}</td>
+                        <td><span class="badge ${estadoClass}">${estadoText}</span></td>
+                        <td style="text-align: center; white-space: nowrap;">
+                            <button class="btn" style="background: #ffc107; padding: 6px 10px; margin-right: 5px;" onclick="abrirEditarFarmacia(${f.id})" title="Editar Info"><i class="fas fa-edit"></i></button>
+                            
+                            <button class="btn" style="background: #17a2b8; padding: 6px 10px; margin-right: 5px;" onclick="abrirModalUsuario(${f.id}, '${f.nombreComercial}')" title="Crear Admin"><i class="fas fa-user-plus"></i></button>
+                            
+                            ${btnEstado}
+                        </td>
+                    </tr>
+                `;
+            });
+            $('#tablaFarmacias').html(html);
+        });
+    }
+
+    // Funciones Específicas para abrir modales (Evita cruce de eventos)
+    function abrirModalFarmacia() {
+        $('#formFarmacia')[0].reset();
+        $('#farmaciaId').val('');
+        $('#modalTitle').text('Registrar Farmacia');
+        $('#modalFarmacia').css('display', 'flex');
+    }
+
+    function abrirEditarFarmacia(id) {
+        $.get('/api/superadmin/farmacias/' + id, function(f) {
+            $('#farmaciaId').val(f.id);
+            $('#nombre').val(f.nombreComercial);
+            $('#ruc').val(f.ruc);
+            $('#direccion').val(f.direccion);
+            $('#telefono').val(f.telefono);
+            $('#modalTitle').text('Editar Farmacia');
+            $('#modalFarmacia').css('display', 'flex');
+        });
+    }
+
+    function abrirModalUsuario(idFarmacia, nombreFarmacia) {
+        $('#formUsuario')[0].reset();
+        $('#usuarioFarmaciaId').val(idFarmacia);
+        $('#nombreFarmaciaUser').text(nombreFarmacia);
+        $('#modalUsuario').css('display', 'flex');
+    }
+
+    function cambiarEstado(id, nombre, estaActivo) {
+        Swal.fire({
+            title: `¿${estaActivo ? 'Deshabilitar' : 'Habilitar'} Farmacia?`,
+            text: `Cambiarás el estado de "${nombre}"`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, cambiar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post(`/api/superadmin/farmacias/${id}/cambiar-estado`, function() {
+                    cargarFarmacias();
+                    Swal.fire('Actualizado', '', 'success');
+                });
+            }
+        });
+    }
+
+    function confirmarLogout() {
+        Swal.fire({
+            title: '¿Salir?',
+            showCancelButton: true,
+            confirmButtonText: 'Sí'
+        }).then((r) => { if(r.isConfirmed) window.location.href = '/logout'; })
+    }
+</script>
+
+</body>
+</html>

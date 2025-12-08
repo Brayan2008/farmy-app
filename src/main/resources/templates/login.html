@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Sistema de Gestión PHARMAHORRO</title>
     <link rel="stylesheet" th:href="@{/css/login.css}">
+    <script th:src="@{/jquery.js}"></script>
 </head>
+
 <body>
     <main>
         <div class="container">
@@ -38,12 +41,46 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="login-button">
-                        <a th:href="@{/home}">Iniciar Sesión</a>
-                    </button>
+                    <button type="submit" class="login-button"> Iniciar Sesión </button>
                 </form>
             </div>
         </div>
     </main>
+    <script>
+        // Lógica JS + JQuery para el Login
+        $(document).ready(function () {
+            $('#loginForm').submit(function (event) {
+
+                event.preventDefault(); // Evitar que el formulario recargue la página
+
+                const datos = {
+                    email: $('#email').val(),
+                    password: $('#password').val()
+                };
+
+                // AJAX POST al Backend
+                $.ajax({
+                    url: '/api/login', // Endpoint que crearemos en Java
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(datos),
+                    success: function (response) {
+                        // Redirigir según el rol
+                        if (response.rol === 'SUPER_ADMIN') {
+                            window.location.href = '/superadmin/dashboard';
+                        } else if (response.rol === 'ADMIN_FARMACIA' || response.rol === 'VENDEDOR') {
+                            window.location.href = '/home';
+                        } else {
+                            window.location.href = '/tienda/home';
+                        }
+                    },
+                    error: function (xhr) {
+                        $('#mensajeError').text(xhr.responseText || "Error de credenciales").fadeIn();
+                    }
+                });
+            });
+        });
+    </script>
 </body>
+
 </html>

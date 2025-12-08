@@ -6,9 +6,12 @@ import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import lombok.Getter;
@@ -33,6 +36,10 @@ public class Categoria {
 
     @OneToMany(mappedBy = "categoria")
     private List<Productos> productos = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "id_farmacia", foreignKey = @ForeignKey(name = "FK_Farmacia_Categoria"))
+    private Farmacia farmacia;
 
     @PrePersist
     public void preGuardado() {

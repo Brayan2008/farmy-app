@@ -5,8 +5,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
 import app.farmy.farmy.model.Usuario;
+import app.farmy.farmy.model.Usuario.SuperRol;
 import app.farmy.farmy.repository.RolRepository;
 import app.farmy.farmy.repository.UsuarioRepository;
+import app.farmy.farmy.security.FarmySesion;
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,7 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Controller
 @RequestMapping("usuarios")
-public class UsuarioController {
+public class UsuarioController implements FarmySesion{
 
     @Autowired
     private UsuarioRepository user;
@@ -26,19 +30,18 @@ public class UsuarioController {
     private RolRepository rol;
 
     @GetMapping
-    public String getUsuarios(Model model) {
-        var lista = user.findAll();
-        System.out.println(lista.size() + "");
-        model.addAttribute("listaUsers", lista);
+    public String getUsuarios(Model model, HttpSession session) {
+        model.addAttribute("listaUsers", user.findByFarmacia(getFarmaciaActual(session)));
         model.addAttribute("roles", rol.findAll());
         model.addAttribute("usuario", new Usuario());
         return "/home/usuarios/usuarios";
     }
 
     @PostMapping("/save")
-    public String postUsuario(@ModelAttribute Usuario usuario) {
+    public String postUsuario(@ModelAttribute Usuario usuario, HttpSession session) {
+        usuario.setSuperRol(SuperRol.ADMIN_FARMACIA);
+        usuario.setFarmacia(getFarmaciaActual(session));
         user.save(usuario);
-        System.out.println("Guardando usuario");
         return "redirect:/usuarios";
     }
 
@@ -60,15 +63,12 @@ public class UsuarioController {
     public String editarUsuario(@PathVariable int id, @ModelAttribute Usuario usuarioEditar) {
         var ufetch = user.findById(id).orElseThrow();
 
-        // Actualizar solo los campos permitidos. Mantener email y contraseña existentes.
         ufetch.setNombreUsuario(usuarioEditar.getNombreUsuario());
         ufetch.setNombreCompleto(usuarioEditar.getNombreCompleto());
         ufetch.setTelefono(usuarioEditar.getTelefono());
 
-        // si el binding del rol llega como entidad con id, se actualizará correctamente
-        ufetch.setRol(usuarioEditar.getRol());
+        ufetch.setSuperRol(usuarioEditar.getSuperRol());
         
-        // Campo Estado en la entidad se llama 'Estado' (con mayúscula)
         ufetch.setEstado(usuarioEditar.getEstado());
 
         user.save(ufetch);

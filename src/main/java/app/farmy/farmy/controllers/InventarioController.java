@@ -19,10 +19,12 @@ import app.farmy.farmy.model.Usuario;
 import app.farmy.farmy.repository.InventarioMovimientoRepository;
 import app.farmy.farmy.repository.LoteRepository;
 import app.farmy.farmy.repository.UsuarioRepository;
+import app.farmy.farmy.security.FarmySesion;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/inventario")
-public class InventarioController {
+public class InventarioController implements FarmySesion {
 
     @Autowired
     private LoteRepository loteRepository;
@@ -34,9 +36,9 @@ public class InventarioController {
     private UsuarioRepository usuarioRepository;
 
     @GetMapping
-    public String listarInventario(Model model) {
-        List<Lote> lotes = loteRepository.findAll();
-        List<Usuario> usuarios = usuarioRepository.findAll();
+    public String listarInventario(Model model, HttpSession session) {
+        List<Lote> lotes = loteRepository.findAll().stream().filter(arg0 -> arg0.getProducto().getFarmacia().getId() == getFarmaciaActual(session).getId()).toList();
+        List<Usuario> usuarios = usuarioRepository.findByFarmacia(getFarmaciaActual(session));
         
         model.addAttribute("lotes", lotes);
         model.addAttribute("usuarios", usuarios);
@@ -47,14 +49,16 @@ public class InventarioController {
     }
 
     @GetMapping("/movimientos")
-    public String listarMovimientos(Model model) {
-        List<InventarioMovimiento> movimientos = inventarioMovimientoRepository.findAll();
+    public String listarMovimientos(Model model, HttpSession session) {
+        List<InventarioMovimiento> movimientos = inventarioMovimientoRepository.findAll().stream()
+                .filter(mov -> mov.getUsuario().getFarmacia() == getFarmaciaActual(session))
+                .toList();
         model.addAttribute("movimientos", movimientos);
         return "home/inventario/movimientos";
     }
 
     @PostMapping("/movimiento/guardar")
-    public String guardarMovimiento(@ModelAttribute InventarioMovimiento movimiento, RedirectAttributes redirectAttributes) {
+    public String guardarMovimiento(@ModelAttribute InventarioMovimiento movimiento, RedirectAttributes redirectAttributes, HttpSession session) {
         try {
             Lote lote = loteRepository.findById(movimiento.getLote().getIdLote()).orElse(null);
             if (lote == null) {
@@ -79,7 +83,7 @@ public class InventarioController {
 
             movimiento.setStockNuevo(nuevoStock);
             movimiento.setFechaMovimiento(LocalDateTime.now());
-            
+            movimiento.setUsuario(getUsuarioActual(session));
             // Update Lote
             lote.setCantidadActual(nuevoStock);
             loteRepository.save(lote);

@@ -59,6 +59,10 @@ public class Caja {
     @Column(length = 50)
     private String referencia;
 
+    @ManyToOne
+    @JoinColumn(name = "id_farmacia", foreignKey = @ForeignKey(name = "FK_Farmacia_Caja"))
+    private Farmacia farmacia;
+
     @PrePersist
     public void preGuardado() {
         if (fecha == null) {

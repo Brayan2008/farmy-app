@@ -37,10 +37,12 @@ import app.farmy.farmy.repository.MetodoPagoRepository;
 import app.farmy.farmy.repository.VentaDetalleRepository;
 import app.farmy.farmy.repository.VentaPagoRepository;
 import app.farmy.farmy.repository.VentasRepository;
+import app.farmy.farmy.security.FarmySesion;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/ventas")
-public class VentaController {
+public class VentaController implements FarmySesion{
 
     @Autowired
     private VentasRepository ventasRepository;
@@ -66,8 +68,8 @@ public class VentaController {
     private final ObjectMapper mapper = new ObjectMapper();
 
     @GetMapping
-    public String listaVentas(Model model) {
-        model.addAttribute("listaVentas", ventasRepository.findAll());
+    public String listaVentas(Model model, HttpSession session) {
+        model.addAttribute("listaVentas", ventasRepository.findAll().stream().filter(v -> v.getUsuario().getFarmacia().getId() == getFarmaciaActual(session).getId()).toList());
         model.addAttribute("metodosPago", metodoPagoRepository.findAll());
         model.addAttribute("ventaPago", new VentaPago());
         model.addAttribute("estado_caja_usuario",false);
@@ -126,14 +128,14 @@ public class VentaController {
     }
 
     @GetMapping("/nueva")
-    public String nuevaVenta(Model model) {
+    public String nuevaVenta(Model model, HttpSession session) {
         model.addAttribute("venta", new Ventas());
-        model.addAttribute("clientes", clienteRepository.findAll());
+        model.addAttribute("clientes", clienteRepository.findByFarmacia(getFarmaciaActual(session)));
 
         // Filter products that have at least one active lote with stock > 0
         List<Lote> lotesConStock = loteRepository.findAll()
                 .stream()
-                .filter(l -> "Activo".equals(l.getEstado()) && l.getCantidadActual() > 0)
+                .filter(l -> "Activo".equals(l.getEstado()) && l.getCantidadActual() > 0 && l.getProducto().getFarmacia().getId() == getFarmaciaActual(session).getId())
                 .collect(Collectors.toList());
 
         lotesConStock.forEach(arg0 -> System.out.println(arg0.getIdLote() + " - " + arg0.getProducto().getNombreProducto() + " - Stock: " + arg0.getCantidadActual())); //TODO borrar esta linea despues de probar
@@ -155,7 +157,8 @@ public class VentaController {
             @RequestParam(required = false) String fechaVencimientoPago,
             @RequestParam(required = false) Integer metodoPago,
             @RequestParam String itemsJson,
-            @RequestParam(required = false) Double montoPagoInicial) {
+            @RequestParam(required = false) Double montoPagoInicial,
+            HttpSession session) {
 
         Ventas venta = new Ventas();
 
@@ -207,7 +210,7 @@ public class VentaController {
             venta.setEstadoPago(EstadoPago.PAGADO);
         }
 
-        // Save venta to get ID
+        venta.setUsuario(getUsuarioActual(session));
         ventasRepository.save(venta);
 
         // Process items
@@ -258,7 +261,6 @@ public class VentaController {
 
             } catch (Exception ex) {
                 ex.printStackTrace();
-                // In a real app, we should rollback transaction here
             }
         }
 

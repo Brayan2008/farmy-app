@@ -69,9 +69,16 @@ public class Productos {
     @OneToMany(mappedBy = "producto")
     private final List<Lote> lotes = new ArrayList<>();
 
+    @ManyToOne
+    @JoinColumn(name = "idFarmacia", foreignKey = @ForeignKey(name = "FK_Farmacia_Producto"))
+    private Farmacia farmacia;
+
     @PrePersist
     public void preGuardado() {
         fechaRegistro = LocalDate.now();
         estado = "Activo";
     }
+
+
+
 }

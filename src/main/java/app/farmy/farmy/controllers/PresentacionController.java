@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import app.farmy.farmy.model.Presentacion;
 import app.farmy.farmy.repository.PresentacionRepository;
+import app.farmy.farmy.security.FarmySesion;
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -18,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @Controller
 @RequestMapping("productos")
-public class PresentacionController {
+public class PresentacionController implements FarmySesion{
     
     @Autowired
     private PresentacionRepository presentacionRepository;
@@ -30,13 +33,14 @@ public class PresentacionController {
     
     @GetMapping("/tabla_presentaciones")
     @ResponseBody
-    public List<Presentacion> getPresentaciones() {
-        return presentacionRepository.findAll();
+    public List<Presentacion> getPresentaciones(HttpSession session) {
+        return presentacionRepository.findByFarmacia(getFarmaciaActual(session));
     }
     
    @PostMapping("/add_presentacion")
-    public ResponseEntity<String> add_presentacion(@RequestBody Presentacion presentacion) {  // ← @RequestBody para JSON
+    public ResponseEntity<String> add_presentacion(@RequestBody Presentacion presentacion, HttpSession session) {  // ← @RequestBody para JSON
         try {
+            presentacion.setFarmacia(getFarmaciaActual(session));
             presentacionRepository.save(presentacion);
             return ResponseEntity.ok("Presentacion agregada exitosamente");
         } catch (Exception e) {

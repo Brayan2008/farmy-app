@@ -8,18 +8,19 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.GetMapping;
+
 import app.farmy.farmy.model.Marca;
 import app.farmy.farmy.repository.MarcaRepository;
+import app.farmy.farmy.security.FarmySesion;
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
 
-
-
-
 @Controller
 @RequestMapping("productos")
-public class MarcaController {
+public class MarcaController implements FarmySesion{
     
     @Autowired
     private MarcaRepository marcaRepository;
@@ -31,13 +32,14 @@ public class MarcaController {
     
     @GetMapping("/tabla_marcas")
     @ResponseBody
-    public List<Marca> getmarcas() {
-        return marcaRepository.findAll();
+    public List<Marca> getmarcas(HttpSession session) {
+        return marcaRepository.findByFarmacia(getFarmaciaActual(session));
     }
     
    @PostMapping("/add_marca")
-    public ResponseEntity<String> add_marca(@RequestBody Marca marca) {  // ← @RequestBody para JSON
+    public ResponseEntity<String> add_marca(@RequestBody Marca marca, HttpSession session) {  // ← @RequestBody para JSON
         try {
+            marca.setFarmacia(getFarmaciaActual(session));
             marcaRepository.save(marca);
             return ResponseEntity.ok("Marca agregada exitosamente");
         } catch (Exception e) {
@@ -45,7 +47,7 @@ public class MarcaController {
         }
     }
     
-     @PutMapping("/update_marca")
+    @PutMapping("/update_marca")
     public ResponseEntity<String> updateMarca(@RequestBody Marca marca) {
         try {
             if (marcaRepository.existsById(marca.getIdMarca())) {

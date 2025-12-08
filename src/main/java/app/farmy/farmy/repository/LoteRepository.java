@@ -11,4 +11,6 @@ import java.util.List;
 public interface LoteRepository extends JpaRepository<Lote, Integer> {
 
     List<Lote> findByNumeroLote(String numeroLote);
+
+    
 }

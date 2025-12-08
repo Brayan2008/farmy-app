@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,10 +24,12 @@ import app.farmy.farmy.repository.LaboratorioRepository;
 import app.farmy.farmy.repository.MarcaRepository;
 import app.farmy.farmy.repository.PresentacionRepository;
 import app.farmy.farmy.repository.ProductosRepository;
+import app.farmy.farmy.security.FarmySesion;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/productos")
-public class ProductosController {
+public class ProductosController implements FarmySesion{
 
     @Autowired
     private ProductosRepository productosRepository;
@@ -43,16 +46,18 @@ public class ProductosController {
     @Autowired
     private LaboratorioRepository laboratorioRepository;
 
+    Logger logger = Logger.getLogger(ProductosController.class.getName());
+    
     @GetMapping
-    public String listarProductos(Model model) {
-        model.addAttribute("listaProductos", productosRepository.findAll());
+    public String listarProductos(Model model, HttpSession session) {
+        model.addAttribute("listaProductos", productosRepository.findByFarmacia(getFarmaciaActual(session)));
         model.addAttribute("producto", new Productos());
         cargarListas(model);
         return "home/productos/productos";
     }
 
     @PostMapping("/guardar")
-    public String guardarProducto(@ModelAttribute Productos producto, @RequestParam("file") MultipartFile file) {
+    public String guardarProducto(@ModelAttribute Productos producto, @RequestParam("file") MultipartFile file, HttpSession session) {
         if (!file.isEmpty()) {
             try {
                 String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
@@ -67,6 +72,8 @@ public class ProductosController {
                 e.printStackTrace();
             }
         }
+        logger.info("Seteando la farmacia actual" + getFarmaciaActual(session));
+        producto.setFarmacia(getFarmaciaActual(session));
         productosRepository.save(producto);
         return "redirect:/productos";
     }
@@ -81,13 +88,13 @@ public class ProductosController {
         cargarListas(model);
         return "home/productos/detalles-producto";
     }
-    
+
     @PostMapping("/actualizar")
     public String actualizarProducto(@ModelAttribute Productos producto, @RequestParam("file") MultipartFile file) {
-         Productos productoExistente = productosRepository.findById(producto.getIdProducto()).orElse(null);
-         
-         if(productoExistente != null) {
-             if (!file.isEmpty()) {
+        Productos productoExistente = productosRepository.findById(producto.getIdProducto()).orElse(null);
+
+        if (productoExistente != null) {
+            if (!file.isEmpty()) {
                 try {
                     String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
                     Path uploadPath = Paths.get("uploads");
@@ -104,10 +111,10 @@ public class ProductosController {
                 producto.setImgUrl(productoExistente.getImgUrl());
             }
             producto.setFechaRegistro(productoExistente.getFechaRegistro());
-            
+
             productosRepository.save(producto);
-         }
-         
+        }
+
         return "redirect:/productos";
     }
 

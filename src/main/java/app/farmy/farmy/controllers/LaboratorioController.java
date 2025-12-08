@@ -14,10 +14,12 @@ import org.springframework.web.server.ResponseStatusException;
 
 import app.farmy.farmy.model.Laboratorio;
 import app.farmy.farmy.repository.LaboratorioRepository;
+import app.farmy.farmy.security.FarmySesion;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("laboratorios")
-public class LaboratorioController {
+public class LaboratorioController implements FarmySesion{
 
     @Autowired
     private LaboratorioRepository laboratorioRepo;
@@ -25,18 +27,19 @@ public class LaboratorioController {
     private static final String RUC_INVALIDO = "RUC inválido. Debe tener 11 dígitos.";
 
     @GetMapping
-    public String getLaboratorios(Model model) {
-        model.addAttribute("listaLaboratorios", laboratorioRepo.findAll());
+    public String getLaboratorios(Model model, HttpSession session) {
+        model.addAttribute("listaLaboratorios", laboratorioRepo.findByFarmacia(getFarmaciaActual(session)));
         model.addAttribute("laboratorio", new Laboratorio());
         return "/home/laboratorios/laboratorios";
     }
 
     @PostMapping("/save")
-    public String saveLaboratorio(@NonNull @ModelAttribute Laboratorio laboratorio) {
+    public String saveLaboratorio(@NonNull @ModelAttribute Laboratorio laboratorio, HttpSession session) {
         if (!validarRuc(laboratorio)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, RUC_INVALIDO);
         }
 
+        laboratorio.setFarmacia(getFarmaciaActual(session));
         var savedLaboratorio = laboratorioRepo.save(laboratorio);
         if (savedLaboratorio.getCodigo() == null || savedLaboratorio.getCodigo().trim().isEmpty()) {
             savedLaboratorio.setCodigo("LAB" + String.format("%03d", savedLaboratorio.getIdLaboratorio()));

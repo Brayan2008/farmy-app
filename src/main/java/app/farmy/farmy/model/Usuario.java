@@ -1,11 +1,16 @@
 package app.farmy.farmy.model;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,25 +19,28 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 @Entity
 @Getter
 @Setter
-@ToString
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = "email", name = "UK_Email_Usuario"),
+})
 public class Usuario {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int idUsuario;
 
     @Column(nullable = false)
     private String nombreUsuario;
 
     @Column(nullable = false, length = 16)
-    private String contraseña;
+    private String password;
 
     @Column(nullable = false)
     private String nombreCompleto;
@@ -43,9 +51,9 @@ public class Usuario {
     @Column(length = 9)
     private String telefono;
 
-    private LocalDate fechaCreacion;
+    private LocalDateTime fechaCreacion;
 
-    private LocalDate fechaUltimoAcceso;
+    private LocalDateTime fechaUltimoAcceso;
 
     private String Estado;
 
@@ -53,9 +61,12 @@ public class Usuario {
     @JoinColumn(name = "idRol", foreignKey = @ForeignKey(name = "FK_Rol_Usuario"))
     private Rol rol;
 
+    @Enumerated(EnumType.STRING)
+    private SuperRol superRol; // Enum que crearemos abajo
+
     @OneToMany(mappedBy = "usuario")
     private final List<Compra> compras = new ArrayList<>();
-    
+
     @OneToMany(mappedBy = "usuario")
     private final List<PagoCompra> pagoCompras = new ArrayList<>();
 
@@ -65,12 +76,23 @@ public class Usuario {
     @OneToMany(mappedBy = "usuario")
     private final List<Ventas> ventas = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "idFarmacia", foreignKey = @ForeignKey(name = "FK_Farmacia_Usuario"))
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+    private Farmacia farmacia;
+
     @PrePersist
     public void fechaCreacion() {
-        fechaCreacion = LocalDate.now();
+        fechaCreacion = LocalDateTime.now();
         Estado = "Activo";
     }
-    
+
+    public enum SuperRol {
+        SUPER_ADMIN,
+        ADMIN_FARMACIA,
+        EMPLEADO
+    }
+
     /*
      * @PreUpdate
      * public void fechaActualizacion(){

@@ -13,10 +13,12 @@ import org.springframework.web.server.ResponseStatusException;
 
 import app.farmy.farmy.model.Proveedor;
 import app.farmy.farmy.repository.ProveedorRepository;
+import app.farmy.farmy.security.FarmySesion;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("proveedores")
-public class ProveedorController {
+public class ProveedorController implements FarmySesion{
 
     @Autowired
     private ProveedorRepository proveedorRepo;
@@ -24,25 +26,21 @@ public class ProveedorController {
     private String rucInvalidoMensage = "RUC inválido. Debe tener 11 dígitos.";
 
     @GetMapping
-    public String getProveedores(Model model) {
-        model.addAttribute("listaProveedores", proveedorRepo.findAll());
+    public String getProveedores(Model model, HttpSession session) {
+        model.addAttribute("listaProveedores", proveedorRepo.findByFarmacia(getFarmaciaActual(session)));
         model.addAttribute("proveedor", new Proveedor());
         return "/home/proveedores/proveedores";
     }
 
     @PostMapping("/save")
-    public String saveProveedor(@ModelAttribute Proveedor proveedor) {
+    public String saveProveedor(@ModelAttribute Proveedor proveedor, HttpSession session) {
         // validar longitud de RUC antes de guardar
         if (!validarRUC(proveedor)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, rucInvalidoMensage);
         }
 
+        proveedor.setFarmacia(getFarmaciaActual(session));
         proveedor = proveedorRepo.save(proveedor);
-        // Generar código después de guardar (cuando ya tenemos el ID)
-        if (proveedor.getCodigo() == null || proveedor.getCodigo().isEmpty()) {
-            proveedor.setCodigo("PROV" + String.format("%03d", proveedor.getIdProveedor()));
-            proveedorRepo.save(proveedor);
-        }
         return "redirect:/proveedores";
     }
 

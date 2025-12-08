@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuperAdmin | Usuarios</title>
+    <link rel="stylesheet" th:href="@{/styles.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+<div class="dashboard-container">
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <div class="sidebar" id="sidebar">
+        <h3>Super Admin</h3>
+        <a href="/superadmin/dashboard"><i class="fas fa-clinic-medical"></i> Farmacias</a>
+        <a href="/superadmin/usuarios" class="active"><i class="fas fa-users"></i> Usuarios Globales</a>
+        <a href="#" onclick="confirmarLogout()" style="margin-top: 50px; color: #ff6b6b;"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+    </div>
+
+    <div class="main-content">
+        <div class="header-content">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <h2>Usuarios del Sistema</h2>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Farmacia</th>
+                        <th>Estado</th> <th style="text-align: center;">Acciones</th> </tr>
+                </thead>
+                <tbody id="tablaUsuarios"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="modalEditar" class="modal-overlay">
+    <div class="modal-content">
+        <h3>Editar Usuario</h3>
+        <form id="formEditar">
+            <input type="hidden" id="editId">
+            <div class="form-row">
+                <label>Nombre Completo</label>
+                <input type="text" id="editNombre" required>
+            </div>
+            <div class="form-row">
+                <label>Email</label>
+                <input type="email" id="editEmail" required>
+            </div>
+            
+            <div class="form-row">
+                <label>Nueva Contraseña <small style="color: #888;">(Opcional)</small></label>
+                <input type="password" id="editPassword" placeholder="Dejar en blanco para mantener la actual">
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button type="button" class="btn" style="background: #6c757d;" onclick="$('#modalEditar').hide()">Cancelar</button>
+                <button type="submit" class="btn" style="background: var(--color-business);">Actualizar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // --- UI Logic ---
+    function toggleSidebar() {
+        $('#sidebar').toggleClass('active');
+        $('.sidebar-overlay').toggleClass('active');
+    }
+
+    function confirmarLogout() {
+        Swal.fire({
+            title: '¿Salir?',
+            showCancelButton: true,
+            confirmButtonText: 'Sí'
+        }).then((r) => { if(r.isConfirmed) window.location.href = '/logout'; })
+    }
+
+    // --- Business Logic ---
+    $(document).ready(function() {
+        cargarUsuarios();
+
+        // Submit Editar
+        $('#formEditar').submit(function(e) {
+            e.preventDefault();
+            
+            const passwordVal = $('#editPassword').val();
+            
+            const data = {
+                id: $('#editId').val(),
+                nombreCompleto: $('#editNombre').val(),
+                email: $('#editEmail').val(),
+                password: passwordVal // Enviamos lo que haya escrito (vacío o texto)
+            };
+
+            $.ajax({
+                url: '/api/superadmin/usuarios',
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function() {
+                    $('#modalEditar').hide();
+                    cargarUsuarios();
+                    
+                    // Mensaje personalizado según si cambió la clave o no
+                    let mensaje = 'Información actualizada.';
+                    if(passwordVal) {
+                        mensaje += ' La contraseña también ha sido cambiada.';
+                    }
+                    
+                    Swal.fire('Actualizado', mensaje, 'success');
+                },
+                error: function() { Swal.fire('Error', 'No se pudo actualizar.', 'error'); }
+            });
+        });
+    });
+
+    function cargarUsuarios() {
+        $.ajax({
+            url: '/api/superadmin/usuarios',
+            type: 'GET',
+            success: function(usuarios) {
+                let html = '';
+                if(usuarios.length === 0) {
+                    html = '<tr><td colspan="6" style="text-align:center;">No hay usuarios registrados.</td></tr>';
+                } else {
+                    usuarios.forEach(u => {
+                        // Manejo de nulos
+                        const farmaciaBadge = u.nombreFarmacia === 'N/A (Global)' 
+                            ? '<span style="color:#999;">Global</span>'
+                            : `<span style="color: var(--color-business); font-weight:bold;">${u.nombreFarmacia}</span>`;
+                        
+                        // Estado (Si es null, asumimos activo)
+                        const isActive = u.estado !== false; 
+                        const estadoHtml = isActive 
+                            ? '<span class="badge bg-active">Activo</span>' 
+                            : '<span class="badge bg-inactive">Bloqueado</span>';
+
+                        // Botón Toggle Estado
+                        const btnToggle = isActive
+                            ? `<button class="btn" style="background: #dc3545; padding: 6px 10px;" onclick="cambiarEstado(${u.id}, true)" title="Bloquear Acceso"><i class="fas fa-user-lock"></i></button>`
+                            : `<button class="btn" style="background: #28a745; padding: 6px 10px;" onclick="cambiarEstado(${u.id}, false)" title="Desbloquear"><i class="fas fa-unlock"></i></button>`;
+
+                        html += `
+                            <tr>
+                                <td>${u.id}</td>
+                                <td>${u.nombreCompleto}</td>
+                                <td>${u.email}</td>
+                                <td>${farmaciaBadge}</td>
+                                <td>${estadoHtml}</td>
+                                <td style="text-align: center;">
+                                    <button class="btn" style="background: #ffc107; padding: 6px 10px; margin-right:5px;" onclick="abrirEditar(${u.id})" title="Editar"><i class="fas fa-edit"></i></button>
+                                    ${btnToggle}
+                                </td>
+                            </tr>
+                        `;
+                    });
+                }
+                $('#tablaUsuarios').html(html);
+            }
+        });
+    }
+
+    function abrirEditar(id) {
+        $.get('/api/superadmin/usuarios/' + id, function(u) {
+            $('#editId').val(u.id);
+            $('#editNombre').val(u.nombreCompleto);
+            $('#editEmail').val(u.email);
+            $('#editPassword').val(''); // <--- IMPORTANTE: Limpiar el campo de password
+            $('#modalEditar').css('display', 'flex');
+        });
+    }
+
+    function cambiarEstado(id, estaActivo) {
+        const accion = estaActivo ? "Bloquear" : "Desbloquear";
+        Swal.fire({
+            title: `¿${accion} Usuario?`,
+            text: estaActivo ? "El usuario no podrá iniciar sesión." : "El usuario podrá volver a entrar.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: estaActivo ? '#d33' : '#28a745',
+            confirmButtonText: `Sí, ${accion}`
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post(`/api/superadmin/usuarios/${id}/cambiar-estado`, function() {
+                    cargarUsuarios();
+                    Swal.fire('Listo', `Usuario ${estaActivo ? 'bloqueado' : 'desbloqueado'}.`, 'success');
+                });
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

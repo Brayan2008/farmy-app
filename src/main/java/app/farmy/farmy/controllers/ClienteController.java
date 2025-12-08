@@ -13,10 +13,12 @@ import org.springframework.web.server.ResponseStatusException;
 
 import app.farmy.farmy.model.Cliente;
 import app.farmy.farmy.repository.ClienteRepository;
+import app.farmy.farmy.security.FarmySesion;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("clientes")
-public class ClienteController {
+public class ClienteController implements FarmySesion {
 
     @Autowired
     private ClienteRepository clienteRepo;
@@ -25,19 +27,19 @@ public class ClienteController {
 
 
     @GetMapping
-    public String getClientes(Model model) {
-        model.addAttribute("listaClientes", clienteRepo.findAll());
+    public String getClientes(Model model, HttpSession session) {
+        model.addAttribute("listaClientes", clienteRepo.findByFarmacia(getFarmaciaActual(session)));
         model.addAttribute("cliente", new Cliente());
         return "/home/clientes/clientes";
     }
 
     @PostMapping("/save")
-    public String saveCliente(@ModelAttribute Cliente cliente) {
+    public String saveCliente(@ModelAttribute Cliente cliente, HttpSession session) {
         // validar longitud de documento antes de guardar
         if (!validarLongitudDocumento(cliente)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, documentoInvalidoMensage);
         }
-
+        cliente.setFarmacia(getFarmaciaActual(session));
         clienteRepo.save(cliente);
         return "redirect:/clientes";
     }

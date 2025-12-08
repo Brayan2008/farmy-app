@@ -24,6 +24,8 @@ import app.farmy.farmy.model.Lote;
 import app.farmy.farmy.model.TipoCompra;
 import app.farmy.farmy.repository.CompraRepository;
 import app.farmy.farmy.repository.ProveedorRepository;
+import app.farmy.farmy.security.FarmySesion;
+import jakarta.servlet.http.HttpSession;
 import app.farmy.farmy.repository.ProductosRepository;
 import app.farmy.farmy.repository.LoteRepository;
 import app.farmy.farmy.model.PagoCompra;
@@ -35,7 +37,7 @@ import app.farmy.farmy.repository.MetodoPagoRepository;
 
 @Controller
 @RequestMapping("/compras")
-public class CompraController {
+public class CompraController implements FarmySesion {
 
     @Autowired
     private CompraRepository compraRepository;
@@ -58,10 +60,13 @@ public class CompraController {
     private final ObjectMapper mapper = new ObjectMapper();
 
     @GetMapping
-    public String listaCompras(Model model) {
-        model.addAttribute("listaCompras", compraRepository.findAll());
+    public String listaCompras(Model model, HttpSession session) {
+        var compras = compraRepository.findAll().stream()
+                .filter(arg0 -> arg0.getProveedor().getFarmacia().getId() == getFarmaciaActual(session).getId()).toList();
+        System.out.println("Compras encontradas: " + compras.size());
+        model.addAttribute("listaCompras", compras);
         model.addAttribute("metodosPago", metodoPagoRepository.findAll());
-        model.addAttribute("pagoCompra", new app.farmy.farmy.model.PagoCompra());
+        model.addAttribute("pagoCompra", new PagoCompra());
         return "home/compras/compras";
     }
 
@@ -82,7 +87,8 @@ public class CompraController {
 
     @PostMapping("/anular")
     public String anularCompra(@RequestParam int numeroFactura, @RequestParam String motivo) {
-        System.out.println("\n".repeat(20) + "Anulando compra " + numeroFactura + " por motivo: " + motivo + "\n".repeat(20));
+        System.out.println(
+                "\n".repeat(20) + "Anulando compra " + numeroFactura + " por motivo: " + motivo + "\n".repeat(20));
         var c = compraRepository.findById(numeroFactura);
         if (c.isPresent()) {
             Compra compra = c.get();
@@ -96,15 +102,14 @@ public class CompraController {
     }
 
     @GetMapping("/nueva")
-    public String nuevaCompra(Model model) {
-        model.addAttribute("productos", productosRepository.findAll());
-        model.addAttribute("proveedores", proveedorRepository.findAll());
+    public String nuevaCompra(Model model, HttpSession session) {
+        model.addAttribute("productos", productosRepository.findByFarmacia(getFarmaciaActual(session)));
+        model.addAttribute("proveedores", proveedorRepository.findByFarmacia(getFarmaciaActual(session)));
         model.addAttribute("metodosPago", metodoPagoRepository.findAll());
         model.addAttribute("compra", new Compra());
         return "home/compras/nueva_compra";
     }
 
-    //TODO Realizar pago inicial
     @PostMapping("/guardar")
     public String guardarCompra(@RequestParam Integer proveedorId,
             @RequestParam Double subtotal,
@@ -115,12 +120,13 @@ public class CompraController {
             @RequestParam(required = false) String fechaVencimientoPago,
             @RequestParam(required = false) Integer metodoPago,
             @RequestParam String itemsJson,
-            @RequestParam(required = false, defaultValue = "0") Double montoPagoInicial) {
+            @RequestParam(required = false, defaultValue = "0") Double montoPagoInicial,
+            HttpSession session) {
 
         Compra compra = new Compra();
 
         if (proveedorId != null) {
-            Proveedor p = proveedorRepository.findById(proveedorId).orElse(null);
+            Proveedor p = proveedorRepository.findById(proveedorId).get();
             compra.setProveedor(p);
         }
 
@@ -163,7 +169,6 @@ public class CompraController {
             }
         }
 
-
         /*
          * Ejemplo del JSON
          * 
@@ -183,8 +188,8 @@ public class CompraController {
                 List<Map<String, Object>> items = mapper.readValue(itemsJson,
                         new TypeReference<List<Map<String, Object>>>() {
                         });
-                
-                // Save compra first to get ID
+
+                compra.setUsuario(getUsuarioActual(session));
                 compraRepository.save(compra);
 
                 for (Map<String, Object> it : items) {
@@ -198,8 +203,10 @@ public class CompraController {
                     Double precio_compra = (it.get("precio_compra") != null)
                             ? ((Number) it.get("precio_compra")).doubleValue()
                             : 0.0;
-                    LocalDate fecha_vencimiento = LocalDate.parse(it.get("fechaVencimiento").toString() != "" ? it.get("fechaVencimiento").toString() : null);
-                    LocalDate fecha_fabricacion = LocalDate.parse(it.get("fechaFabricacion").toString() != ""  ? it.get("fechaFabricacion").toString() : null);
+                    LocalDate fecha_vencimiento = LocalDate.parse(
+                            it.get("fechaVencimiento").toString() != "" ? it.get("fechaVencimiento").toString() : null);
+                    LocalDate fecha_fabricacion = LocalDate.parse(
+                            it.get("fechaFabricacion").toString() != "" ? it.get("fechaFabricacion").toString() : null);
 
                     Lote lote = new Lote();
                     lote.setNumeroLote(idLote);
@@ -226,8 +233,9 @@ public class CompraController {
                     pago.setMontoPago(BigDecimal.valueOf(montoPagoInicial));
                     pago.setFechaPago(LocalDateTime.now());
                     pago.setMetodoPago(compra.getMetodoPago());
+                    pago.setUsuario(getUsuarioActual(session));
                     pago.setObservaciones("Pago inicial al registrar compra");
-                    
+
                     pagoCompraRepository.save(pago);
                 }
 
