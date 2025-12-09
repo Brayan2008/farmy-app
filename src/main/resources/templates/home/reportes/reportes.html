@@ -81,7 +81,11 @@
                                     </span>
                                 </td>
                                 <td data-label="Formato" th:text="${reporte.formato}">PDF</td>
-                                <td data-label="Fecha Generación" th:text="${#dates.format(reporte.fechaGeneracion, 'dd/MM/yyyy HH:mm')}">27/10/2025 08:30</td>
+                                <!-- CORRECCIÓN: Usar #temporals en lugar de #dates -->
+                                <td data-label="Fecha Generación" 
+                                    th:text="${reporte.fechaGeneracion != null ? #temporals.format(reporte.fechaGeneracion, 'dd/MM/yyyy HH:mm') : '---'}">
+                                    27/10/2025 08:30
+                                </td>
                                 <td data-label="Estado">
                                     <span th:class="${'estado-' + reporte.estado}">
                                         <span th:text="${reporte.estado == 'generado' ? 'Generado' : (reporte.estado == 'proceso' ? 'En Proceso' : 'Error')}">
@@ -91,30 +95,10 @@
                                 </td>
                                 <td data-label="Acciones">
                                     <div class="acciones-group">
-                                        <a th:href="@{${reporte.urlAccion}}" th:if="${reporte.urlAccion != null}" 
-                                           class="btn-ver">Ver</a>
-                                        <button class="btn-editar" th:if="${reporte.estado == 'proceso'}"
-                                                th:onclick="'Reportes.editarReporte(\'' + ${reporte.codigo} + '\')'">
-                                            ✏ Editar
-                                        </button>
-                                        <button class="btn-eliminar" 
-                                                th:onclick="'Reportes.eliminarReporte(\'' + ${reporte.codigo} + '\')'">
-                                            🗑 Eliminar
-                                        </button>
-                                        <a th:href="@{/reportes/descargar/{codigo}(codigo=${reporte.codigo})}" 
-                                           th:if="${reporte.estado == 'generado' && reporte.archivo != null}"
-                                           class="btn-descargar">
-                                            📥 Descargar
-                                        </a>
-                                        <a th:href="@{/ventas/reportes}" 
-                                           th:if="${reporte.tipo == 'ventas' && reporte.estado == 'proceso'}"
-                                           class="btn-continuar">
-                                            ➔ Continuar Ventas
-                                        </a>
-                                        <a th:href="@{/compras/reportes}" 
-                                           th:if="${reporte.tipo == 'compras' && reporte.estado == 'proceso'}"
-                                           class="btn-continuar">
-                                            ➔ Continuar Compras
+                                        <!-- Botón para ver detalles -->
+                                        <a th:href="@{/reportes/ver/{codigo}(codigo=${reporte.codigo})}" 
+                                        class="btn-ver">
+                                            👁️ Ver Detalles
                                         </a>
                                     </div>
                                 </td>
@@ -156,8 +140,11 @@
                     <button class="modal-cerrar" onclick="Reportes.cerrarModalNuevoReporte()">&times;</button>
                 </div>
                 
-                <!-- Formulario modificado -->
+                <!-- Formulario SIMPLIFICADO -->
                 <form th:action="@{/reportes/crear}" method="post" id="formNuevoReporte" class="modal-reporte-body">
+                    <!-- CSRF Token IMPORTANTE -->
+                    <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    
                     <div class="form-grid">
                         <!-- Nombre del Reporte -->
                         <div class="form-group form-group-full">
@@ -169,8 +156,7 @@
                         <!-- Tipo de Reporte -->
                         <div class="form-group">
                             <label for="tipoReporte">Tipo de Reporte *</label>
-                            <select id="tipoReporte" class="form-select" name="tipo" required 
-                                    onchange="Reportes.cambiarTipoReporte()">
+                            <select id="tipoReporte" class="form-select" name="tipo" required>
                                 <option value="">Seleccione...</option>
                                 <option value="ventas">Ventas</option>
                                 <option value="compras">Compras</option>
@@ -208,13 +194,12 @@
                             </select>
                         </div>
 
-                        <!-- Estado -->
+                        <!-- Estado - FIJO EN "proceso" -->
                         <div class="form-group">
                             <label for="estado">Estado Inicial *</label>
-                            <select id="estado" class="form-select" name="estado" required>
-                                <option value="proceso">En Proceso</option>
-                                <option value="programado">Programado</option>
-                            </select>
+                            <input type="text" id="estado" class="form-input" name="estado" 
+                                value="proceso" readonly style="background-color: #f3f4f6;">
+                            <small class="text-gray-500 text-xs">Los reportes nuevos siempre inician en "En Proceso"</small>
                         </div>
 
                         <!-- Fecha Desde -->
@@ -241,9 +226,10 @@
                         <div class="footer-buttons">
                             <button type="button" class="btn-cancelar"
                                 onclick="Reportes.cerrarModalNuevoReporte()">Cancelar</button>
-                            <!-- Botón modificado -->
-                            <button type="button" class="btn-registrar" id="btnGenerarReporte" onclick="Reportes.generarReporte()">
-                                Generar Reporte
+                            <!-- Botón para enviar directamente -->
+                            <button type="submit" class="btn-registrar" id="btnGenerarReporte" 
+                                    onclick="return Reportes.validarFormulario()">
+                                Crear Reporte
                             </button>
                         </div>
                     </div>

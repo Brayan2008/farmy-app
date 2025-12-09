@@ -10,6 +10,16 @@
     <link rel="stylesheet" th:href="@{/css/reporte_compras.css}">
     <script th:src="@{/script.js}"></script>
     <script th:src="@{/js/reporte_compras.js}" defer></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // Variables globales para JavaScript
+        var fromModal = /*[[${fromModal}]]*/ false;
+        var reporteId = /*[[${reporteId}]]*/ null;
+        var nombreReporte = /*[[${nombre != null ? nombre : 'Reporte de Compras'}]]*/ 'Reporte de Compras';
+        var formatoReporte = /*[[${formato != null ? formato : 'pdf'}]]*/ 'pdf';
+        var descripcionReporte = /*[[${descripcion != null ? descripcion : ''}]]*/ '';
+        /*]]>*/
+    </script>
 </head>
 
 <body>
@@ -26,7 +36,7 @@
 
             <div class="container p-4 md:p-6">
                 <!-- Sección: Información del reporte desde modal -->
-                <div th:if="${fromModal}" class="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div th:if="${fromModal != null and fromModal}" class="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
                     <div class="flex justify-between items-start mb-3">
                         <div>
                             <h3 class="text-lg font-semibold text-blue-800">
@@ -65,7 +75,7 @@
                         </div>
                     </div>
                     
-                    <div th:if="${descripcion != null && !descripcion.isEmpty()}" class="mt-3 pt-3 border-t border-blue-200">
+                    <div th:if="${descripcion != null and !#strings.isEmpty(descripcion)}" class="mt-3 pt-3 border-t border-blue-200">
                         <span class="font-medium text-gray-600">Descripción:</span>
                         <p class="text-gray-700 mt-1" th:text="${descripcion}"></p>
                     </div>
@@ -88,12 +98,30 @@
                     </div>
                 </div>
 
-                <form th:action="@{/compras/reportes/generar}" method="post" id="filtroForm">
+                <!-- Mensaje de reporte creado (se mostrará con JavaScript) -->
+                <div id="mensajeReporteCreado" style="display: none;" class="mb-4 p-3 bg-green-100 text-green-800 rounded border border-green-200">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        <p class="font-medium">✓ Reporte creado exitosamente. Puede personalizar los filtros.</p>
+                    </div>
+                </div>
+
+                <!-- Formulario corregido: POST para generar reporte, pero JS lo cambiará a GET para filtros -->
+                <form th:action="@{/compras/reportes}" method="get" id="filtroForm">
+                    
                     <!-- Campos ocultos para los datos del modal -->
-                    <input type="hidden" name="nombreReporte" th:value="${nombre != null ? nombre : 'Reporte de Compras'}">
-                    <input type="hidden" name="tipoReporte" th:value="${tipo != null ? tipo : 'compras'}">
-                    <input type="hidden" name="formato" th:value="${formato != null ? formato : 'pdf'}">
-                    <input type="hidden" name="descripcion" th:value="${descripcion != null ? descripcion : ''}">
+                    <input type="hidden" name="nombreReporte" id="nombreReporteHidden" 
+                           th:value="${nombre != null ? nombre : 'Reporte de Compras'}">
+                    <input type="hidden" name="tipoReporte" id="tipoReporteHidden" 
+                           th:value="${tipo != null ? tipo : 'compras'}">
+                    <input type="hidden" name="formato" id="formatoHidden" 
+                           th:value="${formato != null ? formato : 'pdf'}">
+                    <input type="hidden" name="descripcion" id="descripcionHidden" 
+                           th:value="${descripcion != null ? descripcion : ''}">
+                    <input type="hidden" name="reporteId" id="reporteIdHidden" 
+                           th:value="${reporteId != null ? reporteId : ''}">
                     
                     <!-- Sección: Filtrar períodos -->
                     <div class="reporte-section">
@@ -104,7 +132,7 @@
                                 <label class="filtro-label">Fecha inicio *</label>
                                 <div class="flex gap-2">
                                     <input type="date" class="filtro-input" name="fechaInicio" 
-                                           th:value="${fechaDesde != null ? fechaDesde : fechaInicio}" 
+                                           th:value="${fechaDesde != null ? fechaDesde : (fechaInicio != null ? fechaInicio : '')}" 
                                            required>
                                     <input type="time" class="filtro-input w-32" name="horaInicio" 
                                            th:value="${horaInicio != null ? horaInicio : '00:00'}">
@@ -114,14 +142,14 @@
                             <div class="filtro-group">
                                 <label class="filtro-label">N° de factura</label>
                                 <input type="text" class="filtro-input" name="numeroFactura" 
-                                       th:value="${numeroFactura}" placeholder="Ej: 8888888">
+                                       th:value="${numeroFactura != null ? numeroFactura : ''}" placeholder="Ej: 8888888">
                             </div>
                             
                             <div class="filtro-group">
                                 <label class="filtro-label">Fecha fin *</label>
                                 <div class="flex gap-2">
                                     <input type="date" class="filtro-input" name="fechaFin" 
-                                           th:value="${fechaHasta != null ? fechaHasta : fechaFin}" 
+                                           th:value="${fechaHasta != null ? fechaHasta : (fechaFin != null ? fechaFin : '')}" 
                                            required>
                                     <input type="time" class="filtro-input w-32" name="horaFin" 
                                            th:value="${horaFin != null ? horaFin : '23:59'}">
@@ -138,13 +166,13 @@
                             <div class="filtro-group">
                                 <label class="filtro-label">RUC proveedor</label>
                                 <input type="text" class="filtro-input" name="rucProveedor" 
-                                       th:value="${rucProveedor}" placeholder="Ingrese RUC">
+                                       th:value="${rucProveedor != null ? rucProveedor : ''}" placeholder="Ingrese RUC">
                             </div>
                             
                             <div class="filtro-group">
                                 <label class="filtro-label">Nombre o razón social</label>
                                 <input type="text" class="filtro-input" name="razonSocial" 
-                                       th:value="${razonSocial}" 
+                                       th:value="${razonSocial != null ? razonSocial : ''}" 
                                        placeholder="Ej: Mespiu Cobreza Romona">
                             </div>
                         </div>
@@ -169,23 +197,25 @@
                                         <div class="radio-group">
                                             <div class="radio-option">
                                                 <input type="checkbox" id="tipo-contado" name="tipoContado" 
-                                                       th:checked="${tipoContado != null ? tipoContado : 'true'}">
+                                                       th:checked="${tipoContado != null ? tipoContado : true}"
+                                                       value="true">
                                                 <label for="tipo-contado">Contado</label>
                                             </div>
                                             <div class="radio-option">
                                                 <input type="checkbox" id="tipo-credito" name="tipoCredito"
-                                                       th:checked="${tipoCredito != null ? tipoCredito : 'true'}">
+                                                       th:checked="${tipoCredito != null ? tipoCredito : true}"
+                                                       value="true">
                                                 <label for="tipo-credito">Crédito</label>
                                             </div>
                                         </div>
                                     </td>
                                     <td>
                                         <input type="number" class="filtro-input" name="totalMaximo" 
-                                               th:value="${totalMaximo}" placeholder="1000.00" step="0.01" min="0">
+                                               th:value="${totalMaximo != null ? totalMaximo : ''}" placeholder="1000.00" step="0.01" min="0">
                                     </td>
                                     <td>
                                         <select class="filtro-input" name="ordenarPor">
-                                            <option value="fecha" th:selected="${ordenarPor == 'fecha'}">Fecha</option>
+                                            <option value="fecha" th:selected="${ordenarPor == 'fecha' or ordenarPor == null}">Fecha</option>
                                             <option value="codigo" th:selected="${ordenarPor == 'codigo'}">Código</option>
                                             <option value="total" th:selected="${ordenarPor == 'total'}">Total</option>
                                             <option value="proveedor" th:selected="${ordenarPor == 'proveedor'}">Proveedor</option>
@@ -201,7 +231,7 @@
                                     <td>
                                         <label>Estado de compra:</label>
                                         <select class="filtro-input mt-1" name="estadoCompra">
-                                            <option value="todos" th:selected="${estadoCompraSeleccionado == 'todos'}">Todos</option>
+                                            <option value="todos" th:selected="${estadoCompraSeleccionado == 'todos' or estadoCompraSeleccionado == null}">Todos</option>
                                             <option value="PAGADO" th:selected="${estadoCompraSeleccionado == 'PAGADO'}">Pagado</option>
                                             <option value="PENDIENTE" th:selected="${estadoCompraSeleccionado == 'PENDIENTE'}">Pendiente</option>
                                             <option value="ANULADO" th:selected="${estadoCompraSeleccionado == 'ANULADO'}">Anulado</option>
@@ -210,12 +240,12 @@
                                     <td>
                                         <label>Total mínimo (S/):</label>
                                         <input type="number" class="filtro-input mt-1" name="totalMinimo" 
-                                               th:value="${totalMinimo}" placeholder="10.00" step="0.01" min="0">
+                                               th:value="${totalMinimo != null ? totalMinimo : ''}" placeholder="10.00" step="0.01" min="0">
                                     </td>
                                     <td>
                                         <label>Orden:</label>
                                         <select class="filtro-input mt-1" name="orden">
-                                            <option value="desc" th:selected="${orden == 'desc'}">Descendente</option>
+                                            <option value="desc" th:selected="${orden == 'desc' or orden == null}">Descendente</option>
                                             <option value="asc" th:selected="${orden == 'asc'}">Ascendente</option>
                                         </select>
                                     </td>
@@ -228,6 +258,32 @@
                             </tbody>
                         </table>
                     </div>
+                </form>
+
+                <!-- Formulario oculto solo para generar reporte -->
+                <form id="formGenerarReporte" method="post" th:action="@{/compras/reportes/generar}" style="display: none;">
+                    <!-- CSRF token si está habilitado -->
+                    <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    
+                    <input type="hidden" name="nombreReporte" id="hiddenNombreReporte" 
+                        th:value="${nombre != null ? nombre : 'Reporte de Compras'}">
+                    <input type="hidden" name="tipoReporte" id="hiddenTipoReporte" value="compras">
+                    <input type="hidden" name="formato" id="hiddenFormato" 
+                        th:value="${formato != null ? formato : 'pdf'}">
+                    <input type="hidden" name="descripcion" id="hiddenDescripcion" 
+                        th:value="${descripcion != null ? descripcion : ''}">
+                    <!-- AÑADIR reporteId -->
+                    <input type="hidden" name="reporteId" id="hiddenReporteId" 
+                        th:value="${reporteId != null ? reporteId : ''}">
+                    
+                    <!-- Fechas (se llenarán con JavaScript) -->
+                    <input type="hidden" name="fechaInicio" id="hiddenFechaInicio">
+                    <input type="hidden" name="horaInicio" id="hiddenHoraInicio">
+                    <input type="hidden" name="fechaFin" id="hiddenFechaFin">
+                    <input type="hidden" name="horaFin" id="hiddenHoraFin">
+                    
+                    <!-- Total de registros con valor por defecto -->
+                    <input type="hidden" name="totalRegistros" id="hiddenTotalRegistros" value="0">
                 </form>
 
                 <!-- Sección: Registros filtrados -->
@@ -282,9 +338,11 @@
                                         1200.00
                                     </td>
                                     <td>
-                                        <span th:classappend="${compra.estadoPago != null && compra.estadoPago.name() == 'PAGADO'} ? 'estado-pagado' : 
-                                                               (compra.estadoPago != null && compra.estadoPago.name() == 'PENDIENTE') ? 'estado-pendiente' : 
-                                                               'estado-anulado'}"
+                                        <!-- CORRECCIÓN: Expresión Thymeleaf simplificada -->
+                                        <span th:class="${(compra.estadoPago != null && compra.estadoPago.name() == 'PAGADO') ? 
+                                                        'estado-pagado' : 
+                                                        ((compra.estadoPago != null && compra.estadoPago.name() == 'PENDIENTE') ? 
+                                                        'estado-pendiente' : 'estado-anulado')}"
                                               th:text="${compra.estadoPago != null ? compra.estadoPago.name() : 
                                                        (compra.estado != null ? compra.estado : '---')}">
                                             Pagado
@@ -355,6 +413,7 @@
                     <button type="button" class="btn-reporte btn-cancelar" onclick="ReporteCompras.cancelarReporte()">
                         Cancelar
                     </button>
+                    
                     <button type="button" class="btn-reporte btn-generar" onclick="ReporteCompras.generarReporte()">
                         <span id="btnGenerarTexto">Generar Reporte</span>
                         <span id="btnGenerarLoading" class="hidden">
@@ -368,5 +427,62 @@
             </div>
         </div>
     </main>
+
+    <script>
+        // JavaScript para manejar la lógica condicional
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar si viene del modal con reporteId
+            const urlParams = new URLSearchParams(window.location.search);
+            const fromModalParam = urlParams.get('fromModal');
+            const reporteIdParam = urlParams.get('reporteId');
+            
+            console.log('Parámetros URL:', { fromModalParam, reporteIdParam });
+            console.log('Variables Thymeleaf:', { fromModal: window.fromModal, reporteId: window.reporteId });
+            
+            // Usar variables Thymeleaf o parámetros URL
+            const isFromModal = window.fromModal || fromModalParam === 'true';
+            const hasReporteId = window.reporteId || reporteIdParam;
+            
+            console.log('Resultado:', { isFromModal, hasReporteId });
+            
+            if (isFromModal && hasReporteId) {
+                // Mostrar mensaje de reporte creado
+                const mensajeDiv = document.getElementById('mensajeReporteCreado');
+                if (mensajeDiv) {
+                    mensajeDiv.style.display = 'block';
+                }
+                
+                // Cambiar texto del botón
+                const btnGenerarTexto = document.getElementById('btnGenerarTexto');
+                if (btnGenerarTexto) {
+                    btnGenerarTexto.textContent = 'Actualizar Reporte';
+                }
+            }
+            
+            // Configurar fechas por defecto si están vacías
+            const fechaInicioInput = document.querySelector('input[name="fechaInicio"]');
+            const fechaFinInput = document.querySelector('input[name="fechaFin"]');
+            
+            const hoy = new Date();
+            const hace30Dias = new Date();
+            hace30Dias.setDate(hoy.getDate() - 30);
+            
+            // Función para formatear fecha como YYYY-MM-DD
+            function formatDate(date) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+            
+            if (fechaInicioInput && !fechaInicioInput.value) {
+                fechaInicioInput.value = formatDate(hace30Dias);
+            }
+            
+            if (fechaFinInput && !fechaFinInput.value) {
+                fechaFinInput.value = formatDate(hoy);
+            }
+        });
+    </script>
 </body>
 </html>

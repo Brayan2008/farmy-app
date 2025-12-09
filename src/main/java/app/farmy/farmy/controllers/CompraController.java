@@ -1,8 +1,10 @@
 package app.farmy.farmy.controllers;
 
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -17,18 +19,25 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 //import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.http.HttpStatus;
 
 import app.farmy.farmy.model.Compra;
 import app.farmy.farmy.model.Proveedor;
+import app.farmy.farmy.model.Reporte;
 import app.farmy.farmy.model.EstadoPago;
 import app.farmy.farmy.model.Lote;
 import app.farmy.farmy.model.TipoCompra;
 import app.farmy.farmy.repository.CompraRepository;
 import app.farmy.farmy.repository.ProveedorRepository;
+<<<<<<< Updated upstream
 import app.farmy.farmy.security.FarmySesion;
 import jakarta.servlet.http.HttpSession;
+=======
+import app.farmy.farmy.repository.ReporteRepository;
+//import jakarta.servlet.http.HttpServletRequest;
+>>>>>>> Stashed changes
 import app.farmy.farmy.repository.ProductosRepository;
 import app.farmy.farmy.repository.LoteRepository;
 import app.farmy.farmy.model.PagoCompra;
@@ -59,6 +68,9 @@ public class CompraController implements FarmySesion {
 
     @Autowired
     private PagoCompraRepository pagoCompraRepository;
+
+    @Autowired
+    private ReporteRepository reporteRepository; 
 
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -253,30 +265,32 @@ public class CompraController implements FarmySesion {
 
     @GetMapping("/reportes")
     public String reporteCompras(
-            @RequestParam(required = false) String fechaInicio,
-            @RequestParam(required = false) String horaInicio,
-            @RequestParam(required = false) String fechaFin,
-            @RequestParam(required = false) String horaFin,
-            @RequestParam(required = false) String numeroFactura,
-            @RequestParam(required = false) String rucProveedor,
-            @RequestParam(required = false) String razonSocial,
-            @RequestParam(required = false) Boolean tipoContado,
-            @RequestParam(required = false) Boolean tipoCredito,
-            @RequestParam(required = false) String estadoCompra,
-            @RequestParam(required = false) Double totalMinimo,
-            @RequestParam(required = false) Double totalMaximo,
-            @RequestParam(required = false) String ordenarPor,
-            @RequestParam(required = false) String orden,
-            // Nuevos parámetros del modal
-            @RequestParam(required = false) Boolean fromModal,
-            @RequestParam(required = false) String nombre,
-            @RequestParam(required = false) String tipo,
-            @RequestParam(required = false) String formato,
-            @RequestParam(required = false) String periodo,
-            @RequestParam(required = false) String estado,
-            @RequestParam(required = false) String fechaDesde,
-            @RequestParam(required = false) String fechaHasta,
-            Model model) {
+        @RequestParam(required = false) String fechaInicio,
+        @RequestParam(required = false) String horaInicio,
+        @RequestParam(required = false) String fechaFin,
+        @RequestParam(required = false) String horaFin,
+        @RequestParam(required = false) String numeroFactura,
+        @RequestParam(required = false) String rucProveedor,
+        @RequestParam(required = false) String razonSocial,
+        @RequestParam(required = false) Boolean tipoContado,
+        @RequestParam(required = false) Boolean tipoCredito,
+        @RequestParam(required = false) String estadoCompra,
+        @RequestParam(required = false) Double totalMinimo,
+        @RequestParam(required = false) Double totalMaximo,
+        @RequestParam(required = false) String ordenarPor,
+        @RequestParam(required = false) String orden,
+        // Parámetros del modal
+        @RequestParam(required = false) Boolean fromModal,
+        @RequestParam(required = false) String nombre,
+        @RequestParam(required = false) String tipo,
+        @RequestParam(required = false) String formato,
+        @RequestParam(required = false) String periodo,
+        @RequestParam(required = false) String estado,
+        @RequestParam(required = false) String fechaDesde,
+        @RequestParam(required = false) String fechaHasta,
+        @RequestParam(required = false) String descripcion,
+        @RequestParam(required = false) Long reporteId,  // <-- Este es importante
+        Model model) {
         
         // Hacer copias locales de las variables para usar en el lambda
         final String fechaInicioFinal = fechaInicio;
@@ -291,7 +305,7 @@ public class CompraController implements FarmySesion {
         final String estadoCompraFinal = estadoCompra;
         final Double totalMinimoFinal = totalMinimo;
         final Double totalMaximoFinal = totalMaximo;
-        
+
         // Establecer fechas desde el modal si vienen de allí
         if (fromModal != null && fromModal) {
             if (fechaInicioFinal == null && fechaDesde != null) {
@@ -315,6 +329,27 @@ public class CompraController implements FarmySesion {
             
             model.addAttribute("reporteData", reporteData);
             model.addAttribute("fromModal", true);
+        }
+
+        // Si viene con reporteId, mostrarlo en logs
+        if (reporteId != null) {
+            System.out.println("=== CARGANDO REPORTE EXISTENTE ===");
+            System.out.println("Reporte ID: " + reporteId);
+            System.out.println("Nombre: " + nombre);
+            System.out.println("Tipo: " + tipo);
+            System.out.println("Desde modal: " + fromModal);
+            
+            // Pasar el reporteId al modelo
+            model.addAttribute("reporteId", reporteId);
+            
+            // También cargar el reporte desde la BD para verificar
+            Optional<Reporte> reporteExistente = reporteRepository.findById(reporteId);
+            if (reporteExistente.isPresent()) {
+                System.out.println("Reporte encontrado: " + reporteExistente.get().getNombre());
+                model.addAttribute("nombre", reporteExistente.get().getNombre());
+                model.addAttribute("formato", reporteExistente.get().getFormato());
+                model.addAttribute("descripcion", reporteExistente.get().getDescripcion());
+            }
         }
         
         // Obtener todas las compras
@@ -468,5 +503,102 @@ public class CompraController implements FarmySesion {
         model.addAttribute("orden", orden != null ? orden : "desc");
         
         return "home/reportes/reporte_compras";
+    }
+
+    @PostMapping("/reportes/generar")
+    public String generarReporteSimple(
+        @RequestParam(required = false) String nombreReporte,
+        @RequestParam(required = false) String tipoReporte,
+        @RequestParam(required = false) String formato,
+        @RequestParam(required = false) String descripcion,
+        @RequestParam(required = false) String fechaInicio,
+        @RequestParam(required = false) String horaInicio,
+        @RequestParam(required = false) String fechaFin,
+        @RequestParam(required = false) String horaFin,
+        @RequestParam(required = false) Integer totalRegistros,
+        @RequestParam(required = false) Long reporteId,  // ← AÑADIR este parámetro
+        RedirectAttributes redirectAttributes) {
+        
+        System.out.println("=== GENERANDO REPORTE ===");
+        System.out.println("Nombre: " + (nombreReporte != null ? nombreReporte : "(vacío)"));
+        System.out.println("Formato: " + (formato != null ? formato : "(vacío)"));
+        System.out.println("Reporte ID recibido: " + reporteId);
+        
+        // Si ya existe un reporteId, actualizar ese reporte en lugar de crear uno nuevo
+        if (reporteId != null && reporteId > 0) {
+            try {
+                Optional<Reporte> reporteExistente = reporteRepository.findById(reporteId);
+                if (reporteExistente.isPresent()) {
+                    Reporte reporte = reporteExistente.get();
+                    
+                    // Actualizar los datos del reporte existente
+                    if (nombreReporte != null && !nombreReporte.trim().isEmpty()) {
+                        reporte.setNombre(nombreReporte);
+                    }
+                    if (formato != null && !formato.trim().isEmpty()) {
+                        reporte.setFormato(formato);
+                    }
+                    if (descripcion != null) {
+                        reporte.setDescripcion(descripcion);
+                    }
+                    reporte.setEstado("generado");
+                    reporte.setFechaCompletado(LocalDateTime.now());
+                    if (totalRegistros != null) {
+                        reporte.setRegistrosProcesados(totalRegistros);
+                    }
+                    
+                    // Actualizar parámetros
+                    String parametros = "Período: " + fechaInicio + " " + horaInicio + 
+                                    " - " + fechaFin + " " + horaFin + "\n" +
+                                    "Registros: " + (totalRegistros != null ? totalRegistros : 0);
+                    reporte.setParametros(parametros);
+                    
+                    reporteRepository.save(reporte);
+                    System.out.println("Reporte actualizado ID: " + reporteId);
+                    
+                    redirectAttributes.addFlashAttribute("mensaje", "Reporte actualizado exitosamente");
+                    return "redirect:/reportes";
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        
+        // Si no hay reporteId, crear uno nuevo (flujo original)
+        if (nombreReporte == null || nombreReporte.trim().isEmpty()) {
+            nombreReporte = "Reporte de Compras " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        }
+        
+        if (formato == null || formato.trim().isEmpty()) {
+            formato = "pdf";
+        }
+        
+        if (totalRegistros == null) {
+            totalRegistros = 0;
+        }
+        
+        try {
+            String redirectUrl = "/reportes/guardar-desde-compras?" +
+                            "nombre=" + URLEncoder.encode(nombreReporte, "UTF-8") +
+                            "&tipo=" + (tipoReporte != null ? tipoReporte : "compras") +
+                            "&formato=" + formato +
+                            "&fechaInicio=" + (fechaInicio != null ? fechaInicio : "") +
+                            "&horaInicio=" + (horaInicio != null ? horaInicio : "00:00") +
+                            "&fechaFin=" + (fechaFin != null ? fechaFin : "") +
+                            "&horaFin=" + (horaFin != null ? horaFin : "23:59") +
+                            "&totalRegistros=" + totalRegistros;
+            
+            if (descripcion != null && !descripcion.isEmpty()) {
+                redirectUrl += "&descripcion=" + URLEncoder.encode(descripcion, "UTF-8");
+            }
+            
+            System.out.println("Redirigiendo a: " + redirectUrl);
+            return "redirect:" + redirectUrl;
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", "Error al generar reporte: " + e.getMessage());
+            return "redirect:/compras/reportes";
+        }
     }
 }

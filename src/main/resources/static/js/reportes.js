@@ -36,8 +36,7 @@ const Reportes = (function() {
         if (form) {
             // Prevenir envío por defecto
             form.onsubmit = function(e) {
-                e.preventDefault();
-                generarReporte();
+                return validarFormulario();
             };
             
             // Configurar tipo de reporte inicial
@@ -172,7 +171,7 @@ const Reportes = (function() {
         // Cambiar texto del botón según tipo de reporte
     function cambiarTipoReporte() {
         const tipo = document.getElementById('tipoReporte');
-        const botonGenerar = document.querySelector('.btn-registrar');
+        const botonGenerar = document.getElementById('btnGenerarReporte'); // Cambia a ID específico
         
         if (tipo && botonGenerar) {
             if (tipo.value === 'ventas') {
@@ -182,70 +181,30 @@ const Reportes = (function() {
                 botonGenerar.textContent = 'Continuar a Compras';
                 botonGenerar.title = 'Ir a la página de filtros de compras para personalizar el reporte';
             } else {
-                botonGenerar.textContent = 'Generar Reporte';
-                botonGenerar.title = 'Generar reporte directamente';
+                botonGenerar.textContent = 'Crear Reporte';
+                botonGenerar.title = 'Crear reporte directamente';
             }
         }
     }
     
-    // Generar reporte
     function generarReporte() {
-        const tipoReporte = document.getElementById('tipoReporte').value;
-        const form = document.getElementById('formNuevoReporte');
-        
-        // Validar formulario
-        if (!validarFormulario()) {
-            return;
-        }
-        
-        // Si es tipo ventas, redirigir a reporte de ventas
-        if (tipoReporte === 'ventas') {
-            // Crear URL con parámetros
-            const formData = new FormData(form);
-            const params = new URLSearchParams();
-            
-            // Agregar todos los parámetros
-            for (let [key, value] of formData.entries()) {
-                params.append(key, value);
-            }
-            
-            // Agregar flag para identificar que viene del modal
-            params.append('fromModal', 'true');
-            
-            // Redirigir a ventas/reportes
-            window.location.href = '/ventas/reportes?' + params.toString();
-        } 
-        // Si es tipo compras, redirigir a reporte de compras
-        else if (tipoReporte === 'compras') {
-            // Crear URL con parámetros
-            const formData = new FormData(form);
-            const params = new URLSearchParams();
-            
-            // Agregar todos los parámetros
-            for (let [key, value] of formData.entries()) {
-                params.append(key, value);
-            }
-            
-            // Agregar flag para identificar que viene del modal
-            params.append('fromModal', 'true');
-            
-            // Redirigir a compras/reportes
-            window.location.href = '/compras/reportes?' + params.toString();
-        }
-        else {
-            // Para otros tipos, enviar formulario normalmente
-            form.action = '/reportes/guardar';
-            form.submit();
-        }
+        // Solo validar y dejar que el formulario se envíe normalmente
+        return validarFormulario();
     }
     
-    // Validar formulario
     function validarFormulario() {
         const nombre = document.getElementById('nombreReporte').value;
         const tipo = document.getElementById('tipoReporte').value;
         const formato = document.getElementById('formato').value;
         const fechaDesde = document.getElementById('fechaDesde').value;
         const fechaHasta = document.getElementById('fechaHasta').value;
+        
+        console.log("Validando formulario:");
+        console.log("- Nombre:", nombre);
+        console.log("- Tipo:", tipo);
+        console.log("- Formato:", formato);
+        console.log("- Fecha Desde:", fechaDesde);
+        console.log("- Fecha Hasta:", fechaHasta);
         
         if (!nombre || !tipo || !formato || !fechaDesde || !fechaHasta) {
             mostrarMensajeError('Por favor complete todos los campos requeridos (*)');
@@ -261,8 +220,10 @@ const Reportes = (function() {
             return false;
         }
         
+        console.log("Formulario válido, enviando...");
         return true;
     }
+
     
     // Filtrar reportes por tipo y estado
     function filtrarReportes() {
@@ -574,3 +535,37 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Exportar para uso global
 window.Reportes = Reportes;
+
+// Diagnóstico
+function diagnosticar() {
+    console.log('=== DIAGNÓSTICO REPORTES ===');
+    
+    const modal = document.getElementById('modalReporte');
+    const botonNuevo = document.querySelector('.btn-nuevo');
+    const form = document.getElementById('formNuevoReporte');
+    
+    console.log('1. Modal encontrado:', !!modal);
+    console.log('2. Botón "Nuevo Reporte" encontrado:', !!botonNuevo);
+    console.log('3. Formulario encontrado:', !!form);
+    
+    if (modal) {
+        console.log('   - Estilo display:', modal.style.display);
+        console.log('   - Clases:', modal.className);
+        console.log('   - CSS computed display:', window.getComputedStyle(modal).display);
+    }
+    
+    if (botonNuevo) {
+        console.log('   - HTML:', botonNuevo.outerHTML);
+        console.log('   - Onclick:', botonNuevo.getAttribute('onclick'));
+    }
+}
+
+// Al final de init(), llama al diagnóstico:
+function init() {
+    console.log('Sistema de Reportes inicializado');
+    
+    // ... resto del código de init ...
+    
+    // Diagnóstico
+    diagnosticar();
+}

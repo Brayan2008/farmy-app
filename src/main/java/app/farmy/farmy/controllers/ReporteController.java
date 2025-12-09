@@ -5,14 +5,21 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import app.farmy.farmy.model.Reporte;
+import app.farmy.farmy.model.Compra;
+import app.farmy.farmy.model.EstadoPago;
 import app.farmy.farmy.repository.ReporteRepository;
+import app.farmy.farmy.repository.CompraRepository;
+import jakarta.servlet.http.HttpServletRequest;
 
-//import java.time.LocalDate;
 import java.time.LocalDateTime;
-//import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
+import java.math.BigDecimal;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 @Controller
 @RequestMapping("/reportes")
@@ -20,6 +27,9 @@ public class ReporteController {
     
     @Autowired
     private ReporteRepository reporteRepository;
+    
+    @Autowired
+    private CompraRepository compraRepository;
     
     @GetMapping
     public String listarReportes(Model model) {
@@ -31,69 +41,130 @@ public class ReporteController {
     
     @PostMapping("/crear")
     public String crearReporte(
-            @RequestParam String nombre,
-            @RequestParam String tipo,
-            @RequestParam String formato,
-            @RequestParam String periodo,
-            @RequestParam String estado,
-            @RequestParam String fechaDesde,
-            @RequestParam String fechaHasta,
-            @RequestParam(required = false) String descripcion,
-            Model model) {
+        @RequestParam String nombre,
+        @RequestParam String tipo,
+        @RequestParam String formato,
+        @RequestParam String periodo,
+        @RequestParam String estado,
+        @RequestParam String fechaDesde,
+        @RequestParam String fechaHasta,
+        @RequestParam(required = false) String descripcion,
+        HttpServletRequest request) {
+
+        System.out.println("=== CREANDO NUEVO REPORTE DESDE MODAL ===");
+        System.out.println("Nombre: " + nombre);
+        System.out.println("Tipo: " + tipo);
+        System.out.println("Formato: " + formato);
+        System.out.println("Periodo: " + periodo);
         
-        // Guardar los parámetros del reporte en la sesión
-        Map<String, String> reporteData = new HashMap<>();
-        reporteData.put("nombre", nombre);
-        reporteData.put("tipo", tipo);
-        reporteData.put("formato", formato);
-        reporteData.put("periodo", periodo);
-        reporteData.put("estado", estado);
-        reporteData.put("fechaDesde", fechaDesde);
-        reporteData.put("fechaHasta", fechaHasta);
-        reporteData.put("descripcion", descripcion != null ? descripcion : "");
-        reporteData.put("fechaCreacion", LocalDateTime.now().toString());
+        Reporte reporte = new Reporte();
+        reporte.setNombre(nombre);
+        reporte.setTipo(tipo);
+        reporte.setFormato(formato);
+        reporte.setEstado("proceso");
+        reporte.setFechaGeneracion(LocalDateTime.now());
         
-        // Redirigir según el tipo de reporte
+        long siguienteNumero = reporteRepository.count() + 1;
+        reporte.setCodigo("RPT" + String.format("%03d", siguienteNumero));
+        
+        reporte.setDescripcion(descripcion);
+        
+        String parametros = "Período: " + periodo + "\n" +
+                        "Fechas: " + fechaDesde + " - " + fechaHasta + "\n" +
+                        "Estado inicial: " + estado;
+        reporte.setParametros(parametros);
+        
+        Reporte reporteGuardado = reporteRepository.save(reporte);
+        System.out.println("Reporte guardado ID: " + reporteGuardado.getId());
+        System.out.println("Reporte código: " + reporteGuardado.getCodigo());
+        
         if ("ventas".equals(tipo)) {
-            model.addAttribute("reporteData", reporteData);
             return "redirect:/ventas/reportes?fromModal=true&nombre=" + nombre 
-                   + "&tipo=" + tipo + "&formato=" + formato 
-                   + "&periodo=" + periodo + "&estado=" + estado
-                   + "&fechaDesde=" + fechaDesde + "&fechaHasta=" + fechaHasta;
+                + "&tipo=" + tipo + "&formato=" + formato 
+                + "&periodo=" + periodo + "&estado=proceso"
+                + "&fechaDesde=" + fechaDesde + "&fechaHasta=" + fechaHasta
+                + "&reporteId=" + reporteGuardado.getId();
         } else if ("compras".equals(tipo)) {
-            // Redirigir a compras/reportes cuando el tipo es "compras"
-            model.addAttribute("reporteData", reporteData);
             return "redirect:/compras/reportes?fromModal=true&nombre=" + nombre 
-                   + "&tipo=" + tipo + "&formato=" + formato 
-                   + "&periodo=" + periodo + "&estado=" + estado
-                   + "&fechaDesde=" + fechaDesde + "&fechaHasta=" + fechaHasta;
+                + "&tipo=" + tipo + "&formato=" + formato 
+                + "&periodo=" + periodo + "&estado=proceso"
+                + "&fechaDesde=" + fechaDesde + "&fechaHasta=" + fechaHasta
+                + "&reporteId=" + reporteGuardado.getId();
         } else {
-            // Para otros tipos, crear el reporte directamente
-            Reporte reporte = new Reporte();
-            reporte.setNombre(nombre);
-            reporte.setTipo(tipo);
-            reporte.setFormato(formato);
-            reporte.setEstado("proceso");
-            reporte.setFechaGeneracion(null); // No se genera aún
-            reporte.setCodigo("RPT" + String.format("%03d", reporteRepository.count() + 1));
-            reporte.setDescripcion(descripcion);
-            
-            reporteRepository.save(reporte);
             return "redirect:/reportes";
         }
     }
     
+    @GetMapping("/ver/{codigo}")
+    public String verReporteDetalles(@PathVariable String codigo, Model model) {
+        Reporte reporte = reporteRepository.findByCodigo(codigo);
+        
+        if (reporte == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Reporte no encontrado");
+        }
+        
+        model.addAttribute("reporte", reporte);
+        
+        BigDecimal totalGeneral = BigDecimal.ZERO;
+        BigDecimal totalPendiente = BigDecimal.ZERO;
+        BigDecimal totalPagado = BigDecimal.ZERO;
+        List<Compra> comprasMostrar = null;
+        
+        if ("compras".equals(reporte.getTipo())) {
+            // Por ahora, mostrar todas las compras
+            comprasMostrar = compraRepository.findAll();
+            model.addAttribute("compras", comprasMostrar);
+            model.addAttribute("tipoDatos", "compras");
+            
+            // Calcular totales
+            for (Compra compra : comprasMostrar) {
+                if (compra.getTotal() != null) {
+                    totalGeneral = totalGeneral.add(compra.getTotal());
+                    
+                    if (compra.getEstadoPago() != null) {
+                        if (compra.getEstadoPago() == EstadoPago.PENDIENTE) {
+                            totalPendiente = totalPendiente.add(compra.getTotal());
+                        } else if (compra.getEstadoPago() == EstadoPago.PAGADO) {
+                            totalPagado = totalPagado.add(compra.getTotal());
+                        }
+                    }
+                }
+            }
+        } else if ("ventas".equals(reporte.getTipo())) {
+            model.addAttribute("tipoDatos", "ventas");
+            // TODO: Implementar para ventas
+        } else {
+            model.addAttribute("tipoDatos", "otro");
+        }
+        
+        // Pasar totales al modelo
+        model.addAttribute("totalGeneral", totalGeneral);
+        model.addAttribute("totalPendiente", totalPendiente);
+        model.addAttribute("totalPagado", totalPagado);
+        
+        // Parsear parámetros para mostrar en la vista
+        if (reporte.getParametros() != null && !reporte.getParametros().isEmpty()) {
+            Map<String, String> parametrosMap = new HashMap<>();
+            String[] lineas = reporte.getParametros().split("\n");
+            for (String linea : lineas) {
+                String[] partes = linea.split(":", 2);
+                if (partes.length == 2) {
+                    parametrosMap.put(partes[0].trim(), partes[1].trim());
+                }
+            }
+            model.addAttribute("parametros", parametrosMap);
+        }
+        
+        return "home/reportes/detalle_reporte";
+    }
+    
     @PostMapping("/guardar")
     public String guardarReporte(@ModelAttribute Reporte reporte) {
-        // Generar código único
         reporte.setCodigo("RPT" + String.format("%03d", reporteRepository.count() + 1));
         reporte.setFechaGeneracion(LocalDateTime.now());
-        reporte.setEstado("proceso"); // Cambiar a "generado" cuando se complete
+        reporte.setEstado("proceso");
         
         reporteRepository.save(reporte);
-        
-        // Aquí se podría iniciar la generación del reporte en segundo plano
-        // generarReporteEnSegundoPlano(reporte);
         
         return "redirect:/reportes";
     }
@@ -127,11 +198,9 @@ public class ReporteController {
         reporte.setFechaCompletado(LocalDateTime.now());
         reporte.setRegistrosProcesados(totalRegistros);
         
-        // Generar código único
         long siguienteNumero = reporteRepository.count() + 1;
         reporte.setCodigo("RPT" + String.format("%03d", siguienteNumero));
         
-        // Guardar parámetros del filtro
         StringBuilder parametros = new StringBuilder();
         parametros.append("Período: ").append(fechaInicio).append(" ").append(horaInicio)
                   .append(" - ").append(fechaFin).append(" ").append(horaFin).append("\n");
@@ -167,79 +236,71 @@ public class ReporteController {
     
     @GetMapping("/descargar/{codigo}")
     public String descargarReporte(@PathVariable String codigo) {
-        // Aquí implementar la lógica para descargar el archivo
-        // Por ahora solo redirige
         return "redirect:/reportes";
     }
 
     @PostMapping("/guardar-desde-compras")
     public String guardarReporteDesdeCompras(
             @RequestParam String nombre,
+            @RequestParam String tipo,
             @RequestParam String formato,
             @RequestParam(required = false) String descripcion,
-            @RequestParam String tipo,
             @RequestParam String fechaInicio,
             @RequestParam String horaInicio,
             @RequestParam String fechaFin,
             @RequestParam String horaFin,
-            @RequestParam(required = false) String numeroFactura,
-            @RequestParam(required = false) String rucProveedor,
-            @RequestParam(required = false) String razonSocial,
-            @RequestParam(required = false) Boolean tipoContado,
-            @RequestParam(required = false) Boolean tipoCredito,
-            @RequestParam(required = false) String estadoCompra,
-            @RequestParam(required = false) Double totalMinimo,
-            @RequestParam(required = false) Double totalMaximo,
             @RequestParam int totalRegistros) {
+        
+        System.out.println("=== GUARDANDO REPORTE DESDE COMPRAS ===");
+        System.out.println("Nombre recibido: " + nombre);
+        
+        if (nombre == null || nombre.trim().isEmpty()) {
+            nombre = "Reporte de Compras " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm"));
+        }
+        
+        if (formato == null || formato.trim().isEmpty()) {
+            formato = "pdf";
+        }
+        
+        System.out.println("Nombre final: " + nombre);
         
         Reporte reporte = new Reporte();
         reporte.setNombre(nombre);
-        reporte.setTipo(tipo);
+        reporte.setTipo(tipo != null ? tipo : "compras");
         reporte.setFormato(formato);
         reporte.setDescripcion(descripcion);
-        reporte.setEstado("generado");
+        reporte.setEstado("proceso");
         reporte.setFechaGeneracion(LocalDateTime.now());
-        reporte.setFechaCompletado(LocalDateTime.now());
+        reporte.setFechaCompletado(null);
         reporte.setRegistrosProcesados(totalRegistros);
         
-        // Generar código único
-        long siguienteNumero = reporteRepository.count() + 1;
-        reporte.setCodigo("RPT" + String.format("%03d", siguienteNumero));
+        long count = reporteRepository.count() + 1;
+        reporte.setCodigo("RPT" + String.format("%03d", count));
         
-        // Guardar parámetros del filtro
-        StringBuilder parametros = new StringBuilder();
-        parametros.append("Período: ").append(fechaInicio).append(" ").append(horaInicio)
-                .append(" - ").append(fechaFin).append(" ").append(horaFin).append("\n");
-        if (numeroFactura != null && !numeroFactura.isEmpty()) {
-            parametros.append("N° Factura: ").append(numeroFactura).append("\n");
-        }
-        if (rucProveedor != null && !rucProveedor.isEmpty()) {
-            parametros.append("RUC Proveedor: ").append(rucProveedor).append("\n");
-        }
-        if (razonSocial != null && !razonSocial.isEmpty()) {
-            parametros.append("Proveedor: ").append(razonSocial).append("\n");
-        }
-        if (tipoContado != null || tipoCredito != null) {
-            parametros.append("Tipos: ");
-            if (tipoContado != null && tipoContado) parametros.append("Contado ");
-            if (tipoCredito != null && tipoCredito) parametros.append("Crédito");
-            parametros.append("\n");
-        }
-        if (estadoCompra != null && !estadoCompra.isEmpty() && !estadoCompra.equals("todos")) {
-            parametros.append("Estado: ").append(estadoCompra).append("\n");
-        }
-        if (totalMinimo != null && totalMinimo > 0) {
-            parametros.append("Total Mínimo: S/ ").append(totalMinimo).append("\n");
-        }
-        if (totalMaximo != null && totalMaximo > 0) {
-            parametros.append("Total Máximo: S/ ").append(totalMaximo).append("\n");
-        }
-        parametros.append("Registros: ").append(totalRegistros);
-        
-        reporte.setParametros(parametros.toString());
+        String parametros = "Período: " + fechaInicio + " " + horaInicio + 
+                        " - " + fechaFin + " " + horaFin + "\n" +
+                        "Registros: " + totalRegistros;
+        reporte.setParametros(parametros);
         
         reporteRepository.save(reporte);
         
+        System.out.println("Reporte guardado: " + reporte.getCodigo() + " - " + reporte.getNombre());
         return "redirect:/reportes";
+    }
+
+    @GetMapping("/guardar-desde-compras")
+    public String guardarReporteDesdeComprasGet(
+            @RequestParam String nombre,
+            @RequestParam String tipo,
+            @RequestParam String formato,
+            @RequestParam(required = false) String descripcion,
+            @RequestParam String fechaInicio,
+            @RequestParam String horaInicio,
+            @RequestParam String fechaFin,
+            @RequestParam String horaFin,
+            @RequestParam int totalRegistros) {
+        
+        return guardarReporteDesdeCompras(nombre, tipo, formato, descripcion, 
+                                        fechaInicio, horaInicio, fechaFin, horaFin, totalRegistros);
     }
 }

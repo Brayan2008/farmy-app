@@ -266,6 +266,108 @@
     cursor: not-allowed;
 }
 
+/* Agrega al final de reporte_compras.css */
+
+/* Mensajes flotantes */
+.mensaje-compras {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    animation: slideInRight 0.3s ease;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Spinner para loading */
+.spinner-small {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(59, 130, 246, 0.3);
+    border-radius: 50%;
+    border-top-color: #3b82f6;
+    animation: spin 1s ease-in-out infinite;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Mejoras para filtros */
+.filtro-input:disabled {
+    background-color: #f3f4f6;
+    cursor: not-allowed;
+}
+
+.btn-filtro:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+}
+
+/* Estilos para tabla responsiva */
+@media (max-width: 768px) {
+    .reporte-table-container {
+        border: none;
+    }
+    
+    .reporte-table {
+        display: block;
+        overflow-x: auto;
+    }
+    
+    .reporte-table th,
+    .reporte-table td {
+        white-space: nowrap;
+    }
+}
+
+/* Corrección para checkboxes */
+.radio-group input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.radio-option label {
+    cursor: pointer;
+    user-select: none;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
     .filtro-grid {
