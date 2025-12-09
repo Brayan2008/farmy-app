@@ -10,5 +10,6 @@ package app.farmy.farmy.model;
 public enum EstadoPago {
     PAGADO,
     PENDIENTE,
-    ANULADO
+    ANULADO,
+    PEDIDO
 }

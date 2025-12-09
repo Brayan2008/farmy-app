@@ -8,5 +8,5 @@ public class UsuarioRegistroDTO {
     private String alias;
     private String email;
     private String password;
-    private Long farmaciaId; // Vital: Aquí vinculamos el usuario a la farmacia
+    private Long farmaciaId;
 }

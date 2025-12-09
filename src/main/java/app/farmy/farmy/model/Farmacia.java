@@ -29,6 +29,8 @@ public class Farmacia {
 
     private String direccion;
     private String telefono;
+
+    private String logoUrl;
     
     private Boolean estado = true; // true = Activo
 
@@ -64,4 +66,8 @@ public class Farmacia {
 
     @OneToMany(mappedBy = "farmacia")
     private final List<CajaRegistro> cajasRegistro = new ArrayList<>();
+
+    @OneToMany(mappedBy = "farmacia")
+    private final List<Ventas> ventas = new ArrayList<>();
+
 }

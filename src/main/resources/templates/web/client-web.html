@@ -1,0 +1,128 @@
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FarmaAhorro</title>
+<link rel="stylesheet" th:href="@{/css/webClient.css}">
+</head>
+
+<body>
+
+<div class="topbar">
+    <div class="container">
+        <div class="brand-row">
+            <div class="logo">
+                <img th:if="${farmacia != null and farmacia.logoUrl != null and !farmacia.logoUrl.isEmpty()}"
+                     th:src="@{'/uploads/' + ${farmacia.logoUrl}}" 
+                     alt="Logo Farmacia" 
+                     style="height: 50px; width: auto; margin-right: 10px; border-radius: 50%;">
+                
+                <img th:unless="${farmacia != null and farmacia.logoUrl != null and !farmacia.logoUrl.isEmpty()}"
+                     th:src="@{/img/menu-principal/profile.png}" 
+                     alt="Logo Default" 
+                     style="height: 50px; width: auto; margin-right: 10px; border-radius: 50%;">
+
+                <a th:href="@{'/tienda/' + ${idFarmacia} + '/home'}" class = "color">
+                    <div>
+                        <h1 th:text="${farmacia != null ? farmacia.nombreComercial : 'FarmaAhorro'}">FarmaAhorro</h1>
+                    </div>                    
+                </a>
+            </div>
+
+            <div class="search-row">
+                <div class="search" role="search" aria-label="Buscar productos en la farmacia">
+                    <input type="search" id="searchInput" placeholder="Buscar una marca o producto" aria-label="Buscar" onkeyup="filterProducts()" />
+                    <button aria-label="Buscar" onclick="filterProducts()">Buscar</button>
+                </div>
+
+                <div class="actions">                
+                </div>
+                    <button class="action-btn" aria-label="Carrito" id="cartBtn">
+                        🛒 Carrito (<span id="cartCount">0</span>)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<main>
+    <!-- Sección Catálogo -->
+    <section class="categoria">
+        <div class="container">
+            <div class = "alineado">
+                <h2>Catálogo de Productos</h2>
+            </div>
+            
+            <div class="productos" id="productsGrid">
+                <!-- Iterar sobre productos disponibles -->
+                <div th:each="lote : ${productos}" class="producto" 
+                     th:data-name="${lote.producto.nombreProducto.toLowerCase()}">
+                    
+                    <img th:if="${lote.producto.imgUrl != null and !lote.producto.imgUrl.isEmpty()}"
+                         th:src="@{'/uploads/' + ${lote.producto.imgUrl}}" alt="Producto">
+                    <img th:unless="${lote.producto.imgUrl != null and !lote.producto.imgUrl.isEmpty()}"
+                         th:src="@{/img/default.webp}" alt="Producto">
+                         
+                    <h3 th:text="${lote.producto.nombreProducto}">Nombre Producto</h3>
+                    <p>S/ <span th:text="${lote.precioVenta}">0.00</span></p>
+                    
+                    <a th:href="@{'/tienda/' + ${idFarmacia} + '/producto/' + ${lote.idLote}}" 
+                       style="display: block; text-decoration: none;">
+                        <button style="background: #3498db;">
+                            Ver Detalles
+                        </button>
+                    </a>
+                </div>
+                
+                <!-- Mensaje si no hay productos -->
+                <div th:if="${#lists.isEmpty(productos)}" style="grid-column: 1/-1; text-align: center; padding: 40px; color:black;">
+                    <p>No hay productos disponibles en este momento.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div id="overlay" class="overlay"></div>
+
+<div id="cartPanel" class="cart-panel">
+  <div class="cart-header">
+    <h3>🛒 Mi carrito</h3>
+    <button id="closeCart" aria-label="Cerrar carrito">✕</button>
+  </div>
+  <div class="cart-body" id="cartBody">
+    <div class="empty-cart" id="emptyCartMsg">
+      <img th:src="@{/img/web/Carrito.png}" alt="Carrito vacío">
+      <h4>Tu carrito está vacío</h4>
+      <p>Agrega productos y da el primer paso para iniciar tu compra.</p>
+    </div>
+    <div id="cartItemsList"></div>
+    <div id="cartTotalSection" style="display:none;">
+        <div class="cart-total">Total: S/ <span id="cartTotalValue">0.00</span></div>
+        <a th:href="@{'/tienda/' + ${idFarmacia} + '/checkout'}" class="btn-checkout">Proceder al Pago</a>
+    </div>
+  </div>
+</div>
+
+<div class="chat-widget">
+  <div class="chat-button" id="chatButton">
+    <img th:src="@{/img/web/asistente.png}" alt="Asistente" />
+    <span class="tooltip">¿En qué podemos ayudarte hoy?</span>
+  </div>
+
+  <div class="chat-options" id="chatOptions">
+    <a href="#" class="chat-option">📞 Call Center</a>
+    <a href="#" class="chat-option">💬 Pedir por WhatsApp</a>
+  </div>
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <p>&copy; 2025 FarmaAhorro - Todos los derechos reservados.</p>
+        <p>Contáctanos: <a href="mailto:atencion@farmaahorro.com">atencion@farmaahorro.com</a></p>
+    </div>
+</footer>
+
+<script th:src="@{/js/webClient.js}"></script>
+</body>
+</html>

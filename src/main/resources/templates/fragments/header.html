@@ -6,8 +6,8 @@
     </div>
     <div class="hidden sm:flex items-center gap-1 bg-transparent/40 px-4 py-2 rounded-xl">
         <div class="text-left">
-            <div class="font-bold text-sm md:font-black" th:text="'Celso Bardales'"></div>
-            <div class="text-xs md:text-sm" th:text="'Administrador'"></div>
+            <div class="font-bold text-sm md:font-black" th:text="${session.usuarioLogueado.nombreUsuario}"></div>
+            <div class="text-xs md:text-sm" th:text="${session.usuarioLogueado.rol.nombreRol}"></div>
         </div>
     </div>
 </header>

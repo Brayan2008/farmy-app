@@ -48,21 +48,37 @@
     <section id="sidebar"
         class="css-bg-sidebar flex flex-col pl-2 pr-2 h-dvh overflow-y-auto overflow-x-hidden css-scrollbar-none">
         <!-- User Info -->
-        <section class="flex-initial flex flex-row items-center justify-around pl-2 h-24 gap-1 max-w-52">
-            <img th:src="@{/img/menu-principal/profile.png}" alt="user-icon" class="size-12 rounded-2xl" />
-            <div class="flex flex-col justify-around p-5 h-24 text-white">
-                <h2 class="font-black text-lg">CERVAN CABRERA</h2>
-                <p class="font-semibold text-sm">Admin</p>
-            </div>
-            <div class="px-2 hidden text-black bg-white font-bold border-2 rounded-lg cursor-pointer" id="cerrar-boton"
-                onclick="cerrarSidebar()">
+        <section class="flex-initial flex flex-col items-center justify-around pl-2 h-32 md:h-28 gap-1 max-w-48">
+            <img th:if="${session.usuarioLogueado.farmacia.logoUrl != null}"
+                th:src="@{'/uploads/' + ${session.usuarioLogueado.farmacia.logoUrl}}" alt="user-icon"
+                class="mt-1.5 w-32 h-14 bg-cover rounded-2xl" />
+            <img th:unless="${session.usuarioLogueado.farmacia.logoUrl != null}"
+                th:src="@{/img/menu-principal/profile.png}" alt="user-icon"
+                class="mt-1.5 w-32 h-14 bg-cover rounded-2xl" />
+
+            <h2 class="font-black text-lg text-white px-5 py-1 h-24"
+                th:text="${session.usuarioLogueado.farmacia.nombreComercial.toUpperCase()}">CERVAN CABRERA</h2>
+            <div class="px-2 hidden text-black bg-white font-bold border-2 rounded-lg cursor-pointer"
+                id="cerrar-boton" onclick="cerrarSidebar()">
                 Ocultar
             </div>
+
         </section>
 
         <hr class="flex-initial mt-2" />
 
         <section class="flex-1 flex flex-col gap-1.5 pt-3 text-white font-semibold" id="sidebar-items">
+
+            <!-- Pagina web -->
+            <a th:if="${session.usuarioLogueado != null and session.usuarioLogueado.farmacia != null}"
+                th:href="@{'/tienda/' + ${session.usuarioLogueado.farmacia.id} + '/home'}"
+                class="my-1.5 css-bg-sidebar flex items-center justify-between pr-4 hover:bg-slate-950 rounded-xl cursor-pointer hover:scale-110 transition-transform">
+                <div class="p-4 pr-4 pt-2 pb-2 flex gap-5 items-center">
+                    <img th:src="@{/img/menu-principal/web-icon.svg}" alt="Web-icon" class="size-7" />
+                    <p>Ver página web</p>
+                </div>
+            </a>
+
             <!-- Dashboard -->
             <a th:href="@{/home}"
                 class="my-1.5 css-bg-sidebar flex items-center justify-between pr-4 hover:bg-slate-950 rounded-xl cursor-pointer hover:scale-110 transition-transform">
@@ -207,7 +223,7 @@
                     </a>
                 </ul>
             </details>
-            
+
             <!-- Inventario -->
             <a th:href="@{/inventario}"
                 class="my-1.5 css-bg-sidebar flex items-center justify-between pr-4 hover:bg-slate-950 rounded-xl cursor-pointer hover:scale-110 transition-transform">

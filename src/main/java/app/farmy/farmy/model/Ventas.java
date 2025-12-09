@@ -74,6 +74,10 @@ public class Ventas {
     @OneToMany(mappedBy = "venta")
     private final List<VentaPago> pagoVentas = new ArrayList<>();
 
+    @ManyToOne
+    @JoinColumn(name = "id_farmacia", foreignKey = @ForeignKey(name = "FK_Farmacia_Ventas"))
+    private Farmacia farmacia;
+
     @PrePersist
     public void preGuardado() {
         fechaVenta = LocalDateTime.now();

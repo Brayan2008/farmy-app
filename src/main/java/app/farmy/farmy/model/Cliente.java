@@ -52,6 +52,8 @@ public class Cliente {
 
     private String estado;
 
+    private String telefono;
+
     private LocalDate fechaRegistro;
 
     @OneToMany(mappedBy = "cliente")
