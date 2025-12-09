@@ -33,7 +33,10 @@ public class MarcaController implements FarmySesion{
     @GetMapping("/tabla_marcas")
     @ResponseBody
     public List<Marca> getmarcas(HttpSession session) {
-        return marcaRepository.findByFarmacia(getFarmaciaActual(session));
+        List<Marca> marcas;
+
+        marcas = marcaRepository.findByFarmacia(getFarmaciaActual(session));
+        return marcas;
     }
     
    @PostMapping("/add_marca")

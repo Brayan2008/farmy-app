@@ -1,4 +1,3 @@
-const API_URL = '/productos/tabla_marcas';
 
 let todasLasMarcas = [];
 
@@ -11,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // ✅ Obtener todas las tareas y llenar la tabla
 async function cargarMarcas() {
     try {
-        const response = await fetch(API_URL);
+        const response = await fetch('/productos/tabla_marcas');
         todasLasMarcas = await response.json();
         
         aplicarFiltros(); 

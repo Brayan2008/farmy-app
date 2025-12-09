@@ -3,6 +3,8 @@ package app.farmy.farmy.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ForeignKey;
@@ -10,7 +12,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -34,9 +35,6 @@ public class Marca {
     @Column(nullable = false)
     private Boolean estado;
     
-    @OneToMany(mappedBy = "marca")
-    private final List<Productos> listaProductos = new ArrayList<>();
-    
     public Marca (String nombre, String descripcion, Boolean estado){
         nombreMarca=nombre;
         this.descripcion=descripcion;
@@ -45,6 +43,7 @@ public class Marca {
 
     @ManyToOne
     @JoinColumn(name = "id_farmacia", foreignKey = @ForeignKey(name = "FK_Farmacia_Marca"))
+    @JsonIgnore
     private Farmacia farmacia;
 
 }
