@@ -31,13 +31,10 @@ import app.farmy.farmy.model.Lote;
 import app.farmy.farmy.model.TipoCompra;
 import app.farmy.farmy.repository.CompraRepository;
 import app.farmy.farmy.repository.ProveedorRepository;
-<<<<<<< Updated upstream
 import app.farmy.farmy.security.FarmySesion;
 import jakarta.servlet.http.HttpSession;
-=======
 import app.farmy.farmy.repository.ReporteRepository;
 //import jakarta.servlet.http.HttpServletRequest;
->>>>>>> Stashed changes
 import app.farmy.farmy.repository.ProductosRepository;
 import app.farmy.farmy.repository.LoteRepository;
 import app.farmy.farmy.model.PagoCompra;
