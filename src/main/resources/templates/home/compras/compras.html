@@ -30,14 +30,19 @@
                     <div class="filter-row">
                         <div class="filter-group">
                             <label>Estado:</label>
-                            <select>
-                                <option>Activo</option>
+                            <select id="filtroEstado" onchange="aplicarFiltros()">
+                                <option value="all">Todos</option>
+                                <option value="PENDIENTE">Pendiente</option>
+                                <option value="PAGADO">Pagado</option>
+                                <option value="ANULADO">Anulado</option>
                             </select>
                         </div>
                         <div class="filter-group">
                             <label>Tipo de Pago:</label>
-                            <select>
-                                <option>Activo</option>
+                            <select id="filtroTipo" onchange="aplicarFiltros()">
+                                <option value="all">Todos</option>
+                                <option value="CONTADO">Contado</option>
+                                <option value="CREDITO">Crédito</option>
                             </select>
                         </div>
                     </div>

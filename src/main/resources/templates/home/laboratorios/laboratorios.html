@@ -30,9 +30,10 @@
                     <div class="filter-row">
                         <div class="filter-group">
                             <label>Estado:</label>
-                            <select>
-                                <option>Activo</option>
-                                <option>Inactivo</option>
+                            <select id="filtroEstado" onchange="aplicarFiltros()">
+                                <option value="all">Todos</option>
+                                <option value="true">Activo</option>
+                                <option value="false">Inactivo</option>
                             </select>
                         </div>
                     </div>
