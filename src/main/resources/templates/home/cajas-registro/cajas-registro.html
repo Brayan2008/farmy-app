@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cajas Registro</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <link rel="stylesheet" th:href="@{/css/marcas.css}">
+    <script th:src="@{/script.js}"></script>
+</head>
+
+<body>
+    <main id='main-content' class="flex h-screen">
+
+        <!-- #region sidebar-->
+        <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
+        <!-- #endregion -->
+        <div class="flex-1 h-full w-screen overflow-y-scroll overflow-x-hidden">
+
+            <div th:replace="~{fragments/header.html :: 
+                              header-info('Cajas Registro','Caja > Administrar Cajas Registro')}"></div>
+
+            <div class="container">
+
+                <div th:replace="~{fragments/search.html :: search-fragment('Cajas', 'Buscar cajas...')}"></div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Usuario Asignado</th>
+                            <th>Estado</th>
+                            <th>Fecha Creación</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="caja : ${listaCajas}">
+                            <td data-label="Código" th:text="${caja.codigo}"></td>
+                            <td data-label="Nombre" th:text="${caja.nombre}"></td>
+                            <td data-label="Descripción" th:text="${caja.descripcion ?: 'N/A'}"></td>
+                            <td data-label="Usuario Asignado">
+                                <span th:if="${caja.usuario != null}" th:text="${caja.usuario.nombreCompleto}"></span>
+                                <span th:unless="${caja.usuario != null}" class="text-gray-500">Sin asignar</span>
+                            </td>
+                            <td data-label="Estado">
+                                <span th:classappend="${caja.estado == 'Activo' ? 'activo' : 'inactivo'}" th:text="${caja.estado}"></span>
+                            </td>
+                            <td data-label="Fecha Creación" th:text="${caja.fechaCreacion}"></td>
+                            <td data-label="Acciones">
+                                <div class="acciones-group">
+                                    <form th:action="@{/cajas-registro/editar/{id}(id=${caja.idCajaRegistro})}" method="get">
+                                        <button class="btn-editar" type="submit">✏ Editar</button>
+                                    </form>
+                                    <form th:if="${caja.estado == 'Activo'}" 
+                                          th:action="@{/cajas-registro/deshabilitar/{id}(id=${caja.idCajaRegistro})}" 
+                                          method="post" 
+                                          style="display: inline;">
+                                        <button class="btn-eliminar" type="submit" 
+                                                onclick="return confirm('¿Está seguro de deshabilitar esta caja?')">Deshabilitar</button>
+                                    </form>
+                                    <form th:if="${caja.estado == 'Inactivo'}" 
+                                          th:action="@{/cajas-registro/habilitar/{id}(id=${caja.idCajaRegistro})}" 
+                                          method="post" 
+                                          style="display: inline;">
+                                        <button class="btn-nuevo" type="submit">Habilitar</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="botones-contenedor">
+                    <button class="btn-nuevo" onclick="registrar('modalCajaRegistro')">Nueva Caja</button>
+                </div>
+            </div>
+        </div>
+
+        <dialog id="modalCajaRegistro">
+            <div class="modal-header">
+                <h2>Registrar Caja</h2>
+            </div>
+
+            <form class="modal-body" th:object="${cajaRegistro}" th:action="@{/cajas-registro/save}" method="post">
+                <div class="form-grid">
+                    <div class="form-group form-group-full">
+                        <label for="nombre">Nombre</label>
+                        <input type="text" id="nombre" th:field="*{nombre}" class="form-input" placeholder="Caja Principal" required>
+                    </div>
+
+                    <div class="form-group form-group-full">
+                        <label for="descripcion">Descripción</label>
+                        <textarea id="descripcion" th:field="*{descripcion}" class="form-textarea" 
+                                  placeholder="Descripción de la caja (opcional)"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="usuarioId">Usuario Asignado (Opcional)</label>
+                        <select id="usuarioId" name="usuarioId" class="form-select">
+                            <option value="">-- Sin asignar --</option>
+                            <option th:each="usuario : ${usuarios}" 
+                                    th:value="${usuario.idUsuario}" 
+                                    th:text="${usuario.nombreCompleto + ' (' + usuario.nombreUsuario + ')'}"></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="estado">Estado</label>
+                        <select id="estado" th:field="*{estado}" class="form-select" required>
+                            <option value="Activo">Activo</option>
+                            <option value="Inactivo">Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancelar" onclick="(document.getElementById('modalCajaRegistro').close())">Cancelar</button>
+                    <button type="submit" class="btn-registrar">Registrar</button>
+                </div>
+            </form>
+        </dialog>
+
+    </main>
+
+</body>
+
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Caja Registro</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <link rel="stylesheet" th:href="@{/css/marcas.css}">
+    <script th:src="@{/script.js}"></script>
+</head>
+
+<body>
+    <main id='main-content' class="flex h-screen">
+
+        <!-- #region sidebar-->
+        <div th:replace="~{fragments/sidebar.html :: sidebar-fragment}"></div>
+        <!-- #endregion -->
+        <div class="flex-1 h-full overflow-y-scroll overflow-x-hidden">
+
+            <div th:replace="~{fragments/header.html :: 
+                              header-info('Editar Caja Registro','Caja > Administrar Cajas Registro > Editar')}"></div>
+
+            <div class="container">
+                <h1 class="text-xl font-black text-wrap my-2 sm:text-2xl">Editar Caja Registro</h1>
+
+                <form class="modal-body" th:object="${cajaRegistroEditar}" th:action="@{/cajas-registro/editar/{id}(id=${idCajaRegistro})}" method="post">
+                    <div class="form-grid">
+
+                        <div class="form-group">
+                            <label for="codigo">Código</label>
+                            <input type="text" id="codigo" th:field="*{codigo}" class="form-input" readonly>
+                            <small class="text-gray-500">El código se genera automáticamente</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="nombre">Nombre</label>
+                            <input type="text" id="nombre" th:field="*{nombre}" class="form-input" placeholder="Caja Principal" required>
+                        </div>
+
+                        <div class="form-group form-group-full">
+                            <label for="descripcion">Descripción</label>
+                            <textarea id="descripcion" th:field="*{descripcion}" class="form-textarea" 
+                                      placeholder="Descripción de la caja (opcional)"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="usuarioId">Usuario Asignado</label>
+                            <select id="usuarioId" name="usuarioId" class="form-select">
+                                <option value="">-- Sin asignar --</option>
+                                <option th:each="usuario : ${usuarios}" 
+                                        th:value="${usuario.idUsuario}" 
+                                        th:selected="${cajaRegistroEditar.usuario != null && cajaRegistroEditar.usuario.idUsuario == usuario.idUsuario}"
+                                        th:text="${usuario.nombreCompleto + ' (' + usuario.nombreUsuario + ')'}"></option>
+                            </select>
+                            <small class="text-gray-500">Puede dejar sin asignar o cambiar el usuario asignado</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="estado">Estado</label>
+                            <select id="estado" th:field="*{estado}" class="form-select" required>
+                                <option value="Activo">Activo</option>
+                                <option value="Inactivo">Inactivo</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <a th:href="@{/cajas-registro}" class="btn-cancelar">Cancelar</a>
+                        <button type="submit" class="btn-registrar">Actualizar</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+    </main>
+
+</body>
+
+</html>

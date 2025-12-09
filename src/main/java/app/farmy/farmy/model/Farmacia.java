@@ -61,4 +61,7 @@ public class Farmacia {
 
     @OneToMany(mappedBy = "farmacia")
     private final List<Caja> cajas = new ArrayList<>();
+
+    @OneToMany(mappedBy = "farmacia")
+    private final List<CajaRegistro> cajasRegistro = new ArrayList<>();
 }

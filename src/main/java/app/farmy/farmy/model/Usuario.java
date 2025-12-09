@@ -76,6 +76,9 @@ public class Usuario {
     @OneToMany(mappedBy = "usuario")
     private final List<Ventas> ventas = new ArrayList<>();
 
+    @OneToMany(mappedBy = "usuario")
+    private final List<CajaRegistro> cajasRegistro = new ArrayList<>();
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idFarmacia", foreignKey = @ForeignKey(name = "FK_Farmacia_Usuario"))
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
