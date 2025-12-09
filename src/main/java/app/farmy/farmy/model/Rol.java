@@ -42,7 +42,7 @@ public class Rol {
 
     private String estado;
 
-    @ManyToMany
+    @ManyToMany(fetch = jakarta.persistence.FetchType.EAGER)
     @JoinTable(name = "PermisosXRol", 
                joinColumns = @JoinColumn(name = "IdRol", foreignKey = @ForeignKey(name = "FK_Rol_PermisosXRol")), 
                inverseJoinColumns = @JoinColumn(name = "IdPermiso", foreignKey = @ForeignKey(name=" FK_Permiso_PermisosXRol")))

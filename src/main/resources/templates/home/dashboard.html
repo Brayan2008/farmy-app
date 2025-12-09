@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
@@ -30,9 +30,9 @@
                             <div class="card-title">Ventas del Día</div>
                         </div>
                         <div class="card-content">
-                            <div class="card-value">S/ 1,125.00</div>
-                            <div class="card-subtitle">4 transacciones</div>
-                            <span class="card-change positive">+15.3% vs ayer</span>
+                            <div class="card-value">S/ <span th:text="${totalVentasHoy}">0.00</span></div>
+                            <div class="card-subtitle"><span th:text="${numVentasHoy}">0</span> transacciones</div>
+                            <span class="card-change positive">Hoy</span>
                         </div>
                     </div>
 
@@ -42,9 +42,9 @@
                             <div class="card-title">Compras Pendientes</div>
                         </div>
                         <div class="card-content">
-                            <div class="card-value">S/ 8,370.00</div>
-                            <div class="card-subtitle">3 órdenes activas</div>
-                            <span class="card-change negative"> -5.2% vs mes anterior</span>
+                            <div class="card-value">S/ <span th:text="${totalComprasPendientes}">0.00</span></div>
+                            <div class="card-subtitle"><span th:text="${numComprasPendientes}">0</span> órdenes activas</div>
+                            <span class="card-change negative">Por pagar</span>
                         </div>
                     </div>
 
@@ -54,9 +54,9 @@
                             <div class="card-title">Saldo en Caja</div>
                         </div>
                         <div class="card-content">
-                            <div class="card-value">S/ 565.80</div>
+                            <div class="card-value">S/ <span th:text="${saldoCaja}">0.00</span></div>
                             <div class="card-subtitle">Balance actual</div>
-                            <span class="card-change positive">Ingresos: S/ 1,946.55</span>
+                            <span class="card-change positive">Ingresos: S/ <span th:text="${ingresosCaja}">0.00</span></span>
                         </div>
                     </div>
 
@@ -66,7 +66,7 @@
                             <div class="card-title">Productos Críticos</div>
                         </div>
                         <div class="card-content">
-                            <div class="card-value">12</div>
+                            <div class="card-value" th:text="${productosCriticos}">0</div>
                             <div class="card-subtitle">Bajo stock</div>
                             <span class="card-change negative"> Requieren atención</span>
                         </div>
@@ -93,32 +93,17 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td data-label="Código">PN001</td>
-                                    <td data-label="Cliente">Celso</td>
-                                    <td data-label="Vendedor">Gerardo 001</td>
-                                    <td data-label="Método de Pago">Efectivo</td>
-                                    <td data-label="Importe Total">S/ 80.00</td>
-                                    <td data-label="Estado"><span class="status-badge completado">Registrada</span></td>
-                                    <td data-label="Fecha">27/10/2025</td>
+                                <tr th:each="venta : ${ultimasVentas}">
+                                    <td data-label="Código" th:text="${venta.idVenta}">PN001</td>
+                                    <td data-label="Cliente" th:text="${venta.cliente != null ? venta.cliente.nombre : 'Cliente General'}">Celso</td>
+                                    <td data-label="Vendedor" th:text="${venta.usuario.nombreUsuario}">Gerardo 001</td>
+                                    <td data-label="Método de Pago" th:text="${venta.metodoPago.nombre}">Efectivo</td>
+                                    <td data-label="Importe Total" th:text="'S/ ' + ${venta.total}">S/ 80.00</td>
+                                    <td data-label="Estado"><span class="status-badge completado" th:text="${venta.estadoPago}">Registrada</span></td>
+                                    <td data-label="Fecha" th:text="${#temporals.format(venta.fechaVenta, 'dd/MM/yyyy HH:mm')}">27/10/2025</td>
                                 </tr>
-                                <tr>
-                                    <td data-label="Código">PN003</td>
-                                    <td data-label="Cliente">Missael</td>
-                                    <td data-label="Vendedor">Piña Reategui</td>
-                                    <td data-label="Método de Pago">Efectivo</td>
-                                    <td data-label="Importe Total">S/ 5.00</td>
-                                    <td data-label="Estado"><span class="status-badge completado">Registrada</span></td>
-                                    <td data-label="Fecha">27/10/2025</td>
-                                </tr>
-                                <tr>
-                                    <td data-label="Código">PN004</td>
-                                    <td data-label="Cliente">Fasanando</td>
-                                    <td data-label="Vendedor">Ronaldo Espinoza</td>
-                                    <td data-label="Método de Pago">Efectivo</td>
-                                    <td data-label="Importe Total">S/ 15.00</td>
-                                    <td data-label="Estado"><span class="status-badge completado">Registrada</span></td>
-                                    <td data-label="Fecha">27/10/2025</td>
+                                <tr th:if="${#lists.isEmpty(ultimasVentas)}">
+                                    <td colspan="7" style="text-align: center;">No hay ventas recientes.</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -144,29 +129,16 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td data-label="Código">CAJ001</td>
-                                    <td data-label="Tipo"> Ingreso</td>
-                                    <td data-label="Descripción">Venta de medicamentos - Factura #001</td>
-                                    <td data-label="Monto">S/ 850.00</td>
-                                    <td data-label="Estado"><span class="status-badge completado">Confirmado</span></td>
-                                    <td data-label="Fecha">27/10/2025</td>
+                                <tr th:each="mov : ${ultimosMovimientosCaja}">
+                                    <td data-label="Código" th:text="${mov.codigo}">CAJ001</td>
+                                    <td data-label="Tipo" th:text="${mov.tipo}"> Ingreso</td>
+                                    <td data-label="Descripción" th:text="${mov.descripcion}">Venta de medicamentos</td>
+                                    <td data-label="Monto" th:text="'S/ ' + ${mov.monto}">S/ 850.00</td>
+                                    <td data-label="Estado"><span class="status-badge completado" th:text="${mov.estado}">Confirmado</span></td>
+                                    <td data-label="Fecha" th:text="${mov.fecha} + ' ' + ${mov.hora}">27/10/2025</td>
                                 </tr>
-                                <tr>
-                                    <td data-label="Código">CAJ003</td>
-                                    <td data-label="Tipo"> Ingreso</td>
-                                    <td data-label="Descripción">Venta de medicamentos - Boleta #045</td>
-                                    <td data-label="Monto">S/ 325.50</td>
-                                    <td data-label="Estado"><span class="status-badge pendiente">⏳ Pendiente</span></td>
-                                    <td data-label="Fecha">27/10/2025</td>
-                                </tr>
-                                <tr>
-                                    <td data-label="Código">CAJ004</td>
-                                    <td data-label="Tipo"> Egreso</td>
-                                    <td data-label="Descripción">Gastos operativos - Servicios públicos</td>
-                                    <td data-label="Monto">S/ 180.75</td>
-                                    <td data-label="Estado"><span class="status-badge completado">Confirmado</span></td>
-                                    <td data-label="Fecha">27/10/2025</td>
+                                <tr th:if="${#lists.isEmpty(ultimosMovimientosCaja)}">
+                                    <td colspan="6" style="text-align: center;">No hay movimientos recientes.</td>
                                 </tr>
                             </tbody>
                         </table>
