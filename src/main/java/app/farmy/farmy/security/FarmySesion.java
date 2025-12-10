@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpSession;
 public interface FarmySesion {
     
     static final String FARMACIA_ACTUAL = "farmaciaActual";
-    static final String USUARIO_ACTUAL = "usuarioActual";
+    static final String USUARIO_ACTUAL = "usuarioLogueado";
 
     default Farmacia getFarmaciaActual(HttpSession session) {
         return (Farmacia) session.getAttribute(FARMACIA_ACTUAL);
