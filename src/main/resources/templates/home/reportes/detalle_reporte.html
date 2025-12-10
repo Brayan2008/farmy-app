@@ -6,6 +6,80 @@
     <title>Detalle del Reporte</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" th:href="@{/styles.css}">
+    <style>
+        /* Estilos para los estados y tipos */
+        .tipo-ventas, .tipo-compras {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .tipo-ventas {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        
+        .tipo-compras {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .estado-generado {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .estado-proceso {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .estado-error {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .tipo-contado {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .tipo-credito {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .estado-pagado {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .estado-pendiente {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .estado-anulado, .estado-anulada {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .estado-registrada, .estado-activa {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+    </style>
 </head>
 <body>
     <main id='main-content' class="flex h-dvh">
@@ -26,15 +100,15 @@
                                 <span th:text="${reporte.nombre}">Reporte de Compras</span>
                             </h1>
                             <div class="flex items-center gap-4 mt-2">
-                                <span th:class="${'tipo-' + reporte.tipo}">
+                                <span class="badge" th:class="${'tipo-' + reporte.tipo}">
                                     <span th:text="${#strings.capitalize(reporte.tipo)}">Compras</span>
                                 </span>
-                                <span th:class="${'estado-' + reporte.estado}">
+                                <span class="badge" th:class="${'estado-' + reporte.estado}">
                                     <span th:text="${reporte.estado == 'generado' ? 'Generado' : (reporte.estado == 'proceso' ? 'En Proceso' : 'Error')}">
                                         Generado
                                     </span>
                                 </span>
-                                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                                <span class="badge px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
                                     <span th:text="${reporte.formato}">PDF</span>
                                 </span>
                             </div>
@@ -89,119 +163,247 @@
                     </div>
                 </div>
                 
-                <!-- Datos del reporte según el tipo -->
-                <div th:if="${tipoDatos == 'compras' && compras != null && !compras.isEmpty()}" 
-                     class="bg-white rounded-lg shadow p-6">
+                <!-- DATOS DEL REPORTE SEGÚN EL TIPO -->
+                
+                <!-- Sección para reportes de COMPRAS -->
+                <div th:if="${tipoDatos == 'compras'}" class="bg-white rounded-lg shadow p-6 mb-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-4">Compras del Reporte</h3>
                     
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Código
-                                    </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Proveedor
-                                    </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        RUC
-                                    </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Tipo
-                                    </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Total (S/.)
-                                    </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Estado
-                                    </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Fecha
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <tr th:each="compra : ${compras}">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                        <span th:text="${compra.numeroFactura}">233</span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        <span th:text="${compra.proveedor != null ? compra.proveedor.razonSocial : '---'}">
-                                            Celso
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        <span th:text="${compra.proveedor != null ? compra.proveedor.ruc : '---'}">
-                                            1037483733
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        <span th:classappend="${compra.tipoCompra != null && compra.tipoCompra.name() == 'CREDITO'} ? 'tipo-credito' : 'tipo-contado'"
-                                              th:text="${compra.tipoCompra != null ? compra.tipoCompra.name() : '---'}">
-                                            Contado
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        S/. <span th:text="${compra.total != null ? #numbers.formatDecimal(compra.total, 0, 2) : '0.00'}">
-                                            1200.00
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                        <span th:class="${(compra.estadoPago != null && compra.estadoPago.name() == 'PAGADO') ? 
-                                                        'estado-pagado' : 
-                                                        ((compra.estadoPago != null && compra.estadoPago.name() == 'PENDIENTE') ? 
-                                                        'estado-pendiente' : 'estado-anulado')}"
-                                              th:text="${compra.estadoPago != null ? compra.estadoPago.name() : 
-                                                       (compra.estado != null ? compra.estado : '---')}">
-                                            Pagado
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        <span th:text="${compra.fechaFactura != null ? #temporals.format(compra.fechaFactura, 'dd/MM/yyyy HH:mm') : '---'}">
-                                            09/10/2025 12:40
-                                        </span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div th:if="${compras != null && !compras.isEmpty()}">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Código
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Proveedor
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            RUC
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Tipo
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Total (S/.)
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Estado
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Fecha
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <tr th:each="compra : ${compras}">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                            <span th:text="${compra.numeroFactura}">233</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <span th:text="${compra.proveedor != null ? compra.proveedor.razonSocial : '---'}">
+                                                Celso
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <span th:text="${compra.proveedor != null ? compra.proveedor.ruc : '---'}">
+                                                1037483733
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <span class="badge" 
+                                                  th:class="${compra.tipoCompra != null && compra.tipoCompra.name() == 'CREDITO'} ? 'tipo-credito' : 'tipo-contado'"
+                                                  th:text="${compra.tipoCompra != null ? compra.tipoCompra.name() : '---'}">
+                                                Contado
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            S/. <span th:text="${compra.total != null ? #numbers.formatDecimal(compra.total, 0, 2) : '0.00'}">
+                                                1200.00
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <span class="badge" 
+                                                  th:class="${(compra.estadoPago != null && compra.estadoPago.name() == 'PAGADO') ? 
+                                                              'estado-pagado' : 
+                                                              ((compra.estadoPago != null && compra.estadoPago.name() == 'PENDIENTE') ? 
+                                                              'estado-pendiente' : 'estado-anulado')}"
+                                                  th:text="${compra.estadoPago != null ? compra.estadoPago.name() : 
+                                                           (compra.estado != null ? compra.estado : '---')}">
+                                                Pagado
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <span th:text="${compra.fechaFactura != null ? #temporals.format(compra.fechaFactura, 'dd/MM/yyyy HH:mm') : '---'}">
+                                                09/10/2025 12:40
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Resumen de totales para compras -->
+                        <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
+                            <div class="text-center">
+                                <p class="text-sm text-gray-600 mb-1">Total General</p>
+                                <p class="text-xl font-bold text-blue-600">
+                                    S/. <span th:text="${totalGeneral != null ? #numbers.formatDecimal(totalGeneral, 0, 2) : '0.00'}">
+                                        0.00
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-sm text-gray-600 mb-1">Total Pendiente</p>
+                                <p class="text-xl font-bold text-yellow-600">
+                                    S/. <span th:text="${totalPendiente != null ? #numbers.formatDecimal(totalPendiente, 0, 2) : '0.00'}">
+                                        0.00
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-sm text-gray-600 mb-1">Total Pagado</p>
+                                <p class="text-xl font-bold text-green-600">
+                                    S/. <span th:text="${totalPagado != null ? #numbers.formatDecimal(totalPagado, 0, 2) : '0.00'}">
+                                        0.00
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
                     </div>
                     
-                    <!-- Resumen de totales - VERSIÓN CORREGIDA -->
-                    <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
-                        <div class="text-center">
-                            <p class="text-sm text-gray-600 mb-1">Total General</p>
-                            <p class="text-xl font-bold text-blue-600">
-                                S/. <span th:text="${totalGeneral != null ? #numbers.formatDecimal(totalGeneral, 0, 2) : '0.00'}">
-                                    0.00
-                                </span>
-                            </p>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-sm text-gray-600 mb-1">Total Pendiente</p>
-                            <p class="text-xl font-bold text-yellow-600">
-                                S/. <span th:text="${totalPendiente != null ? #numbers.formatDecimal(totalPendiente, 0, 2) : '0.00'}">
-                                    0.00
-                                </span>
-                            </p>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-sm text-gray-600 mb-1">Total Pagado</p>
-                            <p class="text-xl font-bold text-green-600">
-                                S/. <span th:text="${totalPagado != null ? #numbers.formatDecimal(totalPagado, 0, 2) : '0.00'}">
-                                    0.00
-                                </span>
-                            </p>
-                        </div>
+                    <div th:if="${compras == null || compras.isEmpty()}" 
+                         class="text-center py-8">
+                        <p class="text-lg font-medium text-gray-600 mb-1">No hay datos de compras</p>
+                        <p class="text-gray-500">Este reporte no contiene compras o los datos no están disponibles</p>
                     </div>
                 </div>
                 
-                <!-- Mensaje si no hay datos -->
-                <div th:if="${tipoDatos == 'compras' && (compras == null || compras.isEmpty())}" 
-                     class="bg-white rounded-lg shadow p-6">
+                <!-- Sección para reportes de VENTAS -->
+                <div th:if="${tipoDatos == 'ventas'}" class="bg-white rounded-lg shadow p-6 mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Ventas del Reporte</h3>
+                    
+                    <div th:if="${ventas != null && !ventas.isEmpty()}">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Código
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Cliente
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Documento
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Tipo Venta
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Total (S/.)
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Estado
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Fecha
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <tr th:each="venta : ${ventas}">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                            <span th:text="${venta.idVenta}">V001</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <span th:text="${venta.cliente != null ? venta.cliente.nombre + ' ' + venta.cliente.apellidos : 'Cliente no registrado'}">
+                                                Juan Pérez
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <span th:text="${venta.cliente != null ? 
+                                                           (venta.cliente.tipoDocumento != null ? venta.cliente.tipoDocumento.name() : '') + 
+                                                           ': ' + venta.cliente.numeroDocumento : '---'}">
+                                                DNI: 12345678
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <span class="badge" 
+                                                  th:class="${venta.tipoVenta != null && venta.tipoVenta.name() == 'CREDITO'} ? 
+                                                           'tipo-credito' : 'tipo-contado'"
+                                                  th:text="${venta.tipoVenta != null ? venta.tipoVenta.name() : '---'}">
+                                                Contado
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            S/. <span th:text="${venta.total != null ? #numbers.formatDecimal(venta.total, 0, 2) : '0.00'}">
+                                                150.00
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <span class="badge" 
+                                                  th:class="${venta.estado == 'Anulada' ? 'estado-anulada' : 
+                                                           (venta.estadoPago != null && venta.estadoPago.name() == 'PAGADO') ? 'estado-pagado' :
+                                                           (venta.estadoPago != null && venta.estadoPago.name() == 'PENDIENTE') ? 'estado-pendiente' : 'estado-activa'}"
+                                                  th:text="${venta.estado != null ? venta.estado : 
+                                                           (venta.estadoPago != null ? venta.estadoPago.name() : '---')}">
+                                                Registrada
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <span th:text="${venta.fechaVenta != null ? #temporals.format(venta.fechaVenta, 'dd/MM/yyyy HH:mm') : '---'}">
+                                                09/10/2025 10:30
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Resumen de totales para ventas -->
+                        <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
+                            <div class="text-center">
+                                <p class="text-sm text-gray-600 mb-1">Total General</p>
+                                <p class="text-xl font-bold text-blue-600">
+                                    S/. <span th:text="${totalGeneral != null ? #numbers.formatDecimal(totalGeneral, 0, 2) : '0.00'}">
+                                        0.00
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-sm text-gray-600 mb-1">Total Contado</p>
+                                <p class="text-xl font-bold text-green-600">
+                                    S/. <span th:text="${totalContado != null ? #numbers.formatDecimal(totalContado, 0, 2) : '0.00'}">
+                                        0.00
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-sm text-gray-600 mb-1">Total Crédito</p>
+                                <p class="text-xl font-bold text-yellow-600">
+                                    S/. <span th:text="${totalCredito != null ? #numbers.formatDecimal(totalCredito, 0, 2) : '0.00'}">
+                                        0.00
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div th:if="${ventas == null || ventas.isEmpty()}" 
+                         class="text-center py-8">
+                        <p class="text-lg font-medium text-gray-600 mb-1">No hay datos de ventas</p>
+                        <p class="text-gray-500">Este reporte no contiene ventas o los datos no están disponibles</p>
+                    </div>
+                </div>
+                
+                <!-- Sección para otros tipos de reportes -->
+                <div th:if="${tipoDatos == 'otro'}" class="bg-white rounded-lg shadow p-6 mb-6">
                     <div class="text-center py-8">
-                        <p class="text-lg font-medium text-gray-600 mb-1">No hay datos de compras</p>
-                        <p class="text-gray-500">Este reporte no contiene compras o los datos no están disponibles</p>
+                        <p class="text-lg font-medium text-gray-600 mb-1">Datos no disponibles</p>
+                        <p class="text-gray-500">Este tipo de reporte no tiene vista de datos implementada</p>
                     </div>
                 </div>
                 
@@ -218,11 +420,15 @@
                                 class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
                             Imprimir
                         </button>
-                        <a th:href="@{/compras/reportes(fromModal=true, nombre=${reporte.nombre}, tipo=${reporte.tipo}, formato=${reporte.formato}, estado=${reporte.estado}, reporteId=${reporte.id})}" 
-                           th:if="${reporte.tipo == 'compras'}"
+                        
+                        <!-- Botón para editar filtros (mostrar según tipo y estado) -->
+                        <a th:if="${reporte.estado == 'proceso'}" 
+                           th:href="@{${reporte.tipo == 'ventas' ? '/ventas/reportes' : 
+                                           reporte.tipo == 'compras' ? '/compras/reportes' : '/reportes'}(fromModal=true, nombre=${reporte.nombre}, tipo=${reporte.tipo}, formato=${reporte.formato}, estado=${reporte.estado}, reporteId=${reporte.id})}" 
                            class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
                             Editar Filtros
                         </a>
+                        
                         <a th:href="@{/reportes}" 
                            class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
                             Ver Todos los Reportes
@@ -232,5 +438,13 @@
             </div>
         </div>
     </main>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Tipo de datos:', '[[${tipoDatos}]]');
+            console.log('Ventas disponibles:', '[[${ventas != null ? ventas.size() : 0}]]');
+            console.log('Compras disponibles:', '[[${compras != null ? compras.size() : 0}]]');
+        });
+    </script>
 </body>
 </html>

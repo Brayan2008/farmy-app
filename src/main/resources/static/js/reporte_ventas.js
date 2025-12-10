@@ -75,11 +75,14 @@ const ReporteVentas = (function() {
             });
         }
         
-        // Validar fechas antes de enviar
+        // Configurar event listener para el envío del formulario
         if (formFiltros) {
             formFiltros.addEventListener('submit', function(e) {
-                e.preventDefault();
-                generarReporte();
+                // Prevenir el envío normal para manejar la validación
+                if (!validarYGenerar()) {
+                    e.preventDefault();
+                }
+                // Si validarYGenerar() retorna true, el formulario se enviará normalmente
             });
         }
         
@@ -113,11 +116,8 @@ const ReporteVentas = (function() {
             btnCancelar.addEventListener('click', cancelarReporte);
         }
         
-        // Configurar botón de generar
-        const btnGenerar = document.querySelector('.btn-generar');
-        if (btnGenerar) {
-            btnGenerar.addEventListener('click', generarReporte);
-        }
+        // NOTA: El botón "Generar Reporte" ahora es type="submit" 
+        // y se maneja a través del event listener del formulario
     }
     
     // Configurar validaciones
@@ -218,52 +218,63 @@ const ReporteVentas = (function() {
         return true;
     }
     
-    // Aplicar filtros
+    // En la función aplicarFiltros(), verifica que esté obteniendo todos los parámetros:
+
     function aplicarFiltros() {
-        if (!validarFechas()) {
+        console.log('Aplicando filtros...');
+        
+        // Validar fechas
+        const fechaInicio = document.querySelector('input[name="fechaInicio"]');
+        const fechaFin = document.querySelector('input[name="fechaFin"]');
+        
+        if (!fechaInicio.value || !fechaFin.value) {
+            alert('Las fechas de inicio y fin son requeridas');
             return;
         }
         
-        if (!validarImportes()) {
+        if (new Date(fechaInicio.value) > new Date(fechaFin.value)) {
+            alert('La fecha de inicio no puede ser mayor a la fecha de fin');
             return;
         }
         
         // Mostrar loading
         mostrarLoading(true);
         
-        // Crear formulario temporal para GET
-        const formTemp = document.createElement('form');
-        formTemp.method = 'GET';
-        formTemp.action = '/ventas/reportes';
+        // Obtener todos los valores del formulario
+        const formData = new FormData(document.getElementById('filtroForm'));
+        const params = new URLSearchParams();
         
-        // Copiar todos los datos del formulario principal
-        const formData = new FormData(formFiltros);
+        // Agregar todos los parámetros
         for (let [key, value] of formData.entries()) {
-            if (key !== 'nombreReporte' && key !== 'tipoReporte' && key !== 'formato' && key !== 'descripcion') {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = key;
-                input.value = value;
-                formTemp.appendChild(input);
+            // Solo agregar parámetros que tengan valor (excepto algunos específicos)
+            if (value && value !== '' && 
+                key !== 'nombreReporte' && key !== 'tipoReporte' && 
+                key !== 'formato' && key !== 'descripcion') {
+                params.append(key, value);
             }
         }
         
-        // Agregar parámetros del modal
+        // Agregar parámetros del modal si existen
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('fromModal')) {
-            const fromModalInput = document.createElement('input');
-            fromModalInput.type = 'hidden';
-            fromModalInput.name = 'fromModal';
-            fromModalInput.value = 'true';
-            formTemp.appendChild(fromModalInput);
+            params.append('fromModal', 'true');
+        }
+        if (urlParams.has('reporteId')) {
+            params.append('reporteId', urlParams.get('reporteId'));
+        }
+        if (urlParams.has('nombre')) {
+            params.append('nombre', urlParams.get('nombre'));
         }
         
-        // Enviar formulario
-        document.body.appendChild(formTemp);
-        formTemp.submit();
+        // Construir URL
+        const url = '/ventas/reportes?' + params.toString();
+        console.log('URL de filtros:', url);
+        
+        // Redirigir
+        window.location.href = url;
     }
-    
-    // Eliminar filtros
+
+    // En la función eliminarFiltros():
     function eliminarFiltros() {
         if (!confirm('¿Está seguro de que desea eliminar todos los filtros?')) {
             return;
@@ -284,6 +295,12 @@ const ReporteVentas = (function() {
             radioTodos.checked = true;
         }
         
+        // Resetear checkboxes
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = true;
+        });
+        
         // Resetear fechas a valores por defecto
         const hoy = new Date();
         const hace30Dias = new Date();
@@ -299,30 +316,44 @@ const ReporteVentas = (function() {
         if (fechaFin) fechaFin.value = formatDate(hoy);
         if (horaFin) horaFin.value = '23:59';
         
-        // Aplicar filtros
-        aplicarFiltros();
+        // Resetear selects específicos
+        document.querySelector('select[name="estadoVenta"]').value = 'todos';
+        document.querySelector('select[name="ordenarPor"]').value = 'fecha';
+        document.querySelector('select[name="orden"]').value = 'desc';
+        document.querySelector('select[name="metodoPagoNombre"]').value = '';
+        
+        console.log('Filtros eliminados, aplicando...');
+        
+        // Aplicar filtros después de resetear
+        setTimeout(() => {
+            aplicarFiltros();
+        }, 300);
     }
     
-    // Generar reporte
-    function generarReporte() {
-        if (isGenerating) return;
+    // Validar y generar reporte - NUEVA FUNCIÓN
+    function validarYGenerar() {
+        if (isGenerating) return false;
         
         // Validar formulario
         if (!validarFechas()) {
-            return;
+            return false;
+        }
+        
+        if (!validarImportes()) {
+            return false;
         }
         
         // Obtener total de registros
         const totalRegistros = document.getElementById('totalRegistros').textContent;
         if (parseInt(totalRegistros) === 0) {
             if (!confirm('No hay registros para generar el reporte. ¿Desea continuar de todos modos?')) {
-                return;
+                return false;
             }
         }
         
         // Mostrar confirmación
         if (!confirm('¿Está seguro de generar el reporte? Esto guardará el reporte en el sistema.')) {
-            return;
+            return false;
         }
         
         isGenerating = true;
@@ -338,9 +369,87 @@ const ReporteVentas = (function() {
         }
         totalInput.value = totalRegistros;
         
+        // Deshabilitar el botón para evitar múltiples clics
+        const btnGenerar = document.querySelector('.btn-generar');
+        if (btnGenerar) {
+            btnGenerar.disabled = true;
+        }
+        
+        return true; // Permitir el envío del formulario
+    }
+    
+    // Función para generar reporte (igual que reporte_compras)
+    function generarReporte() {
+        if (isGenerating) return;
+        
+        // Validar fechas
+        const fechaInicio = document.querySelector('input[name="fechaInicio"]');
+        const fechaFin = document.querySelector('input[name="fechaFin"]');
+        
+        if (!fechaInicio.value || !fechaFin.value) {
+            alert('Las fechas de inicio y fin son requeridas');
+            return;
+        }
+        
+        if (new Date(fechaInicio.value) > new Date(fechaFin.value)) {
+            alert('La fecha de inicio no puede ser mayor a la fecha de fin');
+            return;
+        }
+        
+        // Obtener valores de los campos ocultos
+        const nombreHidden = document.getElementById('nombreReporteHidden');
+        const formatoHidden = document.getElementById('formatoHidden');
+        const descripcionHidden = document.getElementById('descripcionHidden');
+        const reporteIdHidden = document.getElementById('reporteIdHidden');
+        
+        const nombre = nombreHidden?.value || 'Reporte de Ventas';
+        const formato = formatoHidden?.value || 'pdf';
+        const descripcion = descripcionHidden?.value || '';
+        const reporteId = reporteIdHidden?.value || '';
+        
+        console.log('=== DATOS A ENVIAR (VENTAS) ===');
+        console.log('Nombre:', nombre);
+        console.log('Formato:', formato);
+        console.log('Descripción:', descripcion);
+        console.log('Reporte ID:', reporteId);
+        
+        // Obtener total de registros
+        const totalRegistrosElement = document.getElementById('totalRegistros');
+        let totalRegistros = '0';
+        
+        if (totalRegistrosElement) {
+            const text = totalRegistrosElement.textContent.trim();
+            totalRegistros = text && !isNaN(text) ? text : '0';
+        }
+        
+        // Confirmar
+        const mensajeConfirmacion = `${reporteId ? 'Actualizar' : 'Generar'} reporte?\n\n` +
+                                `Nombre: ${nombre}\n` +
+                                `Formato: ${formato}\n` +
+                                `Registros: ${totalRegistros}\n` +
+                                `Fechas: ${fechaInicio.value} a ${fechaFin.value}` +
+                                (reporteId ? `\n\n(Actualizando reporte ID: ${reporteId})` : '');
+        
+        if (!confirm(mensajeConfirmacion)) return;
+        
+        isGenerating = true;
+        mostrarLoadingGenerar(true);
+        
+        // Llenar formulario oculto
+        document.getElementById('hiddenNombreReporte').value = nombre;
+        document.getElementById('hiddenFormato').value = formato;
+        document.getElementById('hiddenDescripcion').value = descripcion;
+        document.getElementById('hiddenReporteId').value = reporteId;
+        document.getElementById('hiddenFechaInicio').value = fechaInicio.value;
+        document.getElementById('hiddenHoraInicio').value = document.querySelector('input[name="horaInicio"]')?.value || '00:00';
+        document.getElementById('hiddenFechaFin').value = fechaFin.value;
+        document.getElementById('hiddenHoraFin').value = document.querySelector('input[name="horaFin"]')?.value || '23:59';
+        document.getElementById('hiddenTotalRegistros').value = totalRegistros;
+        
         // Enviar formulario
         setTimeout(() => {
-            formFiltros.submit();
+            console.log('Enviando formulario de ventas... Reporte ID:', reporteId);
+            document.getElementById('formGenerarReporte').submit();
         }, 500);
     }
     
@@ -519,6 +628,7 @@ const ReporteVentas = (function() {
         eliminarFiltros: eliminarFiltros,
         aplicarFiltros: aplicarFiltros,
         generarReporte: generarReporte,
+        validarYGenerar: validarYGenerar,
         cancelarReporte: cancelarReporte,
         exportarDatos: exportarDatos,
         formatoMoneda: formatoMoneda,

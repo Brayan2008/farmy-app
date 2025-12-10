@@ -1,7 +1,10 @@
 package app.farmy.farmy.controllers;
 
 import java.math.BigDecimal;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -28,6 +31,7 @@ import app.farmy.farmy.model.EstadoPago;
 import app.farmy.farmy.model.InventarioMovimiento;
 import app.farmy.farmy.model.InventarioMovimiento.TipoMovimiento;
 import app.farmy.farmy.model.Lote;
+import app.farmy.farmy.model.Reporte;
 import app.farmy.farmy.model.TipoVenta;
 import app.farmy.farmy.model.VentaDetalle;
 import app.farmy.farmy.model.VentaPago;
@@ -36,6 +40,7 @@ import app.farmy.farmy.repository.ClienteRepository;
 import app.farmy.farmy.repository.InventarioMovimientoRepository;
 import app.farmy.farmy.repository.LoteRepository;
 import app.farmy.farmy.repository.MetodoPagoRepository;
+import app.farmy.farmy.repository.ReporteRepository;
 import app.farmy.farmy.repository.VentaDetalleRepository;
 import app.farmy.farmy.repository.VentaPagoRepository;
 import app.farmy.farmy.repository.VentasRepository;
@@ -44,7 +49,7 @@ import jakarta.servlet.http.HttpSession;
 
 import java.time.LocalDate;
 //import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
+//import java.util.Comparator;
 import java.util.HashMap;
 
 @Controller
@@ -71,6 +76,9 @@ public class VentaController implements FarmySesion{
 
     @Autowired
     private InventarioMovimientoRepository inventarioMovimientoRepository;
+
+    @Autowired
+    private ReporteRepository reporteRepository; 
 
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -275,30 +283,65 @@ public class VentaController implements FarmySesion{
     }
 
     // En VentaController.java, modifica el método reporteVentas:
-
     @GetMapping("/reportes")
     public String reporteVentas(
-            @RequestParam(required = false) String fechaInicio,
-            @RequestParam(required = false) String horaInicio,
-            @RequestParam(required = false) String fechaFin,
-            @RequestParam(required = false) String horaFin,
-            @RequestParam(required = false) String tipoDocumento,
-            @RequestParam(required = false) String numeroDocumento,
-            @RequestParam(required = false) String nombreCliente,
-            @RequestParam(required = false) String metodoPagoNombre,
-            @RequestParam(required = false) String estadoVenta,
-            @RequestParam(required = false) Double importeMinimo,
-            @RequestParam(required = false) Double importeMaximo,
-            // Nuevos parámetros del modal
-            @RequestParam(required = false) Boolean fromModal,
-            @RequestParam(required = false) String nombre,
-            @RequestParam(required = false) String tipo,
-            @RequestParam(required = false) String formato,
-            @RequestParam(required = false) String periodo,
-            @RequestParam(required = false) String estado,
-            @RequestParam(required = false) String fechaDesde,
-            @RequestParam(required = false) String fechaHasta,
-            Model model) {
+        @RequestParam(required = false) String fechaInicio,
+        @RequestParam(required = false) String horaInicio,
+        @RequestParam(required = false) String fechaFin,
+        @RequestParam(required = false) String horaFin,
+        @RequestParam(required = false) String tipoDocumento,
+        @RequestParam(required = false) String numeroDocumento,
+        @RequestParam(required = false) String nombreCliente,
+        @RequestParam(required = false) String metodoPagoNombre,
+        @RequestParam(required = false) String estadoVenta,
+        @RequestParam(required = false) Double importeMinimo,
+        @RequestParam(required = false) Double importeMaximo,
+        @RequestParam(required = false) String ordenarPor,
+        @RequestParam(required = false) String orden,
+        // Nuevos parámetros del modal
+        @RequestParam(required = false) Boolean fromModal,
+        @RequestParam(required = false) String nombre,
+        @RequestParam(required = false) String tipo,
+        @RequestParam(required = false) String formato,
+        @RequestParam(required = false) String periodo,
+        @RequestParam(required = false) String estado,
+        @RequestParam(required = false) String fechaDesde,
+        @RequestParam(required = false) String fechaHasta,
+        @RequestParam(required = false) String descripcion,
+        @RequestParam(required = false) Long reporteId,
+        Model model, HttpSession session) {
+        
+        // Al inicio del método reporteVentas, añade:
+        System.out.println("=== FILTROS RECIBIDOS VENTAS ===");
+        System.out.println("fechaInicio: " + fechaInicio);
+        System.out.println("fechaFin: " + fechaFin);
+        System.out.println("tipoDocumento: " + tipoDocumento);
+        System.out.println("numeroDocumento: " + numeroDocumento);
+        System.out.println("nombreCliente: " + nombreCliente);
+        System.out.println("metodoPagoNombre: " + metodoPagoNombre);
+        System.out.println("estadoVenta: " + estadoVenta);
+        System.out.println("importeMinimo: " + importeMinimo);
+        System.out.println("importeMaximo: " + importeMaximo);
+        System.out.println("ordenarPor: " + ordenarPor);
+        System.out.println("orden: " + orden);
+        System.out.println("fromModal: " + fromModal);
+        System.out.println("reporteId: " + reporteId);
+        System.out.println("===============================");
+            
+        // Crear copias finales para usar en el lambda
+        final String fechaInicioFinal = fechaInicio;
+        final String horaInicioFinal = horaInicio;
+        final String fechaFinFinal = fechaFin;
+        final String horaFinFinal = horaFin;
+        final String tipoDocumentoFinal = tipoDocumento;
+        final String numeroDocumentoFinal = numeroDocumento;
+        final String nombreClienteFinal = nombreCliente;
+        final String metodoPagoNombreFinal = metodoPagoNombre;
+        final String estadoVentaFinal = estadoVenta;
+        final Double importeMinimoFinal = importeMinimo;
+        final Double importeMaximoFinal = importeMaximo;
+        final String ordenarPorFinal = ordenarPor;
+        final String ordenFinal = orden;
         
         // Establecer fechas desde el modal si vienen de allí
         if (fromModal != null && fromModal) {
@@ -320,29 +363,140 @@ public class VentaController implements FarmySesion{
             reporteData.put("estado", estado);
             reporteData.put("fechaDesde", fechaDesde);
             reporteData.put("fechaHasta", fechaHasta);
+            reporteData.put("descripcion", descripcion);
             
             model.addAttribute("reporteData", reporteData);
             model.addAttribute("fromModal", true);
         }
+
+        // Si viene con reporteId, mostrarlo
+        if (reporteId != null) {
+            System.out.println("=== CARGANDO REPORTE VENTAS EXISTENTE ===");
+            System.out.println("Reporte ID: " + reporteId);
+            System.out.println("Nombre: " + nombre);
+            
+            model.addAttribute("reporteId", reporteId);
+            
+            // También cargar el reporte desde la BD para verificar
+            Optional<Reporte> reporteExistente = reporteRepository.findById(reporteId);
+            if (reporteExistente.isPresent()) {
+                System.out.println("Reporte encontrado: " + reporteExistente.get().getNombre());
+                model.addAttribute("nombre", reporteExistente.get().getNombre());
+                model.addAttribute("formato", reporteExistente.get().getFormato());
+                model.addAttribute("descripcion", reporteExistente.get().getDescripcion());
+            }
+        }
         
-        // Obtener todas las ventas
-        List<Ventas> ventas = ventasRepository.findAll();
+        // Obtener todas las ventas de la farmacia actual
+        List<Ventas> ventas = ventasRepository.findAll().stream()
+            .filter(v -> v.getUsuario().getFarmacia().getId() == getFarmaciaActual(session).getId())
+            .collect(Collectors.toList());
         
-        // Aplicar filtros (mantén tu lógica actual)
+        // Aplicar filtros (usar las variables FINAL en el lambda)
         List<Ventas> ventasFiltradas = ventas.stream()
             .filter(v -> {
-                // Tu lógica de filtrado actual...
-                return true;
+                boolean pasaFiltro = true;
+                
+                // Filtrar por fecha
+                if (fechaInicioFinal != null && !fechaInicioFinal.isEmpty() && 
+                    fechaFinFinal != null && !fechaFinFinal.isEmpty()) {
+                    try {
+                        LocalDateTime fechaInicioCompleta = LocalDateTime.parse(
+                            fechaInicioFinal + "T" + (horaInicioFinal != null ? horaInicioFinal : "00:00"));
+                        LocalDateTime fechaFinCompleta = LocalDateTime.parse(
+                            fechaFinFinal + "T" + (horaFinFinal != null ? horaFinFinal : "23:59"));
+                        
+                        if (v.getFechaVenta() != null) {
+                            pasaFiltro = pasaFiltro && 
+                                    !v.getFechaVenta().isBefore(fechaInicioCompleta) && 
+                                    !v.getFechaVenta().isAfter(fechaFinCompleta);
+                        }
+                    } catch (Exception e) {
+                        // Si hay error en el parsing, ignorar filtro de fecha
+                        System.out.println("Error parsing fecha: " + e.getMessage());
+                    }
+                }
+                
+                // Filtrar por tipo documento
+                if (tipoDocumentoFinal != null && !tipoDocumentoFinal.isEmpty() && !tipoDocumentoFinal.equals("todos")) {
+                    pasaFiltro = pasaFiltro && v.getCliente() != null && 
+                            v.getCliente().getTipoDocumento() != null &&
+                            v.getCliente().getTipoDocumento().name().equals(tipoDocumentoFinal);
+                }
+                
+                // Filtrar por número de documento
+                if (numeroDocumentoFinal != null && !numeroDocumentoFinal.isEmpty() && v.getCliente() != null) {
+                    pasaFiltro = pasaFiltro && v.getCliente().getNumeroDocumento().contains(numeroDocumentoFinal);
+                }
+                
+                // Filtrar por nombre del cliente
+                if (nombreClienteFinal != null && !nombreClienteFinal.isEmpty() && v.getCliente() != null) {
+                    pasaFiltro = pasaFiltro && (v.getCliente().getNombre().toLowerCase().contains(nombreClienteFinal.toLowerCase()) ||
+                                            v.getCliente().getApellidos().toLowerCase().contains(nombreClienteFinal.toLowerCase()));
+                }
+                
+                // Filtrar por método de pago
+                if (metodoPagoNombreFinal != null && !metodoPagoNombreFinal.isEmpty() && v.getMetodoPago() != null) {
+                    pasaFiltro = pasaFiltro && v.getMetodoPago().getNombreMetodoPago().equals(metodoPagoNombreFinal);
+                }
+                
+                // Filtrar por estado de venta
+                if (estadoVentaFinal != null && !estadoVentaFinal.isEmpty() && !estadoVentaFinal.equals("todos")) {
+                    if ("Registrada".equals(estadoVentaFinal)) {
+                        pasaFiltro = pasaFiltro && "Activo".equals(v.getEstado());
+                    } else if ("Anulada".equals(estadoVentaFinal)) {
+                        pasaFiltro = pasaFiltro && "Anulado".equals(v.getEstado());
+                    } else if ("Pendiente".equals(estadoVentaFinal)) {
+                        pasaFiltro = pasaFiltro && v.getEstadoPago() == EstadoPago.PENDIENTE;
+                    }
+                }
+                
+                // Filtrar por importe mínimo
+                if (importeMinimoFinal != null && importeMinimoFinal > 0 && v.getTotal() != null) {
+                    pasaFiltro = pasaFiltro && v.getTotal().doubleValue() >= importeMinimoFinal;
+                }
+                
+                // Filtrar por importe máximo
+                if (importeMaximoFinal != null && importeMaximoFinal > 0 && v.getTotal() != null) {
+                    pasaFiltro = pasaFiltro && v.getTotal().doubleValue() <= importeMaximoFinal;
+                }
+                
+                return pasaFiltro;
             })
-            .sorted(Comparator.comparing(Ventas::getFechaVenta).reversed())
+            .sorted((v1, v2) -> {
+                // Ordenar según criterio seleccionado
+                String ordenPor = ordenarPorFinal != null ? ordenarPorFinal : "fecha";
+                boolean descendente = ordenFinal != null && ordenFinal.equals("desc");
+                
+                int resultado = 0;
+                
+                switch (ordenPor) {
+                    case "importe":
+                        resultado = v1.getTotal().compareTo(v2.getTotal());
+                        break;
+                    case "cliente":
+                        String cliente1 = v1.getCliente() != null ? 
+                                        v1.getCliente().getNombre() + " " + v1.getCliente().getApellidos() : "";
+                        String cliente2 = v2.getCliente() != null ? 
+                                        v2.getCliente().getNombre() + " " + v2.getCliente().getApellidos() : "";
+                        resultado = cliente1.compareTo(cliente2);
+                        break;
+                    case "fecha":
+                    default:
+                        resultado = v1.getFechaVenta().compareTo(v2.getFechaVenta());
+                        break;
+                }
+                
+                return descendente ? -resultado : resultado;
+            })
             .collect(Collectors.toList());
         
         // Agregar datos al modelo
         model.addAttribute("ventas", ventasFiltradas);
-        model.addAttribute("clientes", clienteRepository.findAll());
+        model.addAttribute("clientes", clienteRepository.findByFarmacia(getFarmaciaActual(session)));
         model.addAttribute("metodosPago", metodoPagoRepository.findAll());
         
-        // Mantener valores de filtros
+        // Mantener valores de filtros (usar las variables originales, no las final)
         model.addAttribute("fechaInicio", fechaInicio != null ? fechaInicio : LocalDate.now().minusDays(30).toString());
         model.addAttribute("horaInicio", horaInicio != null ? horaInicio : "00:00");
         model.addAttribute("fechaFin", fechaFin != null ? fechaFin : LocalDate.now().toString());
@@ -354,11 +508,23 @@ public class VentaController implements FarmySesion{
         model.addAttribute("estadoVentaSeleccionado", estadoVenta != null ? estadoVenta : "todos");
         model.addAttribute("importeMinimo", importeMinimo != null ? importeMinimo : "");
         model.addAttribute("importeMaximo", importeMaximo != null ? importeMaximo : "");
+        model.addAttribute("ordenarPor", ordenarPor != null ? ordenarPor : "fecha");
+        model.addAttribute("orden", orden != null ? orden : "desc");
+        
+        // Pasar datos del modal
+        if (nombre != null) model.addAttribute("nombre", nombre);
+        if (tipo != null) model.addAttribute("tipo", tipo);
+        if (formato != null) model.addAttribute("formato", formato);
+        if (periodo != null) model.addAttribute("periodo", periodo);
+        if (estado != null) model.addAttribute("estado", estado);
+        if (fechaDesde != null) model.addAttribute("fechaDesde", fechaDesde);
+        if (fechaHasta != null) model.addAttribute("fechaHasta", fechaHasta);
+        if (descripcion != null) model.addAttribute("descripcion", descripcion);
         
         return "home/reportes/reporte_ventas";
     }
 
-    // Agrega este método para guardar el reporte desde ventas
+    // Método POST actualizado para aceptar reporteId
     @PostMapping("/reportes/generar")
     public String generarReporteVentas(
             @RequestParam String nombreReporte,
@@ -377,18 +543,90 @@ public class VentaController implements FarmySesion{
             @RequestParam(required = false) Double importeMinimo,
             @RequestParam(required = false) Double importeMaximo,
             @RequestParam int totalRegistros,
+            @RequestParam(required = false) Long reporteId,  // <-- Añadir este parámetro
             RedirectAttributes redirectAttributes) {
         
-        // Guardar el reporte usando el ReporteController
-        // Podrías inyectar el ReporteRepository aquí o llamar al método del otro controller
+        System.out.println("=== GENERANDO REPORTE VENTAS ===");
+        System.out.println("Nombre: " + (nombreReporte != null ? nombreReporte : "(vacío)"));
+        System.out.println("Formato: " + (formato != null ? formato : "(vacío)"));
+        System.out.println("Reporte ID recibido: " + reporteId);
         
-        // Por ahora, redirigir al ReporteController
+        // Si ya existe un reporteId, actualizar ese reporte en lugar de crear uno nuevo
+        if (reporteId != null && reporteId > 0) {
+            try {
+                Optional<Reporte> reporteExistente = reporteRepository.findById(reporteId);
+                if (reporteExistente.isPresent()) {
+                    Reporte reporte = reporteExistente.get();
+                    
+                    // Actualizar los datos del reporte existente
+                    if (nombreReporte != null && !nombreReporte.trim().isEmpty()) {
+                        reporte.setNombre(nombreReporte);
+                    }
+                    if (formato != null && !formato.trim().isEmpty()) {
+                        reporte.setFormato(formato);
+                    }
+                    if (descripcion != null) {
+                        reporte.setDescripcion(descripcion);
+                    }
+                    reporte.setEstado("generado");
+                    reporte.setFechaCompletado(LocalDateTime.now());
+                    if (totalRegistros > 0) {
+                        reporte.setRegistrosProcesados(totalRegistros);
+                    }
+                    
+                    // Actualizar parámetros
+                    StringBuilder parametros = new StringBuilder();
+                    parametros.append("Período: ").append(fechaInicio).append(" ").append(horaInicio)
+                            .append(" - ").append(fechaFin).append(" ").append(horaFin).append("\n");
+                    if (tipoDocumento != null && !tipoDocumento.isEmpty()) {
+                        parametros.append("Tipo Documento: ").append(tipoDocumento).append("\n");
+                    }
+                    if (numeroDocumento != null && !numeroDocumento.isEmpty()) {
+                        parametros.append("N° Documento: ").append(numeroDocumento).append("\n");
+                    }
+                    if (nombreCliente != null && !nombreCliente.isEmpty()) {
+                        parametros.append("Cliente: ").append(nombreCliente).append("\n");
+                    }
+                    if (metodoPagoNombre != null && !metodoPagoNombre.isEmpty()) {
+                        parametros.append("Método Pago: ").append(metodoPagoNombre).append("\n");
+                    }
+                    if (estadoVenta != null && !estadoVenta.isEmpty() && !estadoVenta.equals("todos")) {
+                        parametros.append("Estado Venta: ").append(estadoVenta).append("\n");
+                    }
+                    parametros.append("Registros: ").append(totalRegistros);
+                    
+                    reporte.setParametros(parametros.toString());
+                    
+                    reporteRepository.save(reporte);
+                    System.out.println("Reporte actualizado ID: " + reporteId);
+                    
+                    redirectAttributes.addFlashAttribute("mensaje", "Reporte actualizado exitosamente");
+                    return "redirect:/reportes";
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        
+        // Si no hay reporteId, crear uno nuevo (flujo original)
+        if (nombreReporte == null || nombreReporte.trim().isEmpty()) {
+            nombreReporte = "Reporte de Ventas " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        }
+        
+        if (formato == null || formato.trim().isEmpty()) {
+            formato = "pdf";
+        }
+        
+        // Guardar el reporte usando el ReporteController
         String redirectUrl = String.format(
             "redirect:/reportes/guardar-desde-ventas?nombre=%s&formato=%s&descripcion=%s&tipo=%s" +
             "&fechaInicio=%s&horaInicio=%s&fechaFin=%s&horaFin=%s" +
             "&tipoDocumento=%s&numeroDocumento=%s&nombreCliente=%s&metodoPagoNombre=%s" +
             "&estadoVenta=%s&importeMinimo=%s&importeMaximo=%s&totalRegistros=%d",
-            nombreReporte, formato, descripcion != null ? descripcion : "", tipoReporte,
+            URLEncoder.encode(nombreReporte, StandardCharsets.UTF_8), 
+            formato, 
+            descripcion != null ? URLEncoder.encode(descripcion, StandardCharsets.UTF_8) : "", 
+            tipoReporte,
             fechaInicio, horaInicio != null ? horaInicio : "", fechaFin, horaFin != null ? horaFin : "",
             tipoDocumento != null ? tipoDocumento : "", numeroDocumento != null ? numeroDocumento : "",
             nombreCliente != null ? nombreCliente : "", metodoPagoNombre != null ? metodoPagoNombre : "",
@@ -400,5 +638,38 @@ public class VentaController implements FarmySesion{
         
         redirectAttributes.addFlashAttribute("mensaje", "Reporte generado exitosamente");
         return redirectUrl;
+    }
+
+    // Método GET para redirigir al POST (para compatibilidad)
+    @GetMapping("/reportes/generar")
+    public String generarReporteGet(
+            @RequestParam String nombreReporte,
+            @RequestParam String formato,
+            @RequestParam(required = false) String descripcion,
+            @RequestParam String tipoReporte,
+            @RequestParam String fechaInicio,
+            @RequestParam String horaInicio,
+            @RequestParam String fechaFin,
+            @RequestParam String horaFin,
+            @RequestParam(required = false) String tipoDocumento,
+            @RequestParam(required = false) String numeroDocumento,
+            @RequestParam(required = false) String nombreCliente,
+            @RequestParam(required = false) String metodoPagoNombre,
+            @RequestParam(required = false) String estadoVenta,
+            @RequestParam(required = false) Double importeMinimo,
+            @RequestParam(required = false) Double importeMaximo,
+            @RequestParam int totalRegistros,
+            @RequestParam(required = false) Long reporteId,  // <-- Añadir este parámetro
+            RedirectAttributes redirectAttributes) {
+        
+        // Redirigir al método POST existente
+        return generarReporteVentas(
+            nombreReporte, formato, descripcion, tipoReporte,
+            fechaInicio, horaInicio, fechaFin, horaFin,
+            tipoDocumento, numeroDocumento, nombreCliente, metodoPagoNombre,
+            estadoVenta, importeMinimo, importeMaximo, totalRegistros,
+            reporteId, // <-- Pasar el reporteId
+            redirectAttributes
+        );
     }
 }

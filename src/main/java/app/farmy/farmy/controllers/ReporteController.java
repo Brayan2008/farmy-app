@@ -5,16 +5,23 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import app.farmy.farmy.model.Reporte;
+import app.farmy.farmy.model.TipoVenta;
+import app.farmy.farmy.model.Usuario;
+import app.farmy.farmy.model.Ventas;
 import app.farmy.farmy.model.Compra;
 import app.farmy.farmy.model.EstadoPago;
+import app.farmy.farmy.model.Farmacia;
 import app.farmy.farmy.repository.ReporteRepository;
+import app.farmy.farmy.repository.VentasRepository;
 import app.farmy.farmy.repository.CompraRepository;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.HashMap;
 import java.math.BigDecimal;
 
@@ -30,6 +37,9 @@ public class ReporteController {
     
     @Autowired
     private CompraRepository compraRepository;
+
+    @Autowired
+    private VentasRepository ventasRepository;
     
     @GetMapping
     public String listarReportes(Model model) {
@@ -94,9 +104,18 @@ public class ReporteController {
             return "redirect:/reportes";
         }
     }
+
+    private Farmacia getFarmaciaActual(HttpSession session) {
+        return (Farmacia) session.getAttribute("farmaciaActual");
+    }
+
+    private Usuario getUsuarioActual(HttpSession session) {
+        return (Usuario) session.getAttribute("usuario");
+    }
     
+    // En el método verReporteDetalles de ReporteController:
     @GetMapping("/ver/{codigo}")
-    public String verReporteDetalles(@PathVariable String codigo, Model model) {
+    public String verReporteDetalles(@PathVariable String codigo, Model model, HttpSession session) {
         Reporte reporte = reporteRepository.findByCodigo(codigo);
         
         if (reporte == null) {
@@ -108,15 +127,18 @@ public class ReporteController {
         BigDecimal totalGeneral = BigDecimal.ZERO;
         BigDecimal totalPendiente = BigDecimal.ZERO;
         BigDecimal totalPagado = BigDecimal.ZERO;
+        BigDecimal totalContado = BigDecimal.ZERO;
+        BigDecimal totalCredito = BigDecimal.ZERO;
         List<Compra> comprasMostrar = null;
+        List<Ventas> ventasMostrar = null;
         
         if ("compras".equals(reporte.getTipo())) {
-            // Por ahora, mostrar todas las compras
+            // Para compras
             comprasMostrar = compraRepository.findAll();
             model.addAttribute("compras", comprasMostrar);
             model.addAttribute("tipoDatos", "compras");
             
-            // Calcular totales
+            // Calcular totales para compras
             for (Compra compra : comprasMostrar) {
                 if (compra.getTotal() != null) {
                     totalGeneral = totalGeneral.add(compra.getTotal());
@@ -130,17 +152,58 @@ public class ReporteController {
                     }
                 }
             }
+            
+            // Agregar totales al modelo
+            model.addAttribute("totalGeneral", totalGeneral);
+            model.addAttribute("totalPendiente", totalPendiente);
+            model.addAttribute("totalPagado", totalPagado);
+            
         } else if ("ventas".equals(reporte.getTipo())) {
+            // Para ventas - FILTRAR POR FARMACIA
+            ventasMostrar = ventasRepository.findAll().stream()
+                .filter(v -> v.getUsuario() != null && 
+                            v.getUsuario().getFarmacia() != null &&
+                            v.getUsuario().getFarmacia().getId() == getFarmaciaActual(session).getId())
+                .collect(Collectors.toList());
+            
+            model.addAttribute("ventas", ventasMostrar);
             model.addAttribute("tipoDatos", "ventas");
-            // TODO: Implementar para ventas
+            
+            // Calcular totales para ventas
+            for (Ventas venta : ventasMostrar) {
+                if (venta.getTotal() != null) {
+                    totalGeneral = totalGeneral.add(venta.getTotal());
+                    
+                    // Calcular por tipo de venta
+                    if (venta.getTipoVenta() != null) {
+                        if (venta.getTipoVenta() == TipoVenta.CONTADO) {
+                            totalContado = totalContado.add(venta.getTotal());
+                        } else if (venta.getTipoVenta() == TipoVenta.CREDITO) {
+                            totalCredito = totalCredito.add(venta.getTotal());
+                        }
+                    }
+                    
+                    // Calcular por estado de pago
+                    if (venta.getEstadoPago() != null) {
+                        if (venta.getEstadoPago() == EstadoPago.PENDIENTE) {
+                            totalPendiente = totalPendiente.add(venta.getTotal());
+                        } else if (venta.getEstadoPago() == EstadoPago.PAGADO) {
+                            totalPagado = totalPagado.add(venta.getTotal());
+                        }
+                    }
+                }
+            }
+            
+            // Agregar totales al modelo
+            model.addAttribute("totalGeneral", totalGeneral);
+            model.addAttribute("totalContado", totalContado);
+            model.addAttribute("totalCredito", totalCredito);
+            model.addAttribute("totalPendiente", totalPendiente);
+            model.addAttribute("totalPagado", totalPagado);
+            
         } else {
             model.addAttribute("tipoDatos", "otro");
         }
-        
-        // Pasar totales al modelo
-        model.addAttribute("totalGeneral", totalGeneral);
-        model.addAttribute("totalPendiente", totalPendiente);
-        model.addAttribute("totalPagado", totalPagado);
         
         // Parsear parámetros para mostrar en la vista
         if (reporte.getParametros() != null && !reporte.getParametros().isEmpty()) {
@@ -288,19 +351,30 @@ public class ReporteController {
         return "redirect:/reportes";
     }
 
-    @GetMapping("/guardar-desde-compras")
-    public String guardarReporteDesdeComprasGet(
+    // Añade estos métodos en ReporteController para soportar GET
+    @GetMapping("/guardar-desde-ventas")
+    public String guardarReporteDesdeVentasGet(
             @RequestParam String nombre,
-            @RequestParam String tipo,
             @RequestParam String formato,
             @RequestParam(required = false) String descripcion,
+            @RequestParam String tipo,
             @RequestParam String fechaInicio,
             @RequestParam String horaInicio,
             @RequestParam String fechaFin,
             @RequestParam String horaFin,
+            @RequestParam(required = false) String tipoDocumento,
+            @RequestParam(required = false) String numeroDocumento,
+            @RequestParam(required = false) String nombreCliente,
+            @RequestParam(required = false) String metodoPagoNombre,
+            @RequestParam(required = false) String estadoVenta,
+            @RequestParam(required = false) Double importeMinimo,
+            @RequestParam(required = false) Double importeMaximo,
             @RequestParam int totalRegistros) {
         
-        return guardarReporteDesdeCompras(nombre, tipo, formato, descripcion, 
-                                        fechaInicio, horaInicio, fechaFin, horaFin, totalRegistros);
+        return guardarReporteDesdeVentas(nombre, formato, descripcion, tipo,
+                                        fechaInicio, horaInicio, fechaFin, horaFin,
+                                        tipoDocumento, numeroDocumento, nombreCliente,
+                                        metodoPagoNombre, estadoVenta, importeMinimo,
+                                        importeMaximo, totalRegistros);
     }
 }
