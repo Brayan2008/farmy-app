@@ -106,7 +106,11 @@ public class ReporteController {
     }
 
     private Farmacia getFarmaciaActual(HttpSession session) {
-        return (Farmacia) session.getAttribute("farmaciaActual");
+        Farmacia farmacia = (Farmacia) session.getAttribute("farmaciaActual");
+        System.out.println("Farmacia en sesión: " + (farmacia != null ? 
+                        "ID=" + farmacia.getId() + ", Nombre=" + farmacia.getNombreComercial() : 
+                        "null"));
+        return farmacia;
     }
 
     private Usuario getUsuarioActual(HttpSession session) {

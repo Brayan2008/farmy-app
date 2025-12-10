@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import app.farmy.farmy.model.Cliente;
 import app.farmy.farmy.model.EstadoPago;
+import app.farmy.farmy.model.Farmacia;
 import app.farmy.farmy.model.InventarioMovimiento;
 import app.farmy.farmy.model.InventarioMovimiento.TipoMovimiento;
 import app.farmy.farmy.model.Lote;
@@ -285,36 +286,37 @@ public class VentaController implements FarmySesion{
     // En VentaController.java, modifica el método reporteVentas:
     @GetMapping("/reportes")
     public String reporteVentas(
-        @RequestParam(required = false) String fechaInicio,
-        @RequestParam(required = false) String horaInicio,
-        @RequestParam(required = false) String fechaFin,
-        @RequestParam(required = false) String horaFin,
-        @RequestParam(required = false) String tipoDocumento,
-        @RequestParam(required = false) String numeroDocumento,
-        @RequestParam(required = false) String nombreCliente,
-        @RequestParam(required = false) String metodoPagoNombre,
-        @RequestParam(required = false) String estadoVenta,
-        @RequestParam(required = false) Double importeMinimo,
-        @RequestParam(required = false) Double importeMaximo,
-        @RequestParam(required = false) String ordenarPor,
-        @RequestParam(required = false) String orden,
-        // Nuevos parámetros del modal
-        @RequestParam(required = false) Boolean fromModal,
-        @RequestParam(required = false) String nombre,
-        @RequestParam(required = false) String tipo,
-        @RequestParam(required = false) String formato,
-        @RequestParam(required = false) String periodo,
-        @RequestParam(required = false) String estado,
-        @RequestParam(required = false) String fechaDesde,
-        @RequestParam(required = false) String fechaHasta,
-        @RequestParam(required = false) String descripcion,
-        @RequestParam(required = false) Long reporteId,
-        Model model, HttpSession session) {
+            @RequestParam(required = false) String fechaInicio,
+            @RequestParam(required = false) String horaInicio,
+            @RequestParam(required = false) String fechaFin,
+            @RequestParam(required = false) String horaFin,
+            @RequestParam(required = false) String tipoDocumento,
+            @RequestParam(required = false) String numeroDocumento,
+            @RequestParam(required = false) String nombreCliente,
+            @RequestParam(required = false) String metodoPagoNombre,
+            @RequestParam(required = false) String estadoVenta,
+            @RequestParam(required = false) Double importeMinimo,
+            @RequestParam(required = false) Double importeMaximo,
+            @RequestParam(required = false) String ordenarPor,
+            @RequestParam(required = false) String orden,
+            // Nuevos parámetros del modal
+            @RequestParam(required = false) Boolean fromModal,
+            @RequestParam(required = false) String nombre,
+            @RequestParam(required = false) String tipo,
+            @RequestParam(required = false) String formato,
+            @RequestParam(required = false) String periodo,
+            @RequestParam(required = false) String estado,
+            @RequestParam(required = false) String fechaDesde,
+            @RequestParam(required = false) String fechaHasta,
+            @RequestParam(required = false) String descripcion,
+            @RequestParam(required = false) Long reporteId,
+            Model model, HttpSession session) {
         
-        // Al inicio del método reporteVentas, añade:
         System.out.println("=== FILTROS RECIBIDOS VENTAS ===");
         System.out.println("fechaInicio: " + fechaInicio);
+        System.out.println("horaInicio: " + horaInicio);
         System.out.println("fechaFin: " + fechaFin);
+        System.out.println("horaFin: " + horaFin);
         System.out.println("tipoDocumento: " + tipoDocumento);
         System.out.println("numeroDocumento: " + numeroDocumento);
         System.out.println("nombreCliente: " + nombreCliente);
@@ -327,7 +329,11 @@ public class VentaController implements FarmySesion{
         System.out.println("fromModal: " + fromModal);
         System.out.println("reporteId: " + reporteId);
         System.out.println("===============================");
-            
+        
+        // Obtener farmacia actual
+        Farmacia farmaciaActual = getFarmaciaActual(session);
+        System.out.println("Farmacia actual ID: " + farmaciaActual.getId() + ", Nombre: " + farmaciaActual.getNombreComercial());
+        
         // Crear copias finales para usar en el lambda
         final String fechaInicioFinal = fechaInicio;
         final String horaInicioFinal = horaInicio;
@@ -345,13 +351,16 @@ public class VentaController implements FarmySesion{
         
         // Establecer fechas desde el modal si vienen de allí
         if (fromModal != null && fromModal) {
+            System.out.println("Viene desde modal");
             if (fechaInicio == null && fechaDesde != null) {
                 fechaInicio = fechaDesde;
                 horaInicio = "00:00";
+                System.out.println("Fecha inicio desde modal: " + fechaInicio);
             }
             if (fechaFin == null && fechaHasta != null) {
                 fechaFin = fechaHasta;
                 horaFin = "23:59";
+                System.out.println("Fecha fin desde modal: " + fechaFin);
             }
             
             // Guardar datos del modal para mostrar en la vista
@@ -388,9 +397,30 @@ public class VentaController implements FarmySesion{
         }
         
         // Obtener todas las ventas de la farmacia actual
+        System.out.println("Obteniendo ventas para farmacia ID: " + farmaciaActual.getId());
         List<Ventas> ventas = ventasRepository.findAll().stream()
-            .filter(v -> v.getUsuario().getFarmacia().getId() == getFarmaciaActual(session).getId())
+            .filter(v -> {
+                boolean perteneceAFarmacia = v.getUsuario() != null && 
+                            v.getUsuario().getFarmacia() != null &&
+                            v.getUsuario().getFarmacia().getId() == farmaciaActual.getId();
+                
+                if (!perteneceAFarmacia) {
+                    System.out.println("Venta ID " + v.getIdVenta() + " NO pertenece a farmacia actual");
+                    if (v.getUsuario() == null) {
+                        System.out.println("  - Usuario es null");
+                    } else if (v.getUsuario().getFarmacia() == null) {
+                        System.out.println("  - Farmacia de usuario es null");
+                    } else {
+                        System.out.println("  - Farmacia venta ID: " + v.getUsuario().getFarmacia().getId() + 
+                                        ", Farmacia actual ID: " + farmaciaActual.getId());
+                    }
+                }
+                
+                return perteneceAFarmacia;
+            })
             .collect(Collectors.toList());
+        
+        System.out.println("Total ventas encontradas: " + ventas.size());
         
         // Aplicar filtros (usar las variables FINAL en el lambda)
         List<Ventas> ventasFiltradas = ventas.stream()
@@ -407,58 +437,123 @@ public class VentaController implements FarmySesion{
                             fechaFinFinal + "T" + (horaFinFinal != null ? horaFinFinal : "23:59"));
                         
                         if (v.getFechaVenta() != null) {
-                            pasaFiltro = pasaFiltro && 
-                                    !v.getFechaVenta().isBefore(fechaInicioCompleta) && 
-                                    !v.getFechaVenta().isAfter(fechaFinCompleta);
+                            boolean fechaValida = !v.getFechaVenta().isBefore(fechaInicioCompleta) && 
+                                                !v.getFechaVenta().isAfter(fechaFinCompleta);
+                            
+                            if (!fechaValida) {
+                                System.out.println("Venta ID " + v.getIdVenta() + " fuera de rango de fecha: " + 
+                                                v.getFechaVenta() + " no está entre " + fechaInicioCompleta + 
+                                                " y " + fechaFinCompleta);
+                            }
+                            
+                            pasaFiltro = pasaFiltro && fechaValida;
+                        } else {
+                            System.out.println("Venta ID " + v.getIdVenta() + " tiene fechaVenta null");
+                            pasaFiltro = false;
                         }
                     } catch (Exception e) {
                         // Si hay error en el parsing, ignorar filtro de fecha
                         System.out.println("Error parsing fecha: " + e.getMessage());
+                        e.printStackTrace();
                     }
                 }
                 
                 // Filtrar por tipo documento
                 if (tipoDocumentoFinal != null && !tipoDocumentoFinal.isEmpty() && !tipoDocumentoFinal.equals("todos")) {
-                    pasaFiltro = pasaFiltro && v.getCliente() != null && 
+                    boolean tipoDocValido = v.getCliente() != null && 
                             v.getCliente().getTipoDocumento() != null &&
                             v.getCliente().getTipoDocumento().name().equals(tipoDocumentoFinal);
+                    
+                    if (!tipoDocValido) {
+                        System.out.println("Venta ID " + v.getIdVenta() + " no pasa filtro tipo documento: " + tipoDocumentoFinal);
+                    }
+                    
+                    pasaFiltro = pasaFiltro && tipoDocValido;
                 }
                 
                 // Filtrar por número de documento
                 if (numeroDocumentoFinal != null && !numeroDocumentoFinal.isEmpty() && v.getCliente() != null) {
-                    pasaFiltro = pasaFiltro && v.getCliente().getNumeroDocumento().contains(numeroDocumentoFinal);
+                    boolean numDocValido = v.getCliente().getNumeroDocumento().contains(numeroDocumentoFinal);
+                    
+                    if (!numDocValido) {
+                        System.out.println("Venta ID " + v.getIdVenta() + " no pasa filtro número documento: " + numeroDocumentoFinal);
+                    }
+                    
+                    pasaFiltro = pasaFiltro && numDocValido;
                 }
                 
                 // Filtrar por nombre del cliente
                 if (nombreClienteFinal != null && !nombreClienteFinal.isEmpty() && v.getCliente() != null) {
-                    pasaFiltro = pasaFiltro && (v.getCliente().getNombre().toLowerCase().contains(nombreClienteFinal.toLowerCase()) ||
-                                            v.getCliente().getApellidos().toLowerCase().contains(nombreClienteFinal.toLowerCase()));
+                    boolean nombreValido = v.getCliente().getNombre().toLowerCase().contains(nombreClienteFinal.toLowerCase()) ||
+                                        v.getCliente().getApellidos().toLowerCase().contains(nombreClienteFinal.toLowerCase());
+                    
+                    if (!nombreValido) {
+                        System.out.println("Venta ID " + v.getIdVenta() + " no pasa filtro nombre cliente: " + nombreClienteFinal);
+                    }
+                    
+                    pasaFiltro = pasaFiltro && nombreValido;
                 }
                 
                 // Filtrar por método de pago
                 if (metodoPagoNombreFinal != null && !metodoPagoNombreFinal.isEmpty() && v.getMetodoPago() != null) {
-                    pasaFiltro = pasaFiltro && v.getMetodoPago().getNombreMetodoPago().equals(metodoPagoNombreFinal);
+                    boolean metodoPagoValido = v.getMetodoPago().getNombreMetodoPago().equals(metodoPagoNombreFinal);
+                    
+                    if (!metodoPagoValido) {
+                        System.out.println("Venta ID " + v.getIdVenta() + " no pasa filtro método pago: " + metodoPagoNombreFinal);
+                    }
+                    
+                    pasaFiltro = pasaFiltro && metodoPagoValido;
                 }
                 
                 // Filtrar por estado de venta
                 if (estadoVentaFinal != null && !estadoVentaFinal.isEmpty() && !estadoVentaFinal.equals("todos")) {
+                    boolean estadoValido = false;
+                    
                     if ("Registrada".equals(estadoVentaFinal)) {
-                        pasaFiltro = pasaFiltro && "Activo".equals(v.getEstado());
+                        estadoValido = "Activo".equals(v.getEstado());
                     } else if ("Anulada".equals(estadoVentaFinal)) {
-                        pasaFiltro = pasaFiltro && "Anulado".equals(v.getEstado());
+                        estadoValido = "Anulado".equals(v.getEstado());
                     } else if ("Pendiente".equals(estadoVentaFinal)) {
-                        pasaFiltro = pasaFiltro && v.getEstadoPago() == EstadoPago.PENDIENTE;
+                        estadoValido = v.getEstadoPago() == EstadoPago.PENDIENTE;
                     }
+                    
+                    if (!estadoValido) {
+                        System.out.println("Venta ID " + v.getIdVenta() + " no pasa filtro estado: " + estadoVentaFinal + 
+                                        ", Estado actual: " + v.getEstado() + 
+                                        ", EstadoPago: " + (v.getEstadoPago() != null ? v.getEstadoPago().name() : "null"));
+                    }
+                    
+                    pasaFiltro = pasaFiltro && estadoValido;
                 }
                 
                 // Filtrar por importe mínimo
                 if (importeMinimoFinal != null && importeMinimoFinal > 0 && v.getTotal() != null) {
-                    pasaFiltro = pasaFiltro && v.getTotal().doubleValue() >= importeMinimoFinal;
+                    boolean importeMinValido = v.getTotal().doubleValue() >= importeMinimoFinal;
+                    
+                    if (!importeMinValido) {
+                        System.out.println("Venta ID " + v.getIdVenta() + " no pasa filtro importe mínimo: " + 
+                                        importeMinimoFinal + ", Total: " + v.getTotal());
+                    }
+                    
+                    pasaFiltro = pasaFiltro && importeMinValido;
                 }
                 
                 // Filtrar por importe máximo
                 if (importeMaximoFinal != null && importeMaximoFinal > 0 && v.getTotal() != null) {
-                    pasaFiltro = pasaFiltro && v.getTotal().doubleValue() <= importeMaximoFinal;
+                    boolean importeMaxValido = v.getTotal().doubleValue() <= importeMaximoFinal;
+                    
+                    if (!importeMaxValido) {
+                        System.out.println("Venta ID " + v.getIdVenta() + " no pasa filtro importe máximo: " + 
+                                        importeMaximoFinal + ", Total: " + v.getTotal());
+                    }
+                    
+                    pasaFiltro = pasaFiltro && importeMaxValido;
+                }
+                
+                if (pasaFiltro) {
+                    System.out.println("Venta ID " + v.getIdVenta() + " PASA TODOS LOS FILTROS");
+                } else {
+                    System.out.println("Venta ID " + v.getIdVenta() + " NO PASA FILTROS");
                 }
                 
                 return pasaFiltro;
@@ -491,9 +586,14 @@ public class VentaController implements FarmySesion{
             })
             .collect(Collectors.toList());
         
+        System.out.println("=== RESULTADOS FILTRADOS ===");
+        System.out.println("Total ventas originales: " + ventas.size());
+        System.out.println("Total ventas filtradas: " + ventasFiltradas.size());
+        System.out.println("===========================");
+        
         // Agregar datos al modelo
         model.addAttribute("ventas", ventasFiltradas);
-        model.addAttribute("clientes", clienteRepository.findByFarmacia(getFarmaciaActual(session)));
+        model.addAttribute("clientes", clienteRepository.findByFarmacia(farmaciaActual));
         model.addAttribute("metodosPago", metodoPagoRepository.findAll());
         
         // Mantener valores de filtros (usar las variables originales, no las final)
