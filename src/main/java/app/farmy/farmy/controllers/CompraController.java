@@ -181,6 +181,10 @@ public class CompraController implements FarmySesion {
             }
         }
 
+        if (compra.getTipoCompra() == TipoCompra.CONTADO) {
+            compra.setSaldoPendiente(BigDecimal.ZERO);
+            compra.setEstadoPago(EstadoPago.PAGADO);
+        }
         /*
          * Ejemplo del JSON
          * 

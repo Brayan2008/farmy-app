@@ -110,6 +110,7 @@ public class ProductosController implements FarmySesion{
             } else {
                 producto.setImgUrl(productoExistente.getImgUrl());
             }
+            producto.setFarmacia(productoExistente.getFarmacia());
             producto.setFechaRegistro(productoExistente.getFechaRegistro());
 
             productosRepository.save(producto);

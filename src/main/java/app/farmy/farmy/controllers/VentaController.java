@@ -225,7 +225,7 @@ public class VentaController implements FarmySesion{
             venta.setSaldoPendiente(BigDecimal.ZERO);
             venta.setEstadoPago(EstadoPago.PAGADO);
         }
-
+        venta.setFarmacia(getFarmaciaActual(session));
         venta.setUsuario(getUsuarioActual(session));
         ventasRepository.save(venta);
 

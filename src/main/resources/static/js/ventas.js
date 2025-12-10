@@ -152,8 +152,9 @@ function updateTotals() {
     // Assuming prices include IGV or logic is similar to purchases
     // For sales, usually price is final. Let's assume price includes IGV for display.
     // Or if we need to calculate IGV separately:
-    const subtotal = total / 1.18;
-    const igv = total - subtotal;
+    const subtotal = total;
+    const igv = total * 0.18; // 18% IGV
+    total = subtotal + igv;
 
     document.getElementById('subtotal').innerText = subtotal.toFixed(2);
     document.getElementById('igv').innerText = igv.toFixed(2);

@@ -25,8 +25,7 @@
                 <!-- Left: Products grid -->
                 <div
                     class="css-mover-arriba h-96 md:col-span-2 shadow-xl shadow-black/60 p-5 mb-5 rounded-xl md:h-auto overflow-y-scroll">
-                    <h2 class="font-bold text-2xl mb-4">Productos</h2>
-                    <div th:replace="~{fragments/search.html :: search-fragment('Productos', 'Paracetamol')}"></div>
+                    <h2 class="font-bold text-2xl mb-4">Productos Disponibles</h2>
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 mt-10">
                         <div th:each="p : ${productos}"
                             class="rounded-md shadow-xl shadow-gray-600/60 hover:scale-110 cursor-pointer transition-transform duration-150">
@@ -86,18 +85,17 @@
                                 <input type="date" id="fechaVencimientoId" name="fechaVencimiento" class="form-input"
                                     placeholder="Seleccione fecha">
                             </div>
-
                             <label id="metodoPagoLabel">Metodo de pago : </label>
                             <select id="metodoPagoSelect" th:field="*{compra.metodoPago}" class="form-input" required>
                                 <option value="">-- Seleccione metodo de pago --</option>
-                                <option th:each="mp : ${metodosPago}" th:value="${mp.idMetodoPago}"
+                                <option th:each="mp : ${metodosPago}" th:if="${mp.estado != 'Inactivo'}" th:value="${mp.idMetodoPago}"
                                     th:text="${mp.nombreMetodoPago}"></option>
                             </select>
 
                             <label>Proveedor: </label>
                             <select id="proveedorSelect" th:field="*{compra.proveedor}" class="form-input">
                                 <option value="">-- Seleccione proveedor --</option>
-                                <option th:each="pr : ${proveedores}" th:value="${pr.idProveedor}"
+                                <option th:each="pr : ${proveedores}" th:if="${pr.estado != 'Inactivo'}" th:value="${pr.idProveedor}"
                                     th:text="${pr.razonSocial}"></option>
                             </select>
                         </div>
