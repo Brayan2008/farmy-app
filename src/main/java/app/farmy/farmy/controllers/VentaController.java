@@ -88,7 +88,8 @@ public class VentaController implements FarmySesion{
         model.addAttribute("listaVentas", ventasRepository.findAll().stream().filter(v -> v.getUsuario().getFarmacia().getId() == getFarmaciaActual(session).getId()).toList());
         model.addAttribute("metodosPago", metodoPagoRepository.findAll());
         model.addAttribute("ventaPago", new VentaPago());
-        model.addAttribute("estado_caja_usuario",false);
+        boolean cajaAbierta = Boolean.TRUE.equals(session.getAttribute(Arqueo.SESSION_CAJA_ABIERTA));
+        model.addAttribute("estado_caja_usuario", cajaAbierta);
         return "home/ventas/ventas";
     }
 

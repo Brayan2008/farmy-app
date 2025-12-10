@@ -22,12 +22,28 @@
                           header-info(${estado_caja_usuario}? 'Cerrar caja':'Aperturar caja', ${estado_caja_usuario}? 'Caja > Cerrar' : ' Caja > Aperturar')}"></div>
 
         <div class="container">
-            
-            <div class=" flex flex-col items-center w-full h-full">
 
-                <h2 class="text-2xl mb-40 font-bold" th:text="${estado_caja_usuario}? 'Cerrar caja':'Aperturar caja'"></h2>
-                <input type="text" class=" mb-6 w-80 border-2 border-purple-900 p-1.5 rounded-md" th:placeholder="${estado_caja_usuario}? 'Ingrese el monto con el que cerrará la caja' : 'Ingrese el monto con el que aperturará la caja'" >
-                <button class="btn-nuevo w-36 " th:text="${estado_caja_usuario}? 'Cerrar' : 'Aperturar'"></button>
+            <div class="flex flex-col items-center w-full h-full gap-4">
+                <div th:if="${mensajeExito}" class="w-full max-w-md px-4 py-3 text-green-900 bg-green-100 rounded">
+                    <span th:text="${mensajeExito}"></span>
+                </div>
+                <div th:if="${mensajeError}" class="w-full max-w-md px-4 py-3 text-red-900 bg-red-100 rounded">
+                    <span th:text="${mensajeError}"></span>
+                </div>
+
+                <h2 class="text-2xl mb-6 font-bold" th:text="${estado_caja_usuario}? 'Cerrar caja':'Aperturar caja'"></h2>
+
+                <form th:action="@{${estado_caja_usuario} ? '/arqueo/cierre' : '/arqueo/apertura'}" method="post"
+                      class="flex flex-col items-center gap-4 w-full max-w-md">
+                    <input name="monto" type="number" step="0.01" min="0"
+                           class="w-full border-2 border-purple-900 p-2 rounded-md"
+                           th:placeholder="${estado_caja_usuario}? 'Ingrese el monto con el que cerrará la caja' : 'Ingrese el monto con el que aperturará la caja'"
+                           th:value="${estado_caja_usuario} ? '' : monto_apertura"
+                           required>
+                    <button type="submit" class="btn-nuevo w-36" th:text="${estado_caja_usuario}? 'Cerrar' : 'Aperturar'"></button>
+                </form>
+
+                <a class="text-purple-900 underline mt-4" th:href="@{/ventas}">Volver a ventas</a>
             </div>
 
         </div>
