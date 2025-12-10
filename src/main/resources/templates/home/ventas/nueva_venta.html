@@ -91,8 +91,10 @@
                                 <label class="text-sm font-semibold">Cliente:</label>
                                 <select id="clienteSelect" class="form-input w-full" required>
                                     <option value="">-- Seleccione Cliente --</option>
-                                    <option th:each="c : ${clientes}" th:value="${c.idCliente}"
-                                        th:text="${c.nombre + ' ' + c.apellidos}"></option>
+                                    <option th:each="c : ${clientes}" 
+                                            th:if="${c.estado != 'Inactivo'}"
+                                            th:value="${c.idCliente}"
+                                            th:text="${c.nombre + ' ' + c.apellidos}"></option>
                                 </select>
                             </div>
 
@@ -129,8 +131,10 @@
                                 <label id="metodoPagoLabel" class="text-sm font-semibold">Método de Pago:</label>
                                 <select id="metodoPagoSelect" class="form-input w-full" required>
                                     <option value="">-- Seleccione --</option>
-                                    <option th:each="mp : ${metodosPago}" th:value="${mp.idMetodoPago}"
-                                        th:text="${mp.nombreMetodoPago}"></option>
+                                    <option th:each="mp : ${metodosPago}" 
+                                            th:if="${mp.estado == 'Activo'}"
+                                            th:value="${mp.idMetodoPago}"
+                                            th:text="${mp.nombreMetodoPago}"></option>
                                 </select>
                             </div>
                         </div>

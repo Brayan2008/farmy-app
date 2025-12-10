@@ -88,3 +88,24 @@ function aplicarFiltros() {
         }
     }
 }
+function filtrarProductos() {
+    const searchInput = document.getElementById('search-products');
+    const searchText = searchInput ? searchInput.value.toLowerCase() : '';
+    
+    const gridContainer = document.querySelector('.grid.grid-cols-1');
+    if (gridContainer) {
+        const cards = gridContainer.children;
+        for (let i = 0; i < cards.length; i++) {
+            const card = cards[i];
+            if (card.nodeType !== 1) continue;
+
+            const text = (card.textContent || card.innerText).toLowerCase();
+            
+            if (text.indexOf(searchText) > -1) {
+                card.style.display = "";
+            } else {
+                card.style.display = "none";
+            }
+        }
+    }
+}

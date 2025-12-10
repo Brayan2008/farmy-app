@@ -58,9 +58,9 @@
                 <div class="product-price">S/ <span th:text="${producto.precioVenta}">0.00</span></div>
                 
                 <div class="product-meta">
-                    <p><strong>Categoría:</strong> <span th:text="${producto.producto.categoria.nombreCategoria}">Categoría</span></p>
-                    <p><strong>Presentación:</strong> <span th:text="${producto.producto.presentacion.nombre}">Presentación</span></p>
-                    <p><strong>Laboratorio:</strong> <span th:text="${producto.producto.laboratorio.nombre}">Laboratorio</span></p>
+                    <p th:if="${producto.producto.categoria != null}"><strong>Categoría:</strong> <span th:text="${producto.producto.categoria.nombreCategoria}">Categoría</span></p>
+                    <p th:if="${producto.producto.presentacion != null}"><strong>Presentación:</strong> <span th:text="${producto.producto.presentacion.nombre}">Presentación</span></p>
+                    <p th:if="${producto.producto.laboratorio != null}"><strong>Laboratorio:</strong> <span th:text="${producto.producto.laboratorio.nombre}">Laboratorio</span></p>
                     <p><strong>Stock disponible:</strong> <span th:text="${producto.cantidadActual}">0</span></p>
                 </div>
                 

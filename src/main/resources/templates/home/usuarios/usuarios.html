@@ -46,9 +46,9 @@
                             <td th:text="${usuario.email}"></td>
                             <td th:text="${usuario.nombreCompleto}"></td>
                             <td th:text="${usuario.telefono == null ? 'N/A' : usuario.telefono}"></td>
-                            <td th:text="${usuario.fechaCreacion}"></td>
-                            <td th:text="${usuario.fechaUltimoAcceso}"></td>
-                            <td><span class="activo" th:text="${usuario.estado}"></span></td>
+                            <td th:text="${#temporals.format(usuario.fechaCreacion, 'dd/MM/yy HH:mm')}"></td>
+                            <td th:text="${#temporals.format(usuario.fechaUltimoAcceso, 'dd/MM/yy HH:mm')}"></td>
+                            <td><span class="activo" th:classappend="${usuario.estado == 'Activo' ? 'activo' : 'inactivo'}" th:text="${usuario.estado}"></span></td>
                             <td><span class="rol" th:text="${usuario.rol.nombreRol}"></span></td>
                             <td>
                                 <form th:action="@{/usuarios/editar/{id}(id=${usuario.idUsuario})}" method="get">

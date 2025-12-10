@@ -78,15 +78,11 @@
             </div>
             <div class="form-row">
                 <label>RUC</label>
-                <input type="text" id="ruc" required maxlength="20">
+                <input type="text" id="ruc" required maxlength="11" pattern="\d{11}" title="El RUC debe tener 11 dígitos numéricos">
             </div>
             <div class="form-row">
                 <label>Dirección</label>
                 <input type="text" id="direccion">
-            </div>
-            <div class="form-row">
-                <label>Teléfono</label>
-                <input type="text" id="telefono">
             </div>
             <div class="form-row">
                 <label>Logo / Imagen</label>
@@ -248,6 +244,7 @@
         $('#formFarmacia')[0].reset();
         $('#farmaciaId').val('');
         $('#modalTitle').text('Registrar Farmacia');
+        $('#ruc').prop('readonly', false).css('background-color', 'white'); // Habilitar RUC
         $('#modalFarmacia').css('display', 'flex');
     }
 
@@ -256,6 +253,7 @@
             $('#farmaciaId').val(f.id);
             $('#nombre').val(f.nombreComercial);
             $('#ruc').val(f.ruc);
+            $('#ruc').prop('readonly', true).css('background-color', '#e9ecef'); // Bloquear RUC
             $('#direccion').val(f.direccion);
             $('#telefono').val(f.telefono);
             // No podemos setear el valor de un input file por seguridad

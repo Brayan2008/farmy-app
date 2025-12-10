@@ -24,6 +24,7 @@ import app.farmy.farmy.model.Ventas;
 import app.farmy.farmy.repository.ClienteRepository;
 import app.farmy.farmy.repository.FarmaciaRepository;
 import app.farmy.farmy.repository.LoteRepository;
+import app.farmy.farmy.repository.UsuarioRepository;
 import app.farmy.farmy.repository.VentaDetalleRepository;
 import app.farmy.farmy.repository.VentasRepository;
 
@@ -42,6 +43,9 @@ public class TiendaApiController {
 
     @Autowired
     private LoteRepository loteRepository;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     @Autowired
     private FarmaciaRepository farmaciaRepository;
@@ -119,6 +123,7 @@ public class TiendaApiController {
             venta.setIgv(igv);
             venta.setSaldoPendiente(total);
             venta.setFarmacia(farmacia);
+            venta.setUsuario(usuarioRepository.findByEmail("farmacia" + farmacia.getId() + "@farmy.com").get());
             ventasRepository.save(venta);
 
             return ResponseEntity.ok().body("Pedido registrado con éxito. ID: " + venta.getIdVenta());

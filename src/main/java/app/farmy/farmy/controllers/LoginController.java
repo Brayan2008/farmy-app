@@ -1,5 +1,6 @@
 package app.farmy.farmy.controllers;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import app.farmy.farmy.dto.LoginRequest;
 import app.farmy.farmy.model.Usuario;
+import app.farmy.farmy.repository.UsuarioRepository;
 import app.farmy.farmy.services.UsuarioService;
 
 import jakarta.servlet.http.HttpSession;
@@ -23,6 +25,8 @@ public class LoginController {
     @Autowired
     private UsuarioService usuarioService;
 
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     Logger logger = Logger.getLogger(LoginController.class.getName());
 
@@ -44,7 +48,14 @@ public class LoginController {
         Usuario usuario = usuarioService.validarCredenciales(request.getEmail(), request.getPassword());
 
         if (usuario != null) {
+            if ("Inactivo".equalsIgnoreCase(usuario.getEstado())) {
+                return ResponseEntity.status(401).body("El usuario se encuentra inactivo. Contacte al administrador.");
+            }
+
             logger.info("Usuario Logueado: "  + usuario.getEmail());
+
+            usuario.setFechaUltimoAcceso(LocalDateTime.now());
+            usuarioRepository.save(usuario);
             // Guardamos el usuario en la sesión del servidor
             session.setAttribute("usuarioLogueado", usuario);
 

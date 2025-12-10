@@ -42,9 +42,13 @@ public class MarcaController implements FarmySesion{
    @PostMapping("/add_marca")
     public ResponseEntity<String> add_marca(@RequestBody Marca marca, HttpSession session) {  // ← @RequestBody para JSON
         try {
-            marca.setFarmacia(getFarmaciaActual(session));
-            marcaRepository.save(marca);
-            return ResponseEntity.ok("Marca agregada exitosamente");
+            if (marca.getNombreMarca() != null || !marca.getNombreMarca().isEmpty() || !marca.getNombreMarca().isBlank()) {
+                marca.setFarmacia(getFarmaciaActual(session));
+                marcaRepository.save(marca);
+                return ResponseEntity.ok("Marca agregada exitosamente");
+            } else {
+                return ResponseEntity.badRequest().body("El nombre de la marca es requerido");
+            }
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error al guardar marca");
         }
@@ -53,8 +57,12 @@ public class MarcaController implements FarmySesion{
     @PutMapping("/update_marca")
     public ResponseEntity<String> updateMarca(@RequestBody Marca marca) {
         try {
-            if (marcaRepository.existsById(marca.getIdMarca())) {
-                marcaRepository.save(marca);
+            var getMarca = marcaRepository.findById(marca.getIdMarca()).get();
+            if (getMarca != null) {
+                getMarca.setNombreMarca(marca.getNombreMarca());
+                getMarca.setDescripcion(marca.getDescripcion());
+                getMarca.setEstado(marca.getEstado());
+                marcaRepository.save(getMarca);
                 return ResponseEntity.ok("Marca actualizada exitosamente");
             } else {
                 return ResponseEntity.badRequest().body("Marca no encontrada");

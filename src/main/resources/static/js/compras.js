@@ -240,7 +240,6 @@ function abrirConfirmarRegistro() {
     }
     document.getElementById('formMontoPagoInicial').value = initialPayment;
 
-    alert(fechaVencimiento)
     // construir itemsJson desde el carrito
 
     const items = cart.map(it => ({

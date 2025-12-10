@@ -4,6 +4,7 @@ import app.farmy.farmy.dto.UsuarioRegistroDTO;
 
 import app.farmy.farmy.model.Farmacia;
 import app.farmy.farmy.model.Usuario;
+import app.farmy.farmy.repository.FarmaciaRepository;
 import app.farmy.farmy.services.FarmaciaService;
 import app.farmy.farmy.services.UsuarioService;
 import app.farmy.farmy.services.FarmaciaService.SalidaFarmaciaDTO;
@@ -30,6 +31,9 @@ public class SuperAdminApiController {
     @Autowired
     private UsuarioService usuarioService;
 
+    @Autowired
+    private FarmaciaRepository farmaciaRepository;
+
     @GetMapping
     public List<SalidaFarmaciaDTO> listar() {
         return farmaciaService.listarTodas();
@@ -50,9 +54,24 @@ public class SuperAdminApiController {
             @RequestParam("telefono") String telefono,
             @RequestParam(value = "imagen", required = false) MultipartFile imagen) {
         
-        Farmacia farmacia = new Farmacia();    
+        Farmacia farmacia;
+        if (id != null) {
+            // Modo Edición: Buscamos la existente usando el repositorio
+            farmacia = farmaciaRepository.findById(id).orElse(null);
+            if (farmacia == null) return ResponseEntity.notFound().build();
+            
+            // No necesitamos setear ID ni RUC manualmente si ya tenemos la entidad persistente
+            // El RUC no se debe cambiar si es edición (o validarse si se permite)
+            // farmacia.setRuc(ruc); // Opcional: Si quieres permitir cambiarlo, pero cuidado con duplicados
+        } else {
+            farmacia = new Farmacia();
+            farmacia.setRuc(ruc); // Solo seteamos RUC si es nueva
+        }
+
         farmacia.setNombreComercial(nombreComercial);
-        farmacia.setRuc(ruc);
+        // farmacia.setRuc(ruc); // Movemos esto al else o validamos
+        if (id == null) farmacia.setRuc(ruc); // Aseguramos que solo se setee en creación o si decides permitir edición
+        
         farmacia.setDireccion(direccion);
         farmacia.setTelefono(telefono);
 

@@ -2,6 +2,8 @@ package app.farmy.farmy.services;
 
 import app.farmy.farmy.model.Farmacia;
 import app.farmy.farmy.repository.FarmaciaRepository; // Asegúrate de crear esta interfaz si no existe (vacía extends JpaRepository)
+import app.farmy.farmy.repository.UsuarioRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -11,6 +13,9 @@ public class FarmaciaService {
 
     @Autowired
     private FarmaciaRepository farmaciaRepository;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     public List<SalidaFarmaciaDTO> listarTodas() {
         return farmaciaRepository.findAll().stream()
@@ -36,6 +41,10 @@ public class FarmaciaService {
         if (farmacia != null) {
             farmacia.setEstado(!farmacia.getEstado()); // Invierte el estado (True <-> False)
             farmaciaRepository.save(farmacia);
+
+            usuarioRepository.findByFarmacia(farmacia).forEach( u -> { u.setEstado(farmacia.getEstado() ? "Activo" : "Inactivo");
+                usuarioRepository.save(u);
+             });
         }
     }
 

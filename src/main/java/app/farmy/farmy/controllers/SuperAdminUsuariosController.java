@@ -8,7 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/superadmin/usuarios")
@@ -50,33 +52,39 @@ public class SuperAdminUsuariosController {
     // 2. OBTENER UNO (Para editar)
     @GetMapping("/{id}")
     public ResponseEntity<?> obtenerUsuario(@PathVariable int id) {
-        Usuario u = usuarioRepository.findById(id).orElse(null);
-        if (u == null) return ResponseEntity.notFound().build();
-        
-        // Devolvemos solo lo necesario para editar
-        return ResponseEntity.ok(u); // Aquí Jackson serializará. Si falla por farmacia, usa DTO. 
-        // Si tienes JsonIgnoreProperties en Usuario.java funcionará bien.
+        return usuarioRepository.findById(id)
+            .map(u -> {
+                Map<String, Object> dto = new HashMap<>();
+                dto.put("id", u.getIdUsuario());
+                dto.put("nombreCompleto", u.getNombreCompleto());
+                dto.put("email", u.getEmail());
+                return ResponseEntity.ok(dto);
+            })
+            .orElse(ResponseEntity.notFound().build());
     }
 
     // 3. ACTUALIZAR INFORMACIÓN
     @PutMapping
-    public ResponseEntity<?> actualizarUsuario(@RequestBody Usuario usuarioEditado) {
-        Usuario u = usuarioRepository.findById(usuarioEditado.getIdUsuario()).orElse(null);
-        
-        if (u == null) return ResponseEntity.notFound().build();
+    public ResponseEntity<?> actualizarUsuario(@RequestBody Map<String, Object> request) {
+        try {
+            int id = Integer.parseInt(request.get("id").toString());
+            Usuario u = usuarioRepository.findById(id).orElse(null);
+            
+            if (u == null) return ResponseEntity.notFound().build();
 
-        // Actualizamos datos básicos
-        u.setNombreCompleto(usuarioEditado.getNombreCompleto());
-        u.setEmail(usuarioEditado.getEmail());
-        
-        // LÓGICA DE CONTRASEÑA:
-        // Solo la cambiamos si el campo NO está vacío y NO es nulo.
-        if (usuarioEditado.getPassword() != null && !usuarioEditado.getPassword().trim().isEmpty()) {
-            u.setPassword(usuarioEditado.getPassword());
+            u.setNombreCompleto((String) request.get("nombreCompleto"));
+            u.setEmail((String) request.get("email"));
+            
+            String newPass = (String) request.get("password");
+            if (newPass != null && !newPass.trim().isEmpty()) {
+                u.setPassword(newPass);
+            }
+            
+            usuarioRepository.save(u);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
-        
-        usuarioRepository.save(u);
-        return ResponseEntity.ok().build();
     }
 
     // 4. CAMBIAR ESTADO (Bloquear/Desbloquear)

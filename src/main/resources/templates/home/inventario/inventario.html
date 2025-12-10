@@ -39,7 +39,6 @@
                             <tr>
                                 <th>Producto</th>
                                 <th>Lote</th>
-                                <th>Usuario</th>
                                 <th>F. Vencimiento</th>
                                 <th>P. Compra</th>
                                 <th>P. Venta</th>
@@ -52,7 +51,6 @@
                             <tr th:each="l : ${lotes}">
                                 <td data-label="Producto" th:text="${l.producto.nombreProducto}"></td>
                                 <td data-label="Lote" th:text="${l.numeroLote}"></td>
-                                <td data-label="Usuario" th:text="${(!l.compras.isEmpty() and l.compras[0].usuario != null and l.compras[0].usuario.nombreUsuario != null) ? l.compras[0].usuario.nombreUsuario : '---'}"></td>
                                 <td data-label="F. Vencimiento" th:text="${#temporals.format(l.fechaVencimiento, 'dd/MM/yyyy')}"></td>
                                 <td data-label="P. Compra" th:text="${l.precioCompra}"></td>
                                 <td data-label="P. Venta" th:text="${l.precioVenta}"></td>
@@ -89,14 +87,6 @@
                             <option value="">Seleccione Lote...</option>
                             <option th:each="l : ${lotes}" th:value="${l.idLote}" 
                                     th:text="${l.producto.nombreProducto + ' - ' + l.numeroLote + ' (Stock: ' + l.cantidadActual + ')'}"></option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="usuario">Usuario *</label>
-                        <select th:field="*{usuario}" class="form-select" required>
-                            <option value="">Seleccione Usuario...</option>
-                            <option th:each="u : ${usuarios}" th:value="${u.idUsuario}" th:text="${u.nombreUsuario}"></option>
                         </select>
                     </div>
 

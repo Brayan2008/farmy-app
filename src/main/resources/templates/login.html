@@ -7,6 +7,7 @@
     <title>Login - Sistema de Gestión PHARMAHORRO</title>
     <link rel="stylesheet" th:href="@{/css/login.css}">
     <script th:src="@{/jquery.js}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -75,7 +76,15 @@
                         }
                     },
                     error: function (xhr) {
-                        $('#mensajeError').text(xhr.responseText || "Error de credenciales").fadeIn();
+                        let mensaje = xhr.responseText || "Error de credenciales";
+                        
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error de inicio de sesión',
+                            text: mensaje,
+                            confirmButtonText: 'Intentar de nuevo',
+                            confirmButtonColor: '#d33'
+                        });
                     }
                 });
             });

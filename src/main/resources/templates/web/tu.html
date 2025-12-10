@@ -97,16 +97,32 @@
         <div class="form-row">
             <div class="form-group">
                 <label>Tipo de documento</label>
-                <select id="tipoDocumento">
+                <select id="tipoDocumento" onchange="updateDocLimit()">
                     <option value="DNI">DNI</option>
                     <option value="RUC">RUC</option>
-                    <option value="CE">CE</option>
                 </select>
             </div>
             <div class="form-group">
                 <label>Número de documento</label>
-                <input type="text" id="numeroDocumento" required placeholder="Número de documento" />
+                <input type="text" id="numeroDocumento" required placeholder="Número de documento" maxlength="8" pattern="\d*" oninput="this.value = this.value.replace(/[^0-9]/g, '')"/>
             </div>
+            <script>
+                function updateDocLimit() {
+                    const tipo = document.getElementById('tipoDocumento').value;
+                    const input = document.getElementById('numeroDocumento');
+                    if (tipo === 'DNI') {
+                        input.maxLength = 8;
+                        input.placeholder = "8 dígitos";
+                    } else {
+                        input.maxLength = 11;
+                        input.placeholder = "11 dígitos";
+                    }
+                    // Limpiar si excede el nuevo límite
+                    if (input.value.length > input.maxLength) {
+                        input.value = input.value.slice(0, input.maxLength);
+                    }
+                }
+            </script>
         </div>
 
         <div class="form-row">

@@ -51,8 +51,10 @@ public class InventarioController implements FarmySesion {
     @GetMapping("/movimientos")
     public String listarMovimientos(Model model, HttpSession session) {
         List<InventarioMovimiento> movimientos = inventarioMovimientoRepository.findAll().stream()
-                .filter(mov -> mov.getUsuario().getFarmacia() == getFarmaciaActual(session))
+                .filter(mov -> mov.getUsuario().getFarmacia().getId() == getFarmaciaActual(session).getId())
                 .toList();
+
+                System.out.println(movimientos.size() + "\n".repeat(10));
         model.addAttribute("movimientos", movimientos);
         return "home/inventario/movimientos";
     }
